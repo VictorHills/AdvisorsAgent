@@ -10,10 +10,8 @@ class AdminStudentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Students::first();
-
         $perPage = $request->get('per_page', 10);
-        $students = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $students = Students::latest()->paginate($perPage);
 
         return StudentsResource::collection($students);
     }
