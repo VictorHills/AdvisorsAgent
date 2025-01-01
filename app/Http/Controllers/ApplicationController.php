@@ -9,9 +9,12 @@ use App\Mail\CreateApplicationEmail;
 use App\Models\ApplicationStatus;
 use App\Models\StudentApplications;
 use App\Models\Students;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Storage;
 use Throwable;
 
 class ApplicationController extends Controller
@@ -84,8 +87,13 @@ class ApplicationController extends Controller
             }
 
             $application->refresh();
-            Mail::to($student->email)->bcc([config('app.admin_email'), config('app.counselor_email'), auth()->user()->email])
-                ->send(new CreateApplicationEmail($application));
+
+            try {
+                Mail::to($student->email)->bcc([config('app.admin_email'), config('app.counselor_email'), auth()->user()->email])
+                    ->send(new CreateApplicationEmail($application));
+            } catch (Exception $exception) {
+                Log::debug('Email could not be sent: ' . $exception->getMessage());
+            }
 
             return $this->respondSuccessWithData(message: 'Application created successfully', data: new ApplicationResource($application));
         });
@@ -102,7 +110,7 @@ class ApplicationController extends Controller
 
             foreach ($updateStudentApplicationRequest->file('application_documents') as $file) {
                 if ($file->isValid()) {
-                    $path = $file->store("uploads/applications/$application->id", 'public');
+                    $path = $file->store('uploads', 'public');
                     $filePaths[] = $path;
                 }
             }
@@ -128,5 +136,58 @@ class ApplicationController extends Controller
     {
         $applicationStatuses = ApplicationStatus::get(['id', 'status_name', 'status_code']);
         return $this->respondSuccessWithData(message: 'Application statuses retrieved successfully', data: $applicationStatuses);
+    }
+
+    public function updateApplicationDocument(int $id, Request $request)
+    {
+        $application = StudentApplications::find($id);
+
+        if (!$application) {
+            return $this->respondWithError(message: 'Application not found');
+        }
+
+        if (!$request->update_type) {
+            return $this->respondWithError(message: 'Update type is required');
+        }
+
+        if ($request->update_type === 'delete') {
+
+            if (!$request->document_name) {
+                return $this->respondWithError(message: 'Document name is required for deletion');
+            }
+
+            $documentToDelete = 'uploads/' . $request->document_name;
+            $documents = $application->application_documents ?? [];
+            $documents = array_values(array_filter($documents, fn($doc) => $doc !== $documentToDelete));
+
+            if (Storage::disk('public')->exists($documentToDelete)) {
+                Storage::disk('public')->delete($documentToDelete);
+            }
+
+            $application->application_documents = $documents;
+            $application->save();
+            return $this->respondSuccess(message: 'Document deleted successfully');
+        }
+
+        if ($request->update_type === 'update') {
+            $newPaths = [];
+            if ($request->hasFile('application_documents')) {
+                foreach ($request->file('application_documents') as $file) {
+                    if ($file->isValid()) {
+                        $newPaths[] = $file->store('uploads', 'public');
+                    }
+                }
+            }
+
+            $application->application_documents = array_merge(
+                $application->application_documents ?? [],
+                $newPaths
+            );
+
+            $application->save();
+            return $this->respondSuccess(message: 'Documents updated successfully');
+        }
+
+        return $this->respondWithError(message: 'Invalid update type');
     }
 }
