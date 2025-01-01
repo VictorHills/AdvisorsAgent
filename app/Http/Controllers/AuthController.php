@@ -8,6 +8,8 @@ use App\Mail\AdminEmail;
 use App\Mail\OtpMail;
 use App\Mail\WelcomeMail;
 use App\Models\OTP;
+use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,8 +27,13 @@ class AuthController extends Controller
 
         //send email to user and admin
         $user_full_name = $user->first_name . ' ' . $user->last_name;
-        Mail::to($user->email)->send(new WelcomeMail(user_full_name: $user_full_name, email: $user->email));
-        Mail::to(config('app.admin_email'))->cc(config('app.counselor_email'))->send(new AdminEmail(user: $user));
+
+        try {
+            Mail::to($user->email)->send(new WelcomeMail(user_full_name: $user_full_name, email: $user->email));
+            Mail::to(config('app.admin_email'))->cc(config('app.counselor_email'))->send(new AdminEmail(user: $user));
+        } catch (Exception $exception) {
+            Log::debug('Email could not be sent: ' . $exception->getMessage());
+        }
 
         return response()->json([
             'user' => $user,
@@ -54,6 +61,11 @@ class AuthController extends Controller
             }
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
+        }
+
+        $user = auth()->user();
+        if ($user->role_name == 'bdm-officer') {
+            return $this->respondUnauthorized('This user is not allowed to login');
         }
 
         $data = [
