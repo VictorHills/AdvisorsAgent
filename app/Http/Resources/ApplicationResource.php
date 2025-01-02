@@ -33,10 +33,10 @@ class ApplicationResource extends JsonResource
         ] ?? null;
 
         $response['schools_of_choice_details'] = Universities::whereIn('id', $this->schools_of_choice ?? [])
-            ->get(['id', 'name', 'logo']);
+            ->get(['id', 'name', 'logo'])->toArray();
 
         $response['country_of_preference_details'] = Countries::whereIn('id', $this->country_of_preference ?? [])
-            ->get(['id', 'name', 'currency']);
+            ->get(['id', 'name', 'currency'])->toArray();
 
         return $response;
     }
