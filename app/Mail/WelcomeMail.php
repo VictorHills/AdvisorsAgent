@@ -16,11 +16,11 @@ class WelcomeMail extends Mailable
 
     public string $login_url;
 
-    public function __construct($user_full_name, $email, $login_url = null)
+    public function __construct($user_full_name, $email)
     {
         $this->user_full_name = $user_full_name;
         $this->email = $email;
-        $this->login_url = $login_url ?? config('app.url') . '/login';
+        $this->login_url = config('app.url');
     }
 
     public function build(): WelcomeMail
