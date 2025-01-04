@@ -1,18 +1,21 @@
 <template>
     <div id="app" class="min-h-screen bg-background text-foreground">
-        <Navigation v-if="showNavigation" />
-        <router-view :key="$route.fullPath" />
+        <Navigation v-if="showNavigation"/>
+        <InternetConnectivity/>
+        <router-view :key="$route.fullPath"/>
     </div>
 </template>
 
 <script>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import {computed} from 'vue';
+import {useRoute} from 'vue-router';
 import Navigation from './Navigation.vue';
+import InternetConnectivity from "./InternetConnectivity.vue";
 
 export default {
     name: 'App',
     components: {
+        InternetConnectivity,
         Navigation
     },
     setup() {
