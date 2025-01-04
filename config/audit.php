@@ -190,7 +190,7 @@ return [
     | Audit Console
     |--------------------------------------------------------------------------
     |
-    | Whether console events should be audited (eg. php artisan db:seed).
+    | Whether console events should be audited (e.g. php artisan db:seed).
     |
     */
 
