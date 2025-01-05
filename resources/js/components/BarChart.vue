@@ -18,7 +18,8 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const props = defineProps({
-    data: {type: Object, required: true}
+    data: {type: Object, required: true},
+    label: {type: String, default: 'Default Label'}
 })
 
 const formattedData = computed(() => {
@@ -28,7 +29,7 @@ const formattedData = computed(() => {
         labels: props.data.labels,
         datasets: [
             {
-                label: props.data.label || 'Default Label',
+                label: props.label,
                 data: props.data.data,
                 backgroundColor: '#6366F1',
                 borderColor: '#4F46E5',
