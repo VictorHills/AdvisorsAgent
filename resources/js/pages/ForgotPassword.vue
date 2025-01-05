@@ -313,7 +313,7 @@ export default {
                 });
                 currentStep.value = 2;
             } catch (err) {
-                error.value = err.response?.data?.message || 'Failed to send reset code. Please try again.';
+                error.value = err.response?.data?.message || err.response?.data?.error.message || 'Failed to send reset code. Please try again.';
             } finally {
                 loading.value = false;
             }
@@ -343,7 +343,7 @@ export default {
                 });
                 currentStep.value = 3;
             } catch (err) {
-                error.value = err.response?.data?.message || 'Failed to reset password. Please try again.';
+                error.value = err.response?.data?.message || err.response?.data?.error.message || 'Failed to reset password. Please try again.';
             } finally {
                 loading.value = false;
             }
