@@ -93,8 +93,7 @@
                         </thead>
 
                         <tbody>
-                        <tr v-for="application in filteredApplications" :key="application.id"
-                            class="border-b border-border hover:bg-muted/95 transition-all duration-200">
+                        <tr v-for="application in filteredApplications" :key="application.id" class="border-b border-border hover:bg-muted/95 transition-all duration-200">
                             <td class="py-4 px-4 text-sm">{{ application.studentName }}</td>
                             <td class="py-4 px-4 text-sm">{{ application.courseName }}</td>
                             <td class="py-4 px-4 text-sm">
@@ -137,19 +136,22 @@
                                         class="text-primary hover:underline flex items-center gap-1"
                                         title="View Application">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
-                                        View
                                     </router-link>
+
                                     <router-link
+                                        v-if="isCounselor"
                                         :to="`/applications/${application.id}/edit`"
                                         class="text-blue-600 hover:underline flex items-center gap-1"
                                         title="Edit Application">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                         </svg>
-                                        Edit
                                     </router-link>
                                 </div>
                             </td>
@@ -294,16 +296,26 @@ const filteredApplications = computed(() => {
 const getDisplayedUniversities = (schools, limit) => schools.slice(0, limit);
 const getDisplayedCountries = (countries, limit) => countries.slice(0, limit);
 
-const getStatusClass = (status) => {
+const statusColorMap = {
+    document_submission: 'bg-blue-500/20 text-blue-700',
+    document_in_check: 'bg-yellow-500/20 text-yellow-700',
+    document_check_complete: 'bg-green-500/20 text-green-700',
+    application_in_process: 'bg-blue-500/20 text-blue-700',
+    application_done_successfully: 'bg-green-500/20 text-green-700',
+    conditional_offers_received: 'bg-purple-500/20 text-purple-700',
+    conditional_offers_accepted: 'bg-purple-700/20 text-purple-900',
+    unconditional_offers_received: 'bg-indigo-500/20 text-indigo-700',
+    unconditional_offers_accepted: 'bg-indigo-700/20 text-indigo-900',
+    school_fees_payment_stage: 'bg-orange-500/20 text-orange-700',
+    cas_ceo_loa_i20_stage: 'bg-teal-500/20 text-teal-700',
+    visa_application: 'bg-blue-500/20 text-blue-700',
+    visa_application_granted: 'bg-green-500/20 text-green-700',
+    application_rejected: 'bg-red-500/20 text-red-700',
+};
+
+const getStatusClass = (statusCode) => {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-medium';
-    const statusClasses = {
-        'Pending': 'bg-yellow-500/20 text-yellow-700',
-        'Approved': 'bg-green-500/20 text-green-700',
-        'Rejected': 'bg-red-500/20 text-red-700',
-        'In Review': 'bg-blue-500/20 text-blue-700',
-        'Submitted': 'bg-purple-500/20 text-purple-700',
-    };
-    return `${baseClass} ${statusClasses[status] || 'bg-gray-500/20 text-gray-700'}`;
+    return `${baseClass} ${statusColorMap[statusCode] || 'bg-gray-500/20 text-gray-700'}`;
 };
 
 const fetchApplications = async () => {
@@ -343,9 +355,8 @@ const fetchApplications = async () => {
                 lastPage: paginationData.meta.last_page
             };
         }
-
     } catch (err) {
-        console.error('Error fetching students:', err);
+        console.error('Error fetching applications:', err);
         error.value = 'Failed to load applications. Please try again.';
     } finally {
         loading.value = false;
