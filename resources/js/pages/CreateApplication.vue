@@ -321,7 +321,7 @@
                                     @blur="handleCourseBlur"
                                 />
                                 <div v-if="showCourseDropdown"
-                                     class="absolute z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                                     class="z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
                                     <div v-if="filteredCourses.length === 0" class="p-3 text-sm text-muted-foreground">
                                         No courses found
                                     </div>
@@ -361,7 +361,7 @@
                                     @blur="handleSchoolBlur"
                                 />
                                 <div v-if="showSchoolDropdown"
-                                     class="absolute z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                                     class="z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
                                     <div v-if="filteredSchools.length === 0" class="p-3 text-sm text-muted-foreground">
                                         No schools found
                                     </div>
@@ -409,7 +409,7 @@
                                     @blur="handleCountryBlur"
                                 />
                                 <div v-if="showCountryDropdown"
-                                     class="absolute z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                                     class="z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
                                     <div v-if="filteredCountries.length === 0"
                                          class="p-3 text-sm text-muted-foreground">No countries found
                                     </div>
@@ -646,12 +646,14 @@
                         </div>
 
                         <!-- Error/Success Messages -->
-                        <div v-if="error" class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+                        <div v-if="error"
+                             class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
                             {{ error }}
                         </div>
 
                         <div v-if="success" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                            <div class="bg-card rounded-xl p-8 text-center border border-border shadow-2xl animate-scale-in">
+                            <div
+                                class="bg-card rounded-xl p-8 text-center border border-border shadow-2xl animate-scale-in">
                                 <svg class="w-16 h-16 text-emerald-500 mx-auto mb-4 animate-spin" fill="none"
                                      stroke="currentColor" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
