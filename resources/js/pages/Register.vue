@@ -151,6 +151,25 @@
                         </div>
 
                         <div class="space-y-2 group">
+                            <label for="bdm_officer_id"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">
+                                Business Development Officer
+                            </label>
+                            <select
+                                id="bdm_officer_id"
+                                v-model="form.bdm_officer_id"
+                                :disabled="loading"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <option disabled value="">Select a BDM Officer</option>
+                                <option v-for="officer in bdmOfficers" :key="officer.id" :value="officer.id">
+                                    {{ officer.first_name }} {{ officer.last_name }}
+                                </option>
+                            </select>
+                        </div>
+
+
+                        <div class="space-y-2 group">
                             <label for="password"
                                    class="text-sm font-medium transition-colors group-focus-within:text-primary">Password</label>
                             <div class="relative">
@@ -163,6 +182,7 @@
                                     class="w-full pr-12 px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="••••••••"
                                 />
+
                                 <button
                                     type="button"
                                     @click="showPassword = !showPassword"
@@ -287,9 +307,10 @@ input[type="number"]::-webkit-inner-spin-button {
 </style>
 
 <script>
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import {useAuth} from '../composables/useAuth';
 import {useTheme} from '../composables/useTheme';
+import {authAPI} from "../services/api.js";
 
 export default {
     name: 'Register',
@@ -304,6 +325,7 @@ export default {
             business_registration_number: '',
             email: '',
             phone: '',
+            bdm_officer_id: '',
             password: '',
             password_confirmation: '',
             role_name: 'agent',
@@ -313,6 +335,7 @@ export default {
         const showPassword = ref(false);
         const showConfirm = ref(false);
         const loading = ref(false);
+        const bdmOfficers = ref([]);
 
         const features = [
             'Access to 50+ partner universities',
@@ -330,6 +353,20 @@ export default {
             }
         };
 
+        const fetchBdmOfficers = async () => {
+            try {
+                const response = await authAPI.getBDMOfficers()
+                console.log(response)
+                bdmOfficers.value = response.data?.data || []
+            } catch (err) {
+                console.error('Failed to fetch BDM officers:', err);
+            }
+        };
+
+        onMounted(() => {
+            fetchBdmOfficers()
+        });
+
         return {
             form,
             features,
@@ -339,7 +376,8 @@ export default {
             isDark,
             toggleTheme,
             showPassword,
-            showConfirm
+            showConfirm,
+            bdmOfficers
         };
     }
 };
