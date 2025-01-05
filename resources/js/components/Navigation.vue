@@ -9,8 +9,9 @@
                     </router-link>
 
                     <div class="hidden md:flex items-center space-x-1">
+                        <!-- Filter navigation items based on user role -->
                         <router-link
-                            v-for="item in navItems"
+                            v-for="item in filteredNavItems"
                             :key="item.path"
                             :to="item.path"
                             class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-muted relative"
@@ -66,15 +67,15 @@
                     </button>
 
                     <div class="flex items-center space-x-3 pl-4 border-l border-border">
-                        <!-- Improved text truncation for long names on smaller screens -->
+                        <!-- Display user info with role -->
                         <div class="hidden lg:block text-right max-w-[150px]">
                             <div class="text-sm font-medium truncate"
                                  :title="`${currentUser?.first_name} ${currentUser?.last_name}`">
                                 {{ currentUser?.first_name }} {{ currentUser?.last_name }}
                             </div>
-                            <div class="text-xs text-muted-foreground truncate"
-                                 :title="currentUser?.agency_name || 'Agent'">
-                                {{ currentUser?.agency_name || 'Agent' }}
+                            <div class="text-xs text-muted-foreground truncate capitalize"
+                                 :title="userRole">
+                                {{ userRole || 'User' }}
                             </div>
                         </div>
                         <div class="relative">
@@ -91,9 +92,9 @@
                                          :title="`${currentUser?.first_name} ${currentUser?.last_name}`">
                                         {{ currentUser?.first_name }} {{ currentUser?.last_name }}
                                     </div>
-                                    <div class="text-xs text-muted-foreground truncate"
-                                         :title="currentUser?.agency_name || 'Agent'">
-                                        {{ currentUser?.agency_name || 'Agent' }}
+                                    <div class="text-xs text-muted-foreground truncate capitalize"
+                                         :title="userRole">
+                                        {{ userRole || 'User' }}
                                     </div>
                                 </div>
                                 <button
@@ -121,9 +122,10 @@
             </div>
 
             <!-- Mobile menu with logout button -->
+            <!-- Filter mobile menu items based on user role -->
             <div v-if="mobileMenuOpen" class="md:hidden py-4 border-t border-border animate-slide-down">
                 <router-link
-                    v-for="item in navItems"
+                    v-for="item in filteredNavItems"
                     :key="item.path"
                     :to="item.path"
                     @click="mobileMenuOpen = false"
@@ -167,7 +169,7 @@ export default {
     setup() {
         const route = useRoute();
         const {isDark, toggleTheme} = useTheme();
-        const {user: currentUser, logout, initAuth} = useAuth();
+        const {user: currentUser, logout, initAuth, userRole} = useAuth();
         const mobileMenuOpen = ref(false);
         const showUserMenu = ref(false);
 
@@ -182,23 +184,51 @@ export default {
             return 'JD';
         });
 
-        const navItems = [
+        const allNavItems = [
             {
                 label: 'Dashboard',
                 path: '/dashboard',
+                roles: ["agent", "counselor"],
                 icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 00-5.356-1.857M17 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'
             },
             {
                 label: 'Students',
-                path: '/student-application',
+                path: '/students',
+                roles: ["agent", "counselor"],
                 icon: 'M12 4v16m8-8H4v-2a3 3 0 00-5.356-1.857M17 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'
+            },
+
+            {
+                label: 'Applications',
+                path: '/applications',
+                roles: ["agent", "counselor"],
+                icon: 'M9 17v-6a2 2 0 012-2h6M9 17H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.343M9 17l6 6m0 0l6-6m-6 6V3'
             },
             {
                 label: 'New Application',
                 path: '/applications/create',
+                roles: ["agent"],
                 icon: 'M12 4v16m8-8H4'
-            }
+            },
+            {
+                label: 'New Student',
+                path: '/students/create',
+                roles: ["agent"],
+                icon: 'M12 4v16m8-8H4'
+            },
+            {
+                label: 'Agents',
+                path: '/agents',
+                roles: ["counselor"],
+                icon: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m9-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm7 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-1 10v-2a4 4 0 0 0-3-3.87'
+            },
         ];
+
+        const filteredNavItems = computed(() => {
+            return allNavItems.filter(item => {
+                return item.roles.includes(userRole.value)
+            })
+        })
 
         const isActive = (path) => {
             return route.path === path;
@@ -219,8 +249,10 @@ export default {
 
         return {
             currentUser,
+            userRole,
             userInitials,
-            navItems,
+            allNavItems,
+            filteredNavItems,
             isActive,
             isDark,
             toggleTheme,
