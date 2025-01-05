@@ -44,6 +44,10 @@ export function useAuth() {
         }
     }
 
+    const clearError = () => {
+        error.value = null
+    }
+
     const login = async (credentials) => {
         loading.value = true
         error.value = null
@@ -65,14 +69,8 @@ export function useAuth() {
             await router.push("/dashboard")
             return {success: true}
         } catch (err) {
-            const errorMessage = err.response?.data?.error || err.response?.data?.message || "Login failed"
+            const errorMessage = err.response?.data?.error || err.response?.data?.message || "Login failed. Please check your credentials."
             error.value = errorMessage
-
-            token.value = null
-            user.value = null
-            localStorage.removeItem("auth_token")
-            localStorage.removeItem("user")
-
             return {success: false, error: errorMessage}
         } finally {
             loading.value = false
@@ -87,16 +85,13 @@ export function useAuth() {
             const {data} = await authAPI.register(userData)
             const {user: newUser, message} = data
 
-            // Validate response
             if (!newUser) {
                 throw new Error("Invalid response from server")
             }
 
-            // Save user temporarily if you want — optional
             user.value = newUser
             localStorage.setItem("user", JSON.stringify(newUser))
 
-            // Redirect to login page since user isn't logged in
             await router.push("/login")
 
             return {success: true, message}
@@ -157,5 +152,6 @@ export function useAuth() {
         register,
         logout,
         fetchUser,
+        clearError, // Export clearError function
     }
 }
