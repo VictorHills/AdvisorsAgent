@@ -47,7 +47,7 @@
                          style="animation-delay: 0.3s;">
                         <h3 class="font-bold mb-6">Monthly Agent SignUp</h3>
                         <div class="h-80">
-                            <BarChart v-if="monthlyAgentSignUpData" :data="monthlyAgentSignUpData" label="Applications"/>
+                            <BarChart v-if="monthlyAgentSignUpData" :data="monthlyAgentSignUpData" label="Agent Signup"/>
                             <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
                                 available
                             </div>
