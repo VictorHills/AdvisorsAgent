@@ -45,6 +45,7 @@ export const authAPI = {
     getOtp: (data) => api.post("/auth/otp", data),
     resetPassword: (data) => api.post("/auth/reset-password", data),
     verifyOtp: (email, token, destination) => api.post("/auth/verify-otp", {email, token, destination}),
+    getBDMOfficers: () => api.get("/bdm-officers"),
 }
 
 export const dashboardAPI = {
@@ -160,13 +161,13 @@ export const applicationsAPI = {
             payload.append('_method', 'PATCH');
 
             return api.post(`/update-application-document/${applicationId}`, payload, {
-                headers: { "Content-Type": "multipart/form-data" }
+                headers: {"Content-Type": "multipart/form-data"}
             });
         }
 
         // Otherwise send JSON (for delete operations)
         return api.patch(`/update-application-document/${applicationId}`, payload, {
-            headers: { "Content-Type": "application/json" }
+            headers: {"Content-Type": "application/json"}
         });
     },
 
@@ -219,6 +220,10 @@ export const countriesAPI = {
     getAll: () => api.get("/countries"),
     search: (searchTerm = "", perPage = 10) => api.get("/countries", {params: {search: searchTerm, per_page: perPage}}),
     getOne: (id) => api.get(`/countries/${id}`),
+}
+
+export const agentsAPI = {
+    getAll: (page, per_page, term,) => api.get('/admin/agents', {params: {term: term, per_page: per_page, page: page}})
 }
 
 export default api
