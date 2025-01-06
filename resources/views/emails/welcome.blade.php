@@ -129,12 +129,6 @@
             opacity: 0.9;
         }
 
-        .divider {
-            height: 1px;
-            background: #e5e5e5;
-            margin: 30px 0;
-        }
-
         .support-note {
             background: #f5f5f5;
             padding: 15px;
@@ -176,7 +170,7 @@
     <div class="card">
         <!-- Header with Logo -->
         <div class="header">
-            <img src="{{ config('app.logo_url') ?? 'https://your-domain.com/logo.png' }}" alt="Advisors Academy"/>
+            <img src="{{ asset('favicon.ico') }}" alt="Advisors Academy"/>
             <h1>Welcome Aboard!</h1>
             <p>Your journey starts here</p>
         </div>
@@ -221,16 +215,17 @@
             <!-- Support Note -->
             <div class="support-note">
                 <span class="support-icon">💬</span>
-                <strong>Need Help?</strong> Check out our help center or contact our support team at
-                support@advisorsacademy.com
+                <strong>Need Help?</strong>
+                Check out our help center or contact our support team at support@advisorsacademy.com
             </div>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <p>&copy; {{ date('Y') }} Advisors Academy. All rights reserved.</p>
-            <p style="margin-top: 8px; color: #bbb;">This is an automated message, please do not reply to this
-                email.</p>
+            <p style="margin-top: 8px; color: #bbb;">
+                This is an automated message, please do not reply to this email.
+            </p>
         </div>
     </div>
 </div>
