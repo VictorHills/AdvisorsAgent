@@ -130,12 +130,6 @@
             font-weight: 600;
         }
 
-        .divider {
-            height: 1px;
-            background: #e5e5e5;
-            margin: 30px 0;
-        }
-
         .security-note {
             background: #f5f5f5;
             padding: 15px;
