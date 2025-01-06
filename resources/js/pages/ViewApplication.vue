@@ -400,6 +400,7 @@ const statusColorMap = {
     visa_application: 'bg-blue-500/20 text-blue-700',
     visa_application_granted: 'bg-green-500/20 text-green-700',
     application_rejected: 'bg-red-500/20 text-red-700',
+    pending: 'bg-gray-500/20 text-gray-700',
 };
 
 const getStatusClass = (statusCode) => {
