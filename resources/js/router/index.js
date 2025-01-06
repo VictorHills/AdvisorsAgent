@@ -12,6 +12,7 @@ const ViewApplication = () => import("../pages/ViewApplication.vue");
 const EditApplication = () => import("../pages/EditApplication.vue");
 const Unauthorized = () => import("../pages/Unauthorized.vue");
 const NotFound = () => import("../pages/NotFound.vue");
+const Agents = () => import("../pages/Agents.vue");
 
 const routes = [
     {path: "/", redirect: "/login"},
@@ -53,6 +54,12 @@ const routes = [
         component: Students,
         name: "students",
         meta: {requiresAuth: true, roles: ["agent", "counselor"]},
+    },
+    {
+        path: "/agents",
+        component: Agents,
+        name: "agents",
+        meta: {requiresAuth: true, roles: ["counselor"]},
     },
     {
         path: "/students/create",
