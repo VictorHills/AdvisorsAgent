@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminAgentController;
 use App\Http\Controllers\AdminApplicationController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminStudentController;
@@ -38,6 +39,9 @@ Route::get('countries/{id}', [CountryController::class, 'show']);
 // Application status route
 Route::get('application-status', [ApplicationController::class, 'getApplicationStatus']);
 
+// BDM Officer routes
+Route::get('bdm-officers', [BdmOfficerController::class, 'index']);
+Route::get('bdm-officers/{id}', [BdmOfficerController::class, 'show']);
 
 Route::group(['middleware' => ['auth:api', CheckUserIsAgent::class]], function () {
     // Auth routes
@@ -48,10 +52,7 @@ Route::group(['middleware' => ['auth:api', CheckUserIsAgent::class]], function (
 
     // Application routes
     Route::apiResource('applications', ApplicationController::class);
-
-    // BDM Officer routes
-    Route::get('bdm-officers', [BdmOfficerController::class, 'index']);
-    Route::get('bdm-officers/{id}', [BdmOfficerController::class, 'show']);
+    Route::patch('update-application-document/{id}', [ApplicationController::class, 'updateApplicationDocument']);
 
     // Dashboard routes
     Route::prefix('dashboard')->group(function () {
@@ -88,6 +89,10 @@ Route::group(['middleware' => ['auth:api', CheckUserIsCounselor::class], 'prefix
     Route::prefix('students')->group(function () {
         Route::get('/', [AdminStudentController::class, 'index']);
         Route::get('/{id}', [AdminStudentController::class, 'show']);
+    });
+
+    Route::prefix('agents')->group(function () {
+        Route::get('/', [AdminAgentController::class, 'index']);
     });
 
     Route::apiResource('applications', AdminApplicationController::class)->names([
