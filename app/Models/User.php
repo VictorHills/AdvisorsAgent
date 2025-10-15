@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -13,7 +16,7 @@ class User extends Authenticatable implements JWTSubject
     /**
      * @use HasFactory<UserFactory>
      * */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -55,6 +58,8 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_terms_and_condition_accepted' => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -68,5 +73,15 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    public function bdmOfficer(): BelongsTo
+    {
+        return $this->belongsTo(BusinessDevelopmentOfficers::class, 'bdm_officer_id');
+    }
+
+    public function applications(): User|HasMany
+    {
+        return $this->hasMany(StudentApplications::class, 'agent_id');
     }
 }
