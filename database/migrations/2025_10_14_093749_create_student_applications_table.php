@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('student_applications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('agent_id');
-            $table->unsignedBigInteger('bdm_officer_id');
+            $table->unsignedBigInteger('bdm_officer_id')->nullable();
             $table->unsignedBigInteger('course_id');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
@@ -23,11 +23,12 @@ return new class extends Migration {
             $table->string('phone_number')->unique();
             $table->string('country');
             $table->string('class_of_degree');
-            $table->string('additional_notes')->nullable();
+            $table->text('additional_notes')->nullable();
             $table->string('signature')->nullable();
             $table->json('schools_of_choice');
             $table->json('country_of_preference');
-            $table->json('application_documents');
+            $table->json('application_documents')->nullable();
+            $table->string('status')->default('Pending');
             $table->timestamps();
             $table->softDeletes();
         });
