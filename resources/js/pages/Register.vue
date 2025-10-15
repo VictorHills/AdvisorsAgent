@@ -115,26 +115,60 @@
 
                         <div class="space-y-2 group">
                             <label for="password" class="text-sm font-medium transition-colors group-focus-within:text-primary">Password</label>
-                            <input
-                                id="password"
-                                v-model="form.password"
-                                type="password"
-                                required
-                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                                placeholder="••••••••"
-                            />
+                            <div class="relative">
+                                <input
+                                    id="password"
+                                    v-model="form.password"
+                                    :type="showPassword ? 'text' : 'password'"
+                                    required
+                                    class="w-full pr-12 px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    @click="showPassword = !showPassword"
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground"
+                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                >
+                                    <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.563-4.351M6.07 6.07A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.243 5.147M3 3l18 18" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.88 9.88A3 3 0 0012 15a3 3 0 002.12-.88" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="space-y-2 group">
                             <label for="password_confirmation" class="text-sm font-medium transition-colors group-focus-within:text-primary">Confirm Password</label>
-                            <input
-                                id="password_confirmation"
-                                v-model="form.password_confirmation"
-                                type="password"
-                                required
-                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                                placeholder="••••••••"
-                            />
+                            <div class="relative">
+                                <input
+                                    id="password_confirmation"
+                                    v-model="form.password_confirmation"
+                                    :type="showConfirm ? 'text' : 'password'"
+                                    required
+                                    class="w-full pr-12 px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    @click="showConfirm = !showConfirm"
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground"
+                                    :aria-label="showConfirm ? 'Hide confirm password' : 'Show confirm password'"
+                                >
+                                    <svg v-if="!showConfirm" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.563-4.351M6.07 6.07A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.243 5.147M3 3l18 18" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.88 9.88A3 3 0 0012 15a3 3 0 002.12-.88" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -192,6 +226,9 @@ export default {
             is_terms_and_condition_accepted: false
         });
 
+        const showPassword = ref(false);
+        const showConfirm = ref(false);
+
         const features = [
             'Access to 50+ partner universities',
             'Real-time application tracking',
@@ -212,7 +249,9 @@ export default {
             features,
             handleRegister,
             isDark,
-            toggleTheme
+            toggleTheme,
+            showPassword,
+            showConfirm
         };
     }
 };

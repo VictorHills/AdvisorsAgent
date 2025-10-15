@@ -38,14 +38,33 @@
 
                         <div class="space-y-2 group">
                             <label for="password" class="text-sm font-medium transition-colors group-focus-within:text-primary">Password</label>
-                            <input
-                                id="password"
-                                v-model="form.password"
-                                type="password"
-                                required
-                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                                placeholder="••••••••"
-                            />
+                            <div class="relative">
+                                <input
+                                    id="password"
+                                    v-model="form.password"
+                                    :type="showPassword ? 'text' : 'password'"
+                                    required
+                                    class="w-full px-4 py-3 pr-11 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    @click="showPassword = !showPassword"
+                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                                    tabindex="-1"
+                                >
+                                    <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        <circle cx="12" cy="12" r="3" stroke-width="2" />
+                                    </svg>
+                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M3 3l18 18M10.584 10.587A2.999 2.999 0 0115 12c0 .513-.129.996-.356 1.417M6.71 6.707C4.934 7.92 3.59 9.74 2.958 12c1.274 4.057 5.065 7 9.542 7 1.53 0 2.983-.345 4.287-.965M9.88 4.6A10.66 10.66 0 0112 5c4.477 0 8.268 2.943 9.542 7a11.02 11.02 0 01-2.363 3.78"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -131,6 +150,7 @@ export default {
             password: '',
             remember: false
         });
+        const showPassword = ref(false);
 
         const handleLogin = async () => {
             try {
@@ -145,7 +165,8 @@ export default {
             form,
             handleLogin,
             isDark,
-            toggleTheme
+            toggleTheme,
+            showPassword
         };
     }
 };
