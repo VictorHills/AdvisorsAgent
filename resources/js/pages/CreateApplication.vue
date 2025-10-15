@@ -1,14 +1,27 @@
 <template>
     <div class="min-h-screen bg-background animate-fade-in">
-        <Navigation />
+        <Navigation/>
 
         <main class="container mx-auto px-6 py-8 max-w-4xl">
             <form @submit.prevent="handleSubmit" class="space-y-8">
+                <!-- Display error message if submission fails -->
+                <div v-if="error" class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+                    {{ error }}
+                </div>
+
+                <!-- Display success message -->
+                <div v-if="success"
+                     class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-500 text-sm">
+                    Application submitted successfully!
+                </div>
+
                 <div class="glass-card rounded-xl p-6 animate-slide-up">
                     <h2 class="text-lg font-bold mb-6">Personal Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2 group">
-                            <label for="first_name" class="text-sm font-medium transition-colors group-focus-within:text-primary">First Name *</label>
+                            <label for="first_name"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">First
+                                Name *</label>
                             <input
                                 id="first_name"
                                 v-model="form.first_name"
@@ -20,7 +33,9 @@
                         </div>
 
                         <div class="space-y-2 group">
-                            <label for="middle_name" class="text-sm font-medium transition-colors group-focus-within:text-primary">Middle Name</label>
+                            <label for="middle_name"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Middle
+                                Name</label>
                             <input
                                 id="middle_name"
                                 v-model="form.middle_name"
@@ -31,7 +46,9 @@
                         </div>
 
                         <div class="space-y-2 group">
-                            <label for="last_name" class="text-sm font-medium transition-colors group-focus-within:text-primary">Last Name *</label>
+                            <label for="last_name"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Last
+                                Name *</label>
                             <input
                                 id="last_name"
                                 v-model="form.last_name"
@@ -43,7 +60,9 @@
                         </div>
 
                         <div class="space-y-2 group">
-                            <label for="gender" class="text-sm font-medium transition-colors group-focus-within:text-primary">Gender *</label>
+                            <label for="gender"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Gender
+                                *</label>
                             <select
                                 id="gender"
                                 v-model="form.gender"
@@ -58,7 +77,9 @@
                         </div>
 
                         <div class="space-y-2 group">
-                            <label for="email" class="text-sm font-medium transition-colors group-focus-within:text-primary">Email *</label>
+                            <label for="email"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Email
+                                *</label>
                             <input
                                 id="email"
                                 v-model="form.email"
@@ -70,7 +91,9 @@
                         </div>
 
                         <div class="space-y-2 group">
-                            <label for="phone_number" class="text-sm font-medium transition-colors group-focus-within:text-primary">Phone Number *</label>
+                            <label for="phone_number"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Phone
+                                Number *</label>
                             <input
                                 id="phone_number"
                                 v-model="form.phone_number"
@@ -82,7 +105,9 @@
                         </div>
 
                         <div class="space-y-2 group">
-                            <label for="country" class="text-sm font-medium transition-colors group-focus-within:text-primary">Country of Origin *</label>
+                            <label for="country"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Country
+                                of Origin *</label>
                             <input
                                 id="country"
                                 v-model="form.country"
@@ -94,7 +119,9 @@
                         </div>
 
                         <div class="space-y-2 group">
-                            <label for="class_of_degree" class="text-sm font-medium transition-colors group-focus-within:text-primary">Class of Degree *</label>
+                            <label for="class_of_degree"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Class
+                                of Degree *</label>
                             <select
                                 id="class_of_degree"
                                 v-model="form.class_of_degree"
@@ -116,7 +143,9 @@
                     <h2 class="text-lg font-bold mb-6">Academic Preferences</h2>
                     <div class="space-y-6">
                         <div class="space-y-2 group">
-                            <label for="course_id" class="text-sm font-medium transition-colors group-focus-within:text-primary">Desired Course *</label>
+                            <label for="course_id"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Desired
+                                Course *</label>
                             <select
                                 id="course_id"
                                 v-model="form.course_id"
@@ -124,11 +153,10 @@
                                 class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                             >
                                 <option value="">Select a course</option>
-                                <option value="1">Computer Science</option>
-                                <option value="2">Business Administration</option>
-                                <option value="3">Engineering</option>
-                                <option value="4">Medicine</option>
-                                <option value="5">Law</option>
+                                <!-- Populate courses from API -->
+                                <option v-for="course in courses" :key="course.id" :value="course.id">
+                                    {{ course.name }}
+                                </option>
                             </select>
                         </div>
 
@@ -180,7 +208,9 @@
                     <h2 class="text-lg font-bold mb-6">Additional Information</h2>
                     <div class="space-y-6">
                         <div class="space-y-2 group">
-                            <label for="additional_notes" class="text-sm font-medium transition-colors group-focus-within:text-primary">Additional Notes</label>
+                            <label for="additional_notes"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Additional
+                                Notes</label>
                             <textarea
                                 id="additional_notes"
                                 v-model="form.additional_notes"
@@ -192,9 +222,12 @@
 
                         <div class="space-y-2">
                             <label for="documents" class="text-sm font-medium">Application Documents</label>
-                            <div class="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-all duration-300 cursor-pointer">
-                                <svg class="w-12 h-12 mx-auto text-muted-foreground mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            <div
+                                class="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-all duration-300 cursor-pointer">
+                                <svg class="w-12 h-12 mx-auto text-muted-foreground mb-4" fill="none"
+                                     stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                                 </svg>
                                 <p class="text-sm text-muted-foreground mb-2">Click to upload or drag and drop</p>
                                 <p class="text-xs text-muted-foreground">PDF, DOC, DOCX (max. 10MB)</p>
@@ -217,11 +250,13 @@
                     >
                         Cancel
                     </router-link>
+                    <!-- Disable button while loading -->
                     <button
                         type="submit"
-                        class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95"
+                        :disabled="loading"
+                        class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Submit Application
+                        {{ loading ? 'Submitting...' : 'Submit Application' }}
                     </button>
                 </div>
             </form>
@@ -230,9 +265,10 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useTheme } from '../composables/useTheme';
+import {ref, onMounted} from 'vue';
+import {useRouter} from 'vue-router';
+import {useTheme} from '../composables/useTheme';
+import {applicationsAPI, coursesAPI} from '../services/api';
 import Navigation from '../components/Navigation.vue';
 
 export default {
@@ -242,7 +278,12 @@ export default {
     },
     setup() {
         const router = useRouter();
-        const { isDark, toggleTheme } = useTheme();
+        const {isDark, toggleTheme} = useTheme();
+
+        const loading = ref(false);
+        const error = ref(null);
+        const success = ref(false);
+        const courses = ref([]);
 
         const form = ref({
             first_name: '',
@@ -260,6 +301,15 @@ export default {
             application_documents: []
         });
 
+        const fetchCourses = async () => {
+            try {
+                const response = await coursesAPI.getAll();
+                courses.value = response.data;
+            } catch (err) {
+                console.error('[v0] Error fetching courses:', err);
+            }
+        };
+
         const addSchool = () => {
             form.value.schools_of_choice.push('');
         };
@@ -275,15 +325,40 @@ export default {
 
         const handleSubmit = async () => {
             try {
-                console.log('Application submitted:', form.value);
-                router.push('/dashboard');
-            } catch (error) {
-                console.error('Submit error:', error);
+                loading.value = true;
+                error.value = null;
+                success.value = false;
+
+                const applicationData = {
+                    ...form.value,
+                    schools_of_choice: form.value.schools_of_choice.filter(s => s.trim() !== ''),
+                    country_of_preference: form.value.country_of_preference.filter(c => c.trim() !== '')
+                };
+
+                await applicationsAPI.create(applicationData);
+
+                success.value = true;
+                setTimeout(() => {
+                    router.push('/dashboard');
+                }, 2000);
+            } catch (err) {
+                console.error('[v0] Error submitting application:', err);
+                error.value = err.response?.data?.message || 'Failed to submit application';
+            } finally {
+                loading.value = false;
             }
         };
 
+        onMounted(() => {
+            fetchCourses();
+        });
+
         return {
             form,
+            courses,
+            loading,
+            error,
+            success,
             addSchool,
             addCountry,
             handleFileUpload,

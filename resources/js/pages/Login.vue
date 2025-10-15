@@ -4,7 +4,7 @@
             <div class="w-full max-w-md space-y-8 animate-slide-up">
                 <div class="flex items-center justify-between">
                     <div class="space-y-2">
-                        <img :src="logo()" alt="Advisors Academy" class="h-20 w-auto mb-4" />
+                        <img :src="logo()" alt="Advisors Academy" class="h-20 w-auto mb-4"/>
                         <h1 class="text-3xl font-bold tracking-tight">Welcome back</h1>
                         <p class="text-muted-foreground">Sign in to your agent account</p>
                     </div>
@@ -14,18 +14,26 @@
                         aria-label="Toggle theme"
                     >
                         <svg v-if="isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
                         <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                         </svg>
                     </button>
                 </div>
 
                 <form @submit.prevent="handleLogin" class="space-y-6">
+                    <div v-if="error"
+                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+                        {{ error }}
+                    </div>
+
                     <div class="space-y-4">
                         <div class="space-y-2 group">
-                            <label for="email" class="text-sm font-medium transition-colors group-focus-within:text-primary">Email</label>
+                            <label for="email"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Email</label>
                             <input
                                 id="email"
                                 v-model="form.email"
@@ -37,7 +45,8 @@
                         </div>
 
                         <div class="space-y-2 group">
-                            <label for="password" class="text-sm font-medium transition-colors group-focus-within:text-primary">Password</label>
+                            <label for="password"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Password</label>
                             <div class="relative">
                                 <input
                                     id="password"
@@ -54,12 +63,14 @@
                                     class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
                                     tabindex="-1"
                                 >
-                                    <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        <circle cx="12" cy="12" r="3" stroke-width="2" />
+                                        <circle cx="12" cy="12" r="3" stroke-width="2"/>
                                     </svg>
-                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M3 3l18 18M10.584 10.587A2.999 2.999 0 0115 12c0 .513-.129.996-.356 1.417M6.71 6.707C4.934 7.92 3.59 9.74 2.958 12c1.274 4.057 5.065 7 9.542 7 1.53 0 2.983-.345 4.287-.965M9.88 4.6A10.66 10.66 0 0112 5c4.477 0 8.268 2.943 9.542 7a11.02 11.02 0 01-2.363 3.78"/>
                                     </svg>
@@ -82,9 +93,10 @@
 
                     <button
                         type="submit"
-                        class="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                        :disabled="loading"
+                        class="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Sign in
+                        {{ loading ? 'Signing in...' : 'Sign in' }}
                     </button>
                 </form>
 
@@ -103,21 +115,25 @@
                     <div class="glass-card p-8 rounded-2xl space-y-4 hover:shadow-xl transition-all duration-300">
                         <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
                         </div>
                         <h2 class="text-2xl font-bold">Manage Student Applications</h2>
                         <p class="text-muted-foreground">
-                            Access your dashboard to track applications, manage students, and collaborate with educational institutions worldwide.
+                            Access your dashboard to track applications, manage students, and collaborate with
+                            educational institutions worldwide.
                         </p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div
+                            class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                             <div class="text-3xl font-bold text-primary">500+</div>
                             <div class="text-sm text-muted-foreground mt-1">Applications</div>
                         </div>
-                        <div class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div
+                            class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                             <div class="text-3xl font-bold text-primary">50+</div>
                             <div class="text-sm text-muted-foreground mt-1">Universities</div>
                         </div>
@@ -129,9 +145,9 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useTheme } from '../composables/useTheme';
+import {ref} from 'vue';
+import {useAuth} from '../composables/useAuth';
+import {useTheme} from '../composables/useTheme';
 import logo from '@/assets/logo.png'
 
 export default {
@@ -142,8 +158,8 @@ export default {
         }
     },
     setup() {
-        const router = useRouter();
-        const { isDark, toggleTheme } = useTheme();
+        const {login, loading, error} = useAuth();
+        const {isDark, toggleTheme} = useTheme();
 
         const form = ref({
             email: '',
@@ -153,17 +169,14 @@ export default {
         const showPassword = ref(false);
 
         const handleLogin = async () => {
-            try {
-                console.log('Login attempt:', form.value);
-                router.push('/dashboard');
-            } catch (error) {
-                console.error('Login error:', error);
-            }
+            await login(form.value);
         };
 
         return {
             form,
             handleLogin,
+            loading,
+            error,
             isDark,
             toggleTheme,
             showPassword

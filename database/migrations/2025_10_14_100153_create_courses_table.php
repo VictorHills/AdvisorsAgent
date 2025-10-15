@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('school_id');
+            $table->unsignedBigInteger('school_id');
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->string('description')->nullable();
