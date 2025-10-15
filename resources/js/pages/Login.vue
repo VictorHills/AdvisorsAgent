@@ -4,7 +4,7 @@
             <div class="w-full max-w-md space-y-8 animate-slide-up">
                 <div class="flex items-center justify-between">
                     <div class="space-y-2">
-                        <img :src="logo()" alt="Advisors Academy" class="h-10 w-auto mb-4" />
+                        <img :src="logo()" alt="Advisors Academy" class="h-20 w-auto mb-4" />
                         <h1 class="text-3xl font-bold tracking-tight">Welcome back</h1>
                         <p class="text-muted-foreground">Sign in to your agent account</p>
                     </div>
