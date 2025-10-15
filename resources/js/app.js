@@ -1,4 +1,8 @@
-import "./bootstrap"
+import {createApp} from 'vue';
+import router from "./router/index.js"
+import App from "./components/App.vue"
 
-// This file is kept for backward compatibility
-// The main Vue application is in resources/frontend/main.js
+const app = createApp(App);
+
+app.use(router);
+app.mount('#app');

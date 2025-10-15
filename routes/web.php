@@ -2,9 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::get('/{any}', function () {
     return view('welcome');
-});
-
-// SPA catch-all route
-Route::view('/{any}', 'app')->where('any', '.*');
+})->where('any', '.*');
