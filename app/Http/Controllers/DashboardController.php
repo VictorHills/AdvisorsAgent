@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\StudentApplications;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -19,6 +19,9 @@ class DashboardController extends Controller
         $approvedApplications = StudentApplications::where('agent_id', $agentId)
             ->where('status', 'Approved')
             ->count();
+        $inReviewApplications = StudentApplications::where('agent_id', $agentId)
+            ->where('status', 'In Review')
+            ->count();
         $totalStudents = StudentApplications::where('agent_id', $agentId)
             ->distinct('email')
             ->count();
@@ -27,6 +30,7 @@ class DashboardController extends Controller
             'total_applications' => $totalApplications,
             'pending_applications' => $pendingApplications,
             'approved_applications' => $approvedApplications,
+            'in_review_applications' => $inReviewApplications,
             'total_students' => $totalStudents,
         ]);
     }
@@ -131,5 +135,33 @@ class DashboardController extends Controller
             'labels' => $labels,
             'data' => $data,
         ]);
+    }
+
+    public function recentActivity()
+    {
+        $agentId = auth()->id();
+
+        $activities = StudentApplications::where('agent_id', $agentId)
+            ->with('student')
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($application) {
+                $statusText = match ($application->status) {
+                    'Approved' => 'Application approved',
+                    'Pending' => 'New application submitted',
+                    'In Review' => 'Application in review',
+                    'Rejected' => 'Application rejected',
+                    default => 'Status updated'
+                };
+
+                return [
+                    'id' => $application->id,
+                    'text' => $statusText . ' for ' . $application->student->first_name . ' ' . $application->student->last_name,
+                    'time' => Carbon::parse($application->updated_at)->diffForHumans(),
+                ];
+            });
+
+        return response()->json($activities);
     }
 }

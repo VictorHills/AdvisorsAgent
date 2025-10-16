@@ -24,6 +24,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('dashboard/applications-trend', [DashboardController::class, 'applicationsTrend']);
     Route::get('dashboard/applications-status', [DashboardController::class, 'applicationsStatus']);
     Route::get('dashboard/monthly-applications', [DashboardController::class, 'monthlyApplications']);
+    Route::get('dashboard/recent-activity', [DashboardController::class, 'recentActivity']);
 
     // Application routes
     Route::apiResource('applications', ApplicationController::class);

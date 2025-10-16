@@ -1,6 +1,6 @@
 "use client"
 
-import {ref, computed} from "vue"
+import {computed, ref} from "vue"
 import {useRouter} from "vue-router"
 import {authAPI} from "../services/api"
 
@@ -12,7 +12,7 @@ const error = ref(null)
 export function useAuth() {
     const router = useRouter()
 
-    const isAuthenticated = computed(() => !!token.value)
+    const isAuthenticated = computed(() => !!token.value && !!user.value)
 
     const initAuth = () => {
         const savedToken = localStorage.getItem("auth_token")
@@ -20,7 +20,14 @@ export function useAuth() {
 
         if (savedToken && savedUser) {
             token.value = savedToken
-            user.value = JSON.parse(savedUser)
+            try {
+                user.value = JSON.parse(savedUser)
+            } catch (e) {
+                localStorage.removeItem("auth_token")
+                localStorage.removeItem("user")
+                token.value = null
+                user.value = null
+            }
         }
     }
 
@@ -30,19 +37,30 @@ export function useAuth() {
 
         try {
             const response = await authAPI.login(credentials)
-            const {access_token, user: userData} = response.data
+            const {token: authToken, user: userData} = response.data
 
-            token.value = access_token
+            if (!authToken || !userData) {
+                throw new Error("Invalid response from server")
+            }
+
+            token.value = authToken
             user.value = userData
 
-            localStorage.setItem("auth_token", access_token)
+            localStorage.setItem("auth_token", authToken)
             localStorage.setItem("user", JSON.stringify(userData))
 
-            router.push("/dashboard")
+            await router.push("/dashboard")
             return {success: true}
         } catch (err) {
-            error.value = err.response?.data?.message || "Login failed"
-            return {success: false, error: error.value}
+            const errorMessage = err.response?.data?.error || err.response?.data?.message || "Login failed"
+            error.value = errorMessage
+
+            token.value = null
+            user.value = null
+            localStorage.removeItem("auth_token")
+            localStorage.removeItem("user")
+
+            return {success: false, error: errorMessage}
         } finally {
             loading.value = false
         }
@@ -54,19 +72,30 @@ export function useAuth() {
 
         try {
             const response = await authAPI.register(userData)
-            const {access_token, user: newUser} = response.data
+            const {token: authToken, user: newUser} = response.data
 
-            token.value = access_token
+            if (!authToken || !newUser) {
+                throw new Error("Invalid response from server")
+            }
+
+            token.value = authToken
             user.value = newUser
 
-            localStorage.setItem("auth_token", access_token)
+            localStorage.setItem("auth_token", authToken)
             localStorage.setItem("user", JSON.stringify(newUser))
 
-            router.push("/dashboard")
+            await router.push("/dashboard")
             return {success: true}
         } catch (err) {
-            error.value = err.response?.data?.message || "Registration failed"
-            return {success: false, error: error.value}
+            const errorMessage = err.response?.data?.error || err.response?.data?.message || "Registration failed"
+            error.value = errorMessage
+
+            token.value = null
+            user.value = null
+            localStorage.removeItem("auth_token")
+            localStorage.removeItem("user")
+
+            return {success: false, error: errorMessage}
         } finally {
             loading.value = false
         }
@@ -89,10 +118,14 @@ export function useAuth() {
     const fetchUser = async () => {
         try {
             const response = await authAPI.getUser()
-            user.value = response.data
-            localStorage.setItem("user", JSON.stringify(response.data))
+            user.value = response.data.user
+            localStorage.setItem("user", JSON.stringify(response.data.user))
         } catch (err) {
             console.error("Fetch user error:", err)
+            token.value = null
+            user.value = null
+            localStorage.removeItem("auth_token")
+            localStorage.removeItem("user")
         }
     }
 

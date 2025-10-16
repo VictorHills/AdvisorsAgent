@@ -25,9 +25,14 @@
                 </div>
 
                 <form @submit.prevent="handleLogin" class="space-y-6">
-                    <div v-if="error"
-                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
-                        {{ error }}
+                    <!-- Display error message as toast instead of reloading -->
+                    <div v-if="loginError"
+                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm flex items-start space-x-2">
+                        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>{{ loginError }}</span>
                     </div>
 
                     <div class="space-y-4">
@@ -167,9 +172,17 @@ export default {
             remember: false
         });
         const showPassword = ref(false);
+        const loginError = ref(null);
 
         const handleLogin = async () => {
-            await login(form.value);
+            loginError.value = null;
+
+            const result = await login(form.value);
+
+            if (!result.success) {
+                loginError.value = result.error || 'Login failed. Please try again.';
+                // No reload - just show the error message
+            }
         };
 
         return {
@@ -177,6 +190,7 @@ export default {
             handleLogin,
             loading,
             error,
+            loginError,
             isDark,
             toggleTheme,
             showPassword

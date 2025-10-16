@@ -28,10 +28,13 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem("auth_token")
+    const userStr = localStorage.getItem("user")
 
-    if (to.meta.requiresAuth && !token) {
+    const isAuthenticated = !!(token && userStr)
+
+    if (to.meta.requiresAuth && !isAuthenticated) {
         next("/login")
-    } else if ((to.path === "/login" || to.path === "/register") && token) {
+    } else if ((to.path === "/login" || to.path === "/register") && isAuthenticated) {
         next("/dashboard")
     } else {
         next()

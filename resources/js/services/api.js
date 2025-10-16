@@ -46,6 +46,7 @@ export const dashboardAPI = {
     getApplicationsTrend: () => api.get("/dashboard/applications-trend"),
     getApplicationsStatus: () => api.get("/dashboard/applications-status"),
     getMonthlyApplications: () => api.get("/dashboard/monthly-applications"),
+    getRecentActivity: () => api.get("/dashboard/recent-activity"),
 }
 
 export const applicationsAPI = {

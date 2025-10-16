@@ -184,12 +184,20 @@
                         <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
                              style="animation-delay: 0.3s;">
                             <h3 class="font-bold mb-4">Recent Activity</h3>
-                            <div class="space-y-4">
+                            <!-- Fetch recent activity from API instead of dummy data -->
+                            <div v-if="loadingActivity" class="flex items-center justify-center py-8">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                            </div>
+                            <div v-else-if="recentActivity.length === 0"
+                                 class="text-center py-8 text-muted-foreground text-sm">
+                                No recent activity
+                            </div>
+                            <div v-else class="space-y-4">
                                 <div v-for="activity in recentActivity" :key="activity.id"
                                      class="flex items-start space-x-3 hover:bg-muted/50 p-2 rounded-lg transition-all duration-200">
-                                    <div class="w-2 h-2 bg-primary rounded-full mt-2"></div>
-                                    <div class="flex-1">
-                                        <p class="text-sm">{{ activity.text }}</p>
+                                    <div class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm break-words">{{ activity.text }}</p>
                                         <p class="text-xs text-muted-foreground mt-1">{{ activity.time }}</p>
                                     </div>
                                 </div>
@@ -203,9 +211,9 @@
 </template>
 
 <script>
-import {ref, computed, onMounted} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import {useTheme} from '../composables/useTheme';
-import {dashboardAPI, applicationsAPI} from '../services/api';
+import {applicationsAPI, dashboardAPI} from '../services/api';
 import LineChart from '../components/LineChart.vue';
 import DoughnutChart from '../components/DoughnutChart.vue';
 import BarChart from '../components/BarChart.vue';
@@ -223,11 +231,13 @@ export default {
         const {isDark, toggleTheme} = useTheme();
 
         const loading = ref(true);
+        const loadingActivity = ref(true);
         const stats = ref([]);
         const applicationsChartData = ref({});
         const statusChartData = ref({});
         const monthlyChartData = ref({});
         const students = ref([]);
+        const recentActivity = ref([]);
 
         const searchQuery = ref('');
         const statusFilter = ref('');
@@ -308,6 +318,19 @@ export default {
             }
         };
 
+        const fetchRecentActivity = async () => {
+            try {
+                loadingActivity.value = true;
+                const response = await dashboardAPI.getRecentActivity();
+                recentActivity.value = response.data;
+            } catch (error) {
+                console.error('[v0] Error fetching recent activity:', error);
+                recentActivity.value = [];
+            } finally {
+                loadingActivity.value = false;
+            }
+        };
+
         const getStatusClass = (status) => {
             const statusMap = {
                 'Approved': 'bg-emerald-500/20 text-emerald-500',
@@ -317,13 +340,6 @@ export default {
             };
             return statusMap[status] || 'bg-gray-500/20 text-gray-500';
         };
-
-        const recentActivity = ref([
-            {id: 1, text: 'New application submitted', time: '2 hours ago'},
-            {id: 2, text: 'Application approved', time: '5 hours ago'},
-            {id: 3, text: 'Document uploaded', time: '1 day ago'},
-            {id: 4, text: 'Status updated', time: '2 days ago'}
-        ]);
 
         const filteredStudents = computed(() => {
             let filtered = students.value;
@@ -344,10 +360,12 @@ export default {
 
         onMounted(() => {
             fetchDashboardData();
+            fetchRecentActivity();
         });
 
         return {
             loading,
+            loadingActivity,
             stats,
             applicationsChartData,
             statusChartData,
