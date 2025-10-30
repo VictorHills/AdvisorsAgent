@@ -181,7 +181,6 @@ export default {
 
             if (!result.success) {
                 loginError.value = result.error || 'Login failed. Please try again.';
-                // No reload - just show the error message
             }
         };
 

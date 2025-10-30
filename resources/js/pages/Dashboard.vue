@@ -1,6 +1,5 @@
 <template>
     <div class="min-h-screen bg-background animate-fade-in">
-        <Navigation/>
 
         <main class="container mx-auto px-6 py-8">
             <div v-if="loading" class="flex items-center justify-center py-12">

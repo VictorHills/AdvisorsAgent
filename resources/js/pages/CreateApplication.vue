@@ -1,6 +1,5 @@
 <template>
     <div class="min-h-screen bg-background animate-fade-in">
-        <Navigation/>
 
         <main class="container mx-auto px-6 py-8 max-w-4xl">
             <form @submit.prevent="handleSubmit" class="space-y-8">

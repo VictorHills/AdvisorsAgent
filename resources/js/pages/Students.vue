@@ -1,7 +1,5 @@
 <template>
     <div class="min-h-screen bg-background animate-fade-in">
-        <Navigation/>
-
         <main class="container mx-auto px-6 py-8">
             <div class="mb-8 animate-slide-up">
                 <h1 class="text-3xl font-bold mb-2">Student Applications</h1>
@@ -115,7 +113,7 @@
                                     <button
                                         class="p-2 hover:bg-muted rounded-lg transition-all duration-200 hover:scale-110"
                                         title="View">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -125,9 +123,9 @@
                                     <button
                                         class="p-2 hover:bg-muted rounded-lg transition-all duration-200 hover:scale-110"
                                         title="Edit">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                  d="M11 5H6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                                         </svg>
                                     </button>
                                 </div>
@@ -138,10 +136,10 @@
                 </div>
 
                 <div v-if="filteredStudents.length === 0" class="text-center py-12">
-                    <svg class="w-16 h-16 mx-auto text-muted-foreground mb-4" fill="none" stroke="currentColor"
+                    <svg class="w-16 h-16 mx-auto text-muted-foreground mb-4" stroke="currentColor"
                          viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                     </svg>
                     <p class="text-muted-foreground">No students found matching your filters</p>
                 </div>
@@ -153,13 +151,10 @@
 <script>
 import {ref, computed, onMounted} from 'vue';
 import {studentsAPI} from '../services/api';
-import Navigation from '../components/Navigation.vue';
 
 export default {
     name: 'Students',
-    components: {
-        Navigation
-    },
+    components: {},
     setup() {
         const searchQuery = ref('');
         const statusFilter = ref('');
