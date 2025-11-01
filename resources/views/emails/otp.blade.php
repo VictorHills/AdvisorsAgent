@@ -178,7 +178,7 @@
         <!-- Header with Logo -->
         <div class="header">
             <!-- Added logo to the email header -->
-            <img src="{{ config('app.logo_url') ?? 'https://your-domain.com/logo.png' }}" alt="Advisors Academy" />
+            <img src="{{ config('app.logo_url') ?? 'https://your-domain.com/logo.png' }}" alt="Advisors Academy"/>
             <h1>Verify Your Account</h1>
             <p>Your One-Time Password (OTP)</p>
         </div>
@@ -219,7 +219,8 @@
         <!-- Footer -->
         <div class="footer">
             <p>&copy; {{ date('Y') }} Advisors Academy. All rights reserved.</p>
-            <p style="margin-top: 8px; color: #bbb;">This is an automated message, please do not reply to this email.</p>
+            <p style="margin-top: 8px; color: #bbb;">This is an automated message, please do not reply to this
+                email.</p>
         </div>
     </div>
 </div>
