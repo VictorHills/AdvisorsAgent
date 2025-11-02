@@ -71,31 +71,36 @@ export function useAuth() {
         error.value = null
 
         try {
-            const response = await authAPI.register(userData)
-            const {token: authToken, user: newUser} = response.data
+            const { data } = await authAPI.register(userData)
+            const { user: newUser, message } = data
 
-            if (!authToken || !newUser) {
+            // Validate response
+            if (!newUser) {
                 throw new Error("Invalid response from server")
             }
 
-            token.value = authToken
+            // Save user temporarily if you want — optional
             user.value = newUser
-
-            localStorage.setItem("auth_token", authToken)
             localStorage.setItem("user", JSON.stringify(newUser))
 
-            await router.push("/dashboard")
-            return {success: true}
+            // Redirect to login page since user isn't logged in
+            await router.push("/login")
+
+            return { success: true, message }
         } catch (err) {
-            const errorMessage = err.response?.data?.error || err.response?.data?.message || "Registration failed"
+            const errorMessage =
+                err.response?.data?.error ||
+                err.response?.data?.message ||
+                err.message ||
+                "Registration failed"
+
             error.value = errorMessage
 
-            token.value = null
+            // Clean up
             user.value = null
-            localStorage.removeItem("auth_token")
             localStorage.removeItem("user")
 
-            return {success: false, error: errorMessage}
+            return { success: false, error: errorMessage }
         } finally {
             loading.value = false
         }
