@@ -30,7 +30,7 @@
                          class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm flex items-start space-x-2">
                         <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                         </svg>
                         <span>{{ loginError }}</span>
                     </div>
@@ -93,7 +93,7 @@
                             />
                             <span class="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Remember me</span>
                         </label>
-                        <a href="#" class="text-sm text-primary hover:underline transition-all">Forgot password?</a>
+                        <router-link to="/forgot-password" class="text-sm text-primary hover:underline transition-all">Forgot password?</router-link>
                     </div>
 
                     <button
@@ -163,7 +163,7 @@ export default {
         }
     },
     setup() {
-        const {login, loading, error} = useAuth();
+        const {login, loading} = useAuth();
         const {isDark, toggleTheme} = useTheme();
 
         const form = ref({
@@ -181,6 +181,10 @@ export default {
 
             if (!result.success) {
                 loginError.value = result.error || 'Login failed. Please try again.';
+                // Clear error after 5 seconds
+                setTimeout(() => {
+                    loginError.value = null;
+                }, 5000);
             }
         };
 
@@ -188,7 +192,6 @@ export default {
             form,
             handleLogin,
             loading,
-            error,
             loginError,
             isDark,
             toggleTheme,
