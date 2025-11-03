@@ -5,11 +5,13 @@ import Dashboard from "../pages/Dashboard.vue"
 import CreateApplication from "../pages/CreateApplication.vue"
 import Team from "../pages/Team.vue"
 import Students from "../pages/Students.vue"
+import ForgotPassword from "../pages/ForgotPassword.vue"
 
 const routes = [
     {path: "/", redirect: "/login"},
     {path: "/login", component: Login, name: "login"},
     {path: "/register", component: Register, name: "register"},
+    {path: "/forgot-password", component: ForgotPassword, name: "forgot-password"},
     {path: "/dashboard", component: Dashboard, name: "dashboard", meta: {requiresAuth: true}},
     {path: "/students", component: Students, name: "students", meta: {requiresAuth: true}},
     {
@@ -22,8 +24,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes,
+    history: createWebHistory(), routes,
 })
 
 router.beforeEach((to, from, next) => {
@@ -34,7 +35,7 @@ router.beforeEach((to, from, next) => {
 
     if (to.meta.requiresAuth && !isAuthenticated) {
         next("/login")
-    } else if ((to.path === "/login" || to.path === "/register") && isAuthenticated) {
+    } else if ((to.path === "/login" || to.path === "/register" || to.path === '/forgot-password') && isAuthenticated) {
         next("/dashboard")
     } else {
         next()
