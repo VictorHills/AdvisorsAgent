@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\StudentController;
@@ -13,6 +14,18 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
 });
+
+// Course routes
+Route::get('courses', [CourseController::class, 'index']);
+Route::get('courses/{id}', [CourseController::class, 'show']);
+
+// School routes
+Route::get('schools', [SchoolController::class, 'index']);
+Route::get('schools/{id}', [SchoolController::class, 'show']);
+
+// Country routes
+Route::get('countries', [CountryController::class, 'index']);
+Route::get('countries/{id}', [CountryController::class, 'show']);
 
 Route::group(['middleware' => 'auth:api'], function () {
     // Auth routes
@@ -36,12 +49,4 @@ Route::group(['middleware' => 'auth:api'], function () {
     // BDM Officer routes
     Route::get('bdm-officers', [BdmOfficerController::class, 'index']);
     Route::get('bdm-officers/{id}', [BdmOfficerController::class, 'show']);
-
-    // Course routes
-    Route::get('courses', [CourseController::class, 'index']);
-    Route::get('courses/{id}', [CourseController::class, 'show']);
-
-    // School routes
-    Route::get('schools', [SchoolController::class, 'index']);
-    Route::get('schools/{id}', [SchoolController::class, 'show']);
 });
