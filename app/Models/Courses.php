@@ -11,33 +11,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Courses extends Model
 {
-    /**
-     * @use HasFactory<CoursesFactory>
-     */
-    use HasFactory, SoftDeletes;
+    protected $connection = 'advisor_db';
+    protected $table = 'courses';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'school_id',
-        'name',
-        'slug',
-        'description',
-        'image',
-        'code',
-        'deleted_at',
-    ];
-
-    public function school(): BelongsTo
+    public function university(): BelongsTo
     {
-        return $this->belongsTo(Schools::class, 'school_id');
-    }
-
-    public function applications(): Courses|HasMany
-    {
-        return $this->hasMany(StudentApplications::class, 'course_id');
+        return $this->belongsTo(Universities::class, 'university_id');
     }
 }

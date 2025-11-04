@@ -9,7 +9,8 @@ class CourseController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Courses::with('school');
+        $per_page = $request->per_page ?? 100;
+        $query = Courses::query();
 
         // Search filter
         if ($request->has('search') && $request->search) {
@@ -17,14 +18,19 @@ class CourseController extends Controller
             $request->search%");
         }
 
-        $courses = $query->orderBy('name')->get();
+        $courses = $query->orderBy('name')->select([
+            'id',
+            'name',
+            'university_id',
+            'description',
+        ])->paginate($per_page);
 
-        return response()->json(['data' => $courses]);
+        return $this->respondSuccessWithData(message: 'Courses fetched successfully', data: $courses);
     }
 
     public function show($id)
     {
-        $course = Courses::with('school')->findOrFail($id);
-        return response()->json(['course' => $course]);
+        $course = Courses::with('university')->findOrFail($id);
+        return $this->respondSuccessWithData(message: 'Course fetched successfully', data: $course);
     }
 }
