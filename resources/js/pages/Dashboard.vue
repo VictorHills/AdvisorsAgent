@@ -31,7 +31,10 @@
                          style="animation-delay: 0.3s;">
                         <h3 class="font-bold mb-6">Monthly Applications Overview</h3>
                         <div class="h-80">
-                            <BarChart :data="monthlyChartData"/>
+                            <BarChart v-if="monthlyChartData && Object.keys(monthlyChartData).length > 0" :data="monthlyChartData"/>
+                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">
+                                No data available
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -48,7 +51,10 @@
                          style="animation-delay: 0.5s;">
                         <h3 class="font-bold mb-6">Applications by Status</h3>
                         <div class="h-64">
-                            <DoughnutChart :data="statusChartData"/>
+                            <DoughnutChart v-if="statusChartData && Object.keys(statusChartData).length > 0" :data="statusChartData"/>
+                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">
+                                No data available
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,7 +76,7 @@
                                 <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M21 21l-6-6m2-5a7 7 0 11-18 0 9 9 0 0118 0z"/>
+                                          d="M21 21l-6-6m2-5a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 <input
                                     v-model="searchQuery"
@@ -222,8 +228,8 @@ export default {
     name: 'Dashboard',
     components: {
         LineChart,
-        DoughnutChart,
-        BarChart,
+        //DoughnutChart,
+        //BarChart,
         Navigation
     },
     setup() {
@@ -298,7 +304,9 @@ export default {
 
                 monthlyChartData.value = monthlyRes.data;
 
-                students.value = applicationsRes.data.map(app => ({
+                const applicationsData = Array.isArray(applicationsRes.data) ? applicationsRes.data : (applicationsRes.data.data || []);
+
+                students.value = applicationsData.map(app => ({
                     id: app.id,
                     name: `${app.student.first_name} ${app.student.last_name}`,
                     email: app.student.email,
