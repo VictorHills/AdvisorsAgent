@@ -58,7 +58,7 @@ class ApplicationController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => 'required|exists:advisor_db.courses,id',
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -110,7 +110,7 @@ class ApplicationController extends Controller
         $application = StudentApplications::where('agent_id', $agentId)->findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => 'required|exists:advisor_db.courses,id',
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
