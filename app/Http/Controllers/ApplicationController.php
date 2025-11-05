@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateStudentApplicationRequest;
+use App\Http\Requests\UpdateStudentApplicationRequest;
 use App\Models\StudentApplications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -55,48 +57,9 @@ class ApplicationController extends Controller
         return response()->json(['application' => $application]);
     }
 
-    public function store(Request $request)
+    public function store(CreateStudentApplicationRequest $createStudentApplicationRequest)
     {
-        $validator = Validator::make($request->all(), [
-            'course_id' => 'required|exists:advisor_db.courses,id',
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'gender' => 'required|string|in:Male,Female,Other',
-            'email' => 'required|email|unique:student_applications,email',
-            'phone_number' => 'required|string|unique:student_applications,phone_number',
-            'country' => 'required|string|max:255',
-            'class_of_degree' => 'required|string|max:255',
-            'schools_of_choice' => 'required|array',
-            'country_of_preference' => 'required|array',
-            'additional_notes' => 'nullable|string',
-            'signature' => 'nullable|string',
-            'application_documents' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
-
-        $application = StudentApplications::create([
-            'agent_id' => auth()->id(),
-            'bdm_officer_id' => auth()->user()->bdm_officer_id,
-            'course_id' => $request->course_id,
-            'first_name' => $request->first_name,
-            'middle_name' => $request->middle_name,
-            'last_name' => $request->last_name,
-            'gender' => $request->gender,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'country' => $request->country,
-            'class_of_degree' => $request->class_of_degree,
-            'schools_of_choice' => json_encode($request->schools_of_choice),
-            'country_of_preference' => json_encode($request->country_of_preference),
-            'additional_notes' => $request->additional_notes,
-            'signature' => $request->signature,
-            'application_documents' => json_encode($request->application_documents ?? []),
-            'status' => 'Pending',
-        ]);
+        $application = StudentApplications::create($createStudentApplicationRequest->validated());
 
         return response()->json([
             'application' => $application,
@@ -104,48 +67,11 @@ class ApplicationController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateStudentApplicationRequest $updateStudentApplicationRequest, $id)
     {
         $agentId = auth()->id();
         $application = StudentApplications::where('agent_id', $agentId)->findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'course_id' => 'required|exists:advisor_db.courses,id',
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'gender' => 'required|string|in:Male,Female,Other',
-            'email' => 'required|email|unique:student_applications,email,' . $id,
-            'phone_number' => 'required|string|unique:student_applications,phone_number,' . $id,
-            'country' => 'required|string|max:255',
-            'class_of_degree' => 'required|string|max:255',
-            'schools_of_choice' => 'required|array',
-            'country_of_preference' => 'required|array',
-            'additional_notes' => 'nullable|string',
-            'signature' => 'nullable|string',
-            'application_documents' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
-
-        $application->update([
-            'course_id' => $request->course_id,
-            'first_name' => $request->first_name,
-            'middle_name' => $request->middle_name,
-            'last_name' => $request->last_name,
-            'gender' => $request->gender,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'country' => $request->country,
-            'class_of_degree' => $request->class_of_degree,
-            'schools_of_choice' => json_encode($request->schools_of_choice),
-            'country_of_preference' => json_encode($request->country_of_preference),
-            'additional_notes' => $request->additional_notes,
-            'signature' => $request->signature,
-            'application_documents' => json_encode($request->application_documents ?? []),
-        ]);
+        $application->update($updateStudentApplicationRequest->validated());
 
         return response()->json([
             'application' => $application,
