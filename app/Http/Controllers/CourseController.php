@@ -9,21 +9,18 @@ class CourseController extends Controller
 {
     public function index(Request $request)
     {
-        $per_page = $request->per_page ?? 100;
+        $per_page = $request->input('per_page', 100);
+        $search = $request->input('search', $request->input('term', ''));
+
         $query = Courses::query();
 
-        // Search filter
-        if ($request->has('search') && $request->search) {
-            $query->where('name', 'like', "%
-            $request->search%");
+        if (!empty($search)) {
+            $query->where('name', 'like', "%$search%");
         }
 
-        $courses = $query->orderBy('name')->select([
-            'id',
-            'name',
-            'university_id',
-            'description',
-        ])->paginate($per_page);
+        $courses = $query->orderBy('name')
+            ->select(['id', 'name', 'university_id', 'description'])
+            ->paginate($per_page);
 
         return $this->respondSuccessWithData(message: 'Courses fetched successfully', data: $courses);
     }
