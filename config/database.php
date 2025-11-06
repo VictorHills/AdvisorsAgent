@@ -63,6 +63,20 @@ return [
             ]) : [],
         ],
 
+        'advisor_db' => [
+            'driver' => env('ADVISOR_DB_CONNECTION', 'mysql'),
+            'host' => env('ADVISOR_DB_HOST', '127.0.0.1'),
+            'port' => env('ADVISOR_DB_PORT', '3306'),
+            'database' => env('ADVISOR_DB_DATABASE', 'forge'),
+            'username' => env('ADVISOR_DB_USERNAME', 'forge'),
+            'password' => env('ADVISOR_DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
@@ -148,7 +162,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string)env('APP_NAME', 'laravel')) . '-database-'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 
