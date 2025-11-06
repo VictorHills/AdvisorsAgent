@@ -9,24 +9,25 @@ class CountryController extends Controller
 {
     public function index(Request $request)
     {
-        $per_page = $request->per_page ?? 100;
+        $per_page = $request->input('per_page', 100);
+        $search = $request->input('search', $request->input('term', ''));
+
         $query = Countries::query();
 
-        // Search filter
-        if ($request->has('search') && $request->search) {
-            $query->where('name', 'like', "%
-            $request->search%");
+        if (!empty($search)) {
+            $query->where('name', 'like', "%$search%");
         }
 
-        $countries = $query->orderBy('name')->select([
-            'id',
-            'name',
-            'description',
-            'currency',
-        ])->paginate($per_page);
+        $countries = $query->orderBy('name')
+            ->select(['id', 'name', 'description', 'currency'])
+            ->paginate($per_page);
 
-        return $this->respondSuccessWithData(message: 'Countries fetched successfully', data: $countries);
+        return $this->respondSuccessWithData(
+            message: 'Countries fetched successfully',
+            data: $countries
+        );
     }
+
 
     public function show($id)
     {
