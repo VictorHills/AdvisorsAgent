@@ -142,7 +142,6 @@ class DashboardController extends Controller
         $agentId = auth()->id();
 
         $activities = StudentApplications::where('agent_id', $agentId)
-            ->with('student')
             ->orderBy('updated_at', 'desc')
             ->limit(5)
             ->get()
@@ -157,7 +156,7 @@ class DashboardController extends Controller
 
                 return [
                     'id' => $application->id,
-                    'text' => $statusText . ' for ' . $application->student->first_name . ' ' . $application->student->last_name,
+                    'text' => $statusText . ' for ' . $application->first_name . ' ' . $application->last_name,
                     'time' => Carbon::parse($application->updated_at)->diffForHumans(),
                 ];
             });
