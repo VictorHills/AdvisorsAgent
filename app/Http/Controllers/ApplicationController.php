@@ -6,7 +6,8 @@ use App\Http\Requests\CreateStudentApplicationRequest;
 use App\Http\Requests\UpdateStudentApplicationRequest;
 use App\Models\StudentApplications;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class ApplicationController extends Controller
 {
@@ -22,7 +23,7 @@ class ApplicationController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%$search%")
                     ->orWhere('last_name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%$search%");
             });
         }
 
@@ -57,14 +58,34 @@ class ApplicationController extends Controller
         return response()->json(['application' => $application]);
     }
 
-    public function store(CreateStudentApplicationRequest $createStudentApplicationRequest)
+    /**
+     * @throws Throwable
+     */
+    public function store(CreateStudentApplicationRequest $request)
     {
-        $application = StudentApplications::create($createStudentApplicationRequest->validated());
+        return DB::transaction(function () use ($request) {
+            $application = StudentApplications::create($request->validated());
 
-        return response()->json([
-            'application' => $application,
-            'message' => 'Application created successfully'
-        ], 201);
+            $filePaths = [];
+
+            if ($request->hasFile('application_documents')) {
+                foreach ($request->file('application_documents') as $file) {
+                    if ($file->isValid()) {
+                        $path = $file->store('uploads', 'public');
+                        $filePaths[] = $path;
+                    }
+                }
+
+                $application->update([
+                    'application_documents' => $filePaths
+                ]);
+            }
+
+            return response()->json([
+                'application' => $application,
+                'message' => 'Application created successfully'
+            ], 201);
+        });
     }
 
     public function update(UpdateStudentApplicationRequest $updateStudentApplicationRequest, $id)
