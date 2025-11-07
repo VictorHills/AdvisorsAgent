@@ -10,20 +10,21 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('courses', function (Blueprint $table) {
+        Schema::create('o_t_p_s', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('school_id');
-            $table->string('name')->unique();
-            $table->string('slug')->unique();
-            $table->string('description')->nullable();
-            $table->string('image')->nullable();
-            $table->string('code')->nullable();
+            $table->string('email');
+            $table->string('token');
+            $table->timestamp('expires_at');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('school_id')
-                ->references('id')
-                ->on('schools')
+            $table->index('email');
+            $table->index('token');
+            $table->unique(['email', 'token']);
+
+            $table->foreign('email')
+                ->references('email')
+                ->on('users')
                 ->onDelete('cascade');
         });
     }
@@ -34,7 +35,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::disableForeignKeyConstraints();
-        Schema::dropIfExists('courses');
+        Schema::dropIfExists('o_t_p_s');
         Schema::enableForeignKeyConstraints();
     }
 };

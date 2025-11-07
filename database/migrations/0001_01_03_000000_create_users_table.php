@@ -27,6 +27,10 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
 
+            $table->index('email');
+            $table->index('role_name');
+            $table->index('is_active');
+
             $table->foreign('bdm_officer_id')
                 ->references('id')
                 ->on('business_development_officers')
