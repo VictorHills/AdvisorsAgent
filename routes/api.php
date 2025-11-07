@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('otp', [AuthController::class, 'otp']);
+    Route::post('reset-password', [AuthController::class, 'restPassword']);
 });
 
 // Course routes
