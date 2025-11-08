@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminApplicationController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DashboardController;
@@ -51,4 +53,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     // BDM Officer routes
     Route::get('bdm-officers', [BdmOfficerController::class, 'index']);
     Route::get('bdm-officers/{id}', [BdmOfficerController::class, 'show']);
+
+    Route::group(['middleware' => 'auth:api', 'prefix' => 'admin'], function () {
+        Route::get('dashboard', [AdminDashboardController::class, 'index']);
+        Route::apiResource('applications', AdminApplicationController::class);
+    });
 });
