@@ -39,6 +39,8 @@ export const authAPI = {
     register: (userData) => api.post("/auth/register", userData),
     logout: () => api.post("/auth/logout"),
     getUser: () => api.get("/user"),
+    getOtp: (email) => api.post("/auth/otp", { email }),
+    resetPassword: (data) => api.post("/auth/reset-password", data),
 }
 
 export const dashboardAPI = {
@@ -52,13 +54,94 @@ export const dashboardAPI = {
 export const applicationsAPI = {
     getAll: () => api.get("/applications"),
     getOne: (id) => api.get(`/applications/${id}`),
-    create: (data) => api.post("/applications", data),
-    update: (id, data) => api.put(`/applications/${id}`, data),
+    create: (data) => {
+        const formData = new FormData()
+
+        // Add all form fields except files
+        Object.keys(data).forEach((key) => {
+            if (key !== "application_documents") {
+                if (Array.isArray(data[key])) {
+                    data[key].forEach((item, index) => {
+                        formData.append(`${key}[${index}]`, item)
+                    })
+                } else {
+                    formData.append(key, data[key])
+                }
+            }
+        })
+
+        // Add files with proper array syntax for Laravel
+        if (data.application_documents && data.application_documents.length > 0) {
+            data.application_documents.forEach((file, index) => {
+                formData.append(`application_documents[${index}]`, file)
+            })
+        }
+
+        return api.post("/applications", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        })
+    },
+    update: (id, data) => {
+        const formData = new FormData()
+
+        Object.keys(data).forEach((key) => {
+            if (key !== "application_documents") {
+                if (Array.isArray(data[key])) {
+                    data[key].forEach((item, index) => {
+                        formData.append(`${key}[${index}]`, item)
+                    })
+                } else {
+                    formData.append(key, data[key])
+                }
+            }
+        })
+
+        if (data.application_documents && data.application_documents.length > 0) {
+            data.application_documents.forEach((file, index) => {
+                formData.append(`application_documents[${index}]`, file)
+            })
+        }
+
+        return api.put(`/applications/${id}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        })
+    },
+    patch: (id, data) => {
+        const formData = new FormData()
+
+        Object.keys(data).forEach((key) => {
+            if (key !== "application_documents") {
+                if (Array.isArray(data[key])) {
+                    data[key].forEach((item, index) => {
+                        formData.append(`${key}[${index}]`, item)
+                    })
+                } else {
+                    formData.append(key, data[key])
+                }
+            }
+        })
+
+        if (data.application_documents && data.application_documents.length > 0) {
+            data.application_documents.forEach((file, index) => {
+                formData.append(`application_documents[${index}]`, file)
+            })
+        }
+
+        return api.patch(`/applications/${id}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        })
+    },
     delete: (id) => api.delete(`/applications/${id}`),
 }
 
 export const studentsAPI = {
-    getAll: () => api.get("/students"),
+    getAll: (page = 1, perPage = 10) => api.get("/students", { params: { page, per_page: perPage } }),
     getOne: (id) => api.get(`/students/${id}`),
 }
 
@@ -69,12 +152,21 @@ export const bdmOfficersAPI = {
 
 export const coursesAPI = {
     getAll: () => api.get("/courses"),
+    search: (searchTerm = "", perPage = 10) => api.get("/courses", { params: { search: searchTerm, per_page: perPage } }),
     getOne: (id) => api.get(`/courses/${id}`),
 }
 
 export const schoolsAPI = {
     getAll: () => api.get("/schools"),
+    search: (searchTerm = "", perPage = 10) => api.get("/schools", { params: { search: searchTerm, per_page: perPage } }),
     getOne: (id) => api.get(`/schools/${id}`),
+}
+
+export const countriesAPI = {
+    getAll: () => api.get("/countries"),
+    search: (searchTerm = "", perPage = 10) =>
+        api.get("/countries", { params: { search: searchTerm, per_page: perPage } }),
+    getOne: (id) => api.get(`/countries/${id}`),
 }
 
 export default api
