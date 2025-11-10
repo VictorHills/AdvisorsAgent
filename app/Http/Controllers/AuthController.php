@@ -47,11 +47,10 @@ class AuthController extends Controller
             'is_active' => true,
         ]);
 
-        $token = JWTAuth::fromUser($user);
+        //TODO send an email to the following (User and TGM Admin)
 
         return response()->json([
             'user' => $user,
-            'token' => $token,
             'message' => 'Registration successful'
         ], 201);
     }

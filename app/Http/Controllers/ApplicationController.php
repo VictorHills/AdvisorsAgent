@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateStudentApplicationRequest;
 use App\Http\Requests\UpdateStudentApplicationRequest;
+use App\Http\Resources\ApplicationResource;
 use App\Models\StudentApplications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,8 +15,7 @@ class ApplicationController extends Controller
     public function index(Request $request)
     {
         $agentId = auth()->id();
-        $query = StudentApplications::where('agent_id', $agentId)
-            ->with(['course', 'agent', 'bdmOfficer']);
+        $query = StudentApplications::where('agent_id', $agentId);
 
         // Search filter
         if ($request->has('search') && $request->search) {
@@ -45,7 +45,7 @@ class ApplicationController extends Controller
         $perPage = $request->get('per_page', 10);
         $applications = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
-        return response()->json($applications);
+        return ApplicationResource::collection($applications);
     }
 
     public function show($id)
@@ -61,15 +61,14 @@ class ApplicationController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(CreateStudentApplicationRequest $request)
+    public function store(CreateStudentApplicationRequest $createStudentApplicationRequest)
     {
-        return DB::transaction(function () use ($request) {
-            $application = StudentApplications::create($request->validated());
+        return DB::transaction(function () use ($createStudentApplicationRequest) {
+            $application = StudentApplications::create($createStudentApplicationRequest->validated());
 
             $filePaths = [];
-
-            if ($request->hasFile('application_documents')) {
-                foreach ($request->file('application_documents') as $file) {
+            if ($createStudentApplicationRequest->hasFile('application_documents')) {
+                foreach ($createStudentApplicationRequest->file('application_documents') as $file) {
                     if ($file->isValid()) {
                         $path = $file->store('uploads', 'public');
                         $filePaths[] = $path;
@@ -81,8 +80,10 @@ class ApplicationController extends Controller
                 ]);
             }
 
+            //TODO: Send emails to the following (The Student, BDM Officer, TGM Admin and Agent)
+
             return response()->json([
-                'application' => $application,
+                'application' => new ApplicationResource($application),
                 'message' => 'Application created successfully'
             ], 201);
         });
@@ -92,10 +93,25 @@ class ApplicationController extends Controller
     {
         $agentId = auth()->id();
         $application = StudentApplications::where('agent_id', $agentId)->findOrFail($id);
-        $application->update($updateStudentApplicationRequest->validated());
+        $data = $updateStudentApplicationRequest->validated();
 
+        if ($updateStudentApplicationRequest->hasFile('application_documents')) {
+            $filePaths = [];
+
+            foreach ($updateStudentApplicationRequest->file('application_documents') as $file) {
+                if ($file->isValid()) {
+                    $path = $file->store("uploads/applications/{$application->id}", 'public');
+                    $filePaths[] = $path;
+                }
+            }
+
+            $existingDocuments = $application->application_documents ?? [];
+            $data['application_documents'] = array_merge($existingDocuments, $filePaths);
+        }
+
+        $application->update($data);
         return response()->json([
-            'application' => $application,
+            'application' => new ApplicationResource($application),
             'message' => 'Application updated successfully'
         ]);
     }
