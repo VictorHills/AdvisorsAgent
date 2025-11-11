@@ -26,38 +26,38 @@
                     </div>
                 </div>
 
-                <div class="mb-8">
-                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
-                         style="animation-delay: 0.3s;">
-                        <h3 class="font-bold mb-6">Monthly Applications Overview</h3>
-                        <div class="h-80">
-                            <BarChart v-if="monthlyChartData && Object.keys(monthlyChartData).length > 0" :data="monthlyChartData"/>
-                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">
-                                No data available
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!--                <div class="mb-8">
+                                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                                         style="animation-delay: 0.3s;">
+                                        <h3 class="font-bold mb-6">Monthly Applications Overview</h3>
+                                        <div class="h-80">
+                                            <BarChart v-if="monthlyChartData && Object.keys(monthlyChartData).length > 0" :data="monthlyChartData"/>
+                                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">
+                                                No data available
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
-                         style="animation-delay: 0.4s;">
-                        <h3 class="font-bold mb-6">Applications Trend</h3>
-                        <div class="h-64">
-                            <LineChart :data="applicationsChartData"/>
-                        </div>
-                    </div>
-                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
-                         style="animation-delay: 0.5s;">
-                        <h3 class="font-bold mb-6">Applications by Status</h3>
-                        <div class="h-64">
-                            <DoughnutChart v-if="statusChartData && Object.keys(statusChartData).length > 0" :data="statusChartData"/>
-                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">
-                                No data available
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                                         style="animation-delay: 0.4s;">
+                                        <h3 class="font-bold mb-6">Applications Trend</h3>
+                                        <div class="h-64">
+                                            <LineChart :data="applicationsChartData"/>
+                                        </div>
+                                    </div>
+                                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                                         style="animation-delay: 0.5s;">
+                                        <h3 class="font-bold mb-6">Applications by Status</h3>
+                                        <div class="h-64">
+                                            <DoughnutChart v-if="statusChartData && Object.keys(statusChartData).length > 0" :data="statusChartData"/>
+                                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">
+                                                No data available
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>-->
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 glass-card rounded-xl p-6 animate-slide-up border-t-2 border-primary">
@@ -69,29 +69,6 @@
                             >
                                 + New Application
                             </router-link>
-                        </div>
-
-                        <div class="flex items-center space-x-4 mb-6">
-                            <div class="flex-1 relative">
-                                <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M21 21l-6-6m2-5a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <input
-                                    v-model="searchQuery"
-                                    type="text"
-                                    placeholder="Search students..."
-                                    class="w-full pl-10 pr-4 py-2 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                                />
-                            </div>
-                            <select v-model="statusFilter"
-                                    class="px-4 py-2 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200">
-                                <option value="">All Status</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                                <option value="In Review">In Review</option>
-                            </select>
                         </div>
 
                         <div class="overflow-x-auto">
@@ -111,7 +88,7 @@
                                 </thead>
                                 <tbody>
                                 <tr
-                                    v-for="student in filteredStudents"
+                                    v-for="student in limitedStudents"
                                     :key="student.id"
                                     class="border-b border-border hover:bg-muted/50 hover:border-l-2 hover:border-l-primary transition-all duration-200 cursor-pointer"
                                 >
@@ -167,7 +144,7 @@
                                         <div class="text-xs text-muted-foreground">Submit student application</div>
                                     </div>
                                 </router-link>
-                                <router-link
+                                <!--<router-link
                                     to="/team"
                                     class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105"
                                 >
@@ -182,23 +159,22 @@
                                         <div class="font-medium text-sm">View Team</div>
                                         <div class="text-xs text-muted-foreground">BDO officers</div>
                                     </div>
-                                </router-link>
+                                </router-link>-->
                             </div>
                         </div>
 
                         <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
                              style="animation-delay: 0.3s;">
                             <h3 class="font-bold mb-4">Recent Activity</h3>
-                            <!-- Fetch recent activity from API instead of dummy data -->
                             <div v-if="loadingActivity" class="flex items-center justify-center py-8">
                                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                             </div>
-                            <div v-else-if="recentActivity.length === 0"
+                            <div v-else-if="limitedRecentActivity.length === 0"
                                  class="text-center py-8 text-muted-foreground text-sm">
                                 No recent activity
                             </div>
                             <div v-else class="space-y-4">
-                                <div v-for="activity in recentActivity" :key="activity.id"
+                                <div v-for="activity in limitedRecentActivity" :key="activity.id"
                                      class="flex items-start space-x-3 hover:bg-muted/50 p-2 rounded-lg transition-all duration-200">
                                     <div class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                                     <div class="flex-1 min-w-0">
@@ -228,8 +204,8 @@ export default {
     name: 'Dashboard',
     components: {
         LineChart,
-        //DoughnutChart,
-        //BarChart,
+        // DoughnutChart,
+        // BarChart,
         Navigation
     },
     setup() {
@@ -244,9 +220,6 @@ export default {
         const students = ref([]);
         const recentActivity = ref([]);
 
-        const searchQuery = ref('');
-        const statusFilter = ref('');
-
         const fetchDashboardData = async () => {
             try {
                 loading.value = true;
@@ -259,9 +232,11 @@ export default {
                     applicationsAPI.getAll()
                 ]);
 
+                const statsData = statsRes.data.data || statsRes.data;
+
                 stats.value = [
                     {
-                        value: statsRes.data.total_students || 0,
+                        value: statsData.total_students || 0,
                         label: 'Total Students',
                         change: '+12%',
                         changeColor: 'text-primary',
@@ -270,7 +245,7 @@ export default {
                         icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
                     },
                     {
-                        value: statsRes.data.pending_applications || 0,
+                        value: statsData.pending_applications || 0,
                         label: 'Pending Applications',
                         change: '+8%',
                         changeColor: 'text-blue-500',
@@ -279,8 +254,8 @@ export default {
                         icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
                     },
                     {
-                        value: statsRes.data.approved_applications || 0,
-                        label: 'Approved',
+                        value: statsData.approved_applications || 0,
+                        label: 'Application Submitted',
                         change: '+24%',
                         changeColor: 'text-emerald-500',
                         bgColor: 'bg-emerald-500/20',
@@ -288,8 +263,8 @@ export default {
                         icon: 'M9 12l2 2 4-4m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
                     },
                     {
-                        value: statsRes.data.in_review_applications || 0,
-                        label: 'In Review',
+                        value: statsData.in_review_applications || 0,
+                        label: 'Student Enrolled',
                         change: '-5%',
                         changeColor: 'text-amber-500',
                         bgColor: 'bg-amber-500/20',
@@ -298,21 +273,19 @@ export default {
                     }
                 ];
 
-                applicationsChartData.value = trendRes.data;
-
-                statusChartData.value = statusRes.data;
-
-                monthlyChartData.value = monthlyRes.data;
+                applicationsChartData.value = trendRes.data.data || trendRes.data;
+                statusChartData.value = statusRes.data.data || statusRes.data;
+                monthlyChartData.value = monthlyRes.data.data || monthlyRes.data;
 
                 const applicationsData = Array.isArray(applicationsRes.data) ? applicationsRes.data : (applicationsRes.data.data || []);
 
                 students.value = applicationsData.map(app => ({
                     id: app.id,
-                    name: `${app.student.first_name} ${app.student.last_name}`,
-                    email: app.student.email,
-                    initials: `${app.student.first_name[0]}${app.student.last_name[0]}`,
+                    name: `${app.first_name} ${app.last_name}`,
+                    email: app.email,
+                    initials: `${app.first_name[0]}${app.last_name[0]}`,
                     course: app.course?.name || 'N/A',
-                    country: app.student.country,
+                    country: app.country,
                     status: app.status,
                     statusClass: getStatusClass(app.status),
                     date: new Date(app.created_at).toLocaleDateString()
@@ -340,30 +313,16 @@ export default {
 
         const getStatusClass = (status) => {
             const statusMap = {
-                'Approved': 'bg-emerald-500/20 text-emerald-500',
+                'Application Submitted': 'bg-emerald-500/20 text-emerald-500',
                 'Pending': 'bg-blue-500/20 text-blue-500',
-                'In Review': 'bg-amber-500/20 text-amber-500',
+                'Student Enrolled': 'bg-amber-500/20 text-amber-500',
                 'Rejected': 'bg-red-500/20 text-red-500'
             };
             return statusMap[status] || 'bg-gray-500/20 text-gray-500';
         };
 
-        const filteredStudents = computed(() => {
-            let filtered = students.value;
-
-            if (searchQuery.value) {
-                filtered = filtered.filter(student =>
-                    student.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                    student.email.toLowerCase().includes(searchQuery.value.toLowerCase())
-                );
-            }
-
-            if (statusFilter.value) {
-                filtered = filtered.filter(student => student.status === statusFilter.value);
-            }
-
-            return filtered;
-        });
+        const limitedStudents = computed(() => students.value.slice(0, 5));
+        const limitedRecentActivity = computed(() => recentActivity.value.slice(0, 5));
 
         onMounted(() => {
             fetchDashboardData();
@@ -378,9 +337,8 @@ export default {
             statusChartData,
             monthlyChartData,
             students,
-            searchQuery,
-            statusFilter,
-            filteredStudents,
+            limitedStudents,
+            limitedRecentActivity,
             recentActivity,
             isDark,
             toggleTheme
