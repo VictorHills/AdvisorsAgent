@@ -9,9 +9,21 @@
                 </div>
 
                 <!-- Display success message from endpoint with auto-redirect -->
-                <div v-if="success"
+                <!-- <div v-if="success"
                      class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-500 text-sm">
                     {{ successMessage }}
+                </div> -->
+
+                <!-- ADDED LOADING OVERLAY AFTER SUCCESSFUL SUBMISSION -->
+                <div v-if="success" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div class="bg-card rounded-xl p-8 text-center border border-border shadow-2xl animate-scale-in">
+                        <svg class="w-16 h-16 text-emerald-500 mx-auto mb-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <h3 class="text-xl font-bold mb-2">{{ successMessage }}</h3>
+                        <p class="text-muted-foreground text-sm">Redirecting to student dashboard...</p>
+                    </div>
                 </div>
 
                 <div class="glass-card rounded-xl p-6 animate-slide-up">
@@ -140,7 +152,8 @@
 
                 <div class="glass-card rounded-xl p-6 animate-slide-up" style="animation-delay: 0.1s;">
                     <h2 class="text-lg font-bold mb-6">Academic Preferences</h2>
-                    <div class="space-y-6">
+                    <!-- Added relative positioning to parent container to contain dropdowns properly -->
+                    <div class="space-y-6 relative">
                         <!-- Desired Course with searchable dropdown -->
                         <div class="space-y-2 group">
                             <label for="course_search"
@@ -156,7 +169,9 @@
                                     @focus="handleCourseFocus"
                                     @blur="handleCourseBlur"
                                 />
-                                <div v-if="showCourseDropdown" class="absolute z-10 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                                <!-- Changed z-10 to z-50 for proper layering -->
+                                <div v-if="showCourseDropdown"
+                                     class="absolute z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
                                     <div v-if="filteredCourses.length === 0" class="p-3 text-sm text-muted-foreground">
                                         No courses found
                                     </div>
@@ -175,41 +190,76 @@
                             </div>
                         </div>
 
-                        <!-- Schools of Choice multi-select with search -->
+                        <!-- Schools of Choice - single selection with tooltip showing selected items (max 4) -->
                         <div class="space-y-2">
-                            <label for="school_search"
-                                   class="text-sm font-medium">Schools of Choice *</label>
+                            <div class="flex items-center gap-2">
+                                <label for="school_search"
+                                       class="text-sm font-medium">Schools of Choice * <span
+                                    class="text-xs text-muted-foreground">(Max 4 selections)</span></label>
+                                <!-- Tooltip showing selected schools count -->
+                                <div v-if="form.schools_of_choice.length > 0" class="group relative">
+                                    <div
+                                        class="w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold cursor-help">
+                                        {{ form.schools_of_choice.length }}
+                                    </div>
+                                    <!-- Tooltip displaying selected schools (up to 4) -->
+                                    <div
+                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50">
+                                        <div
+                                            class="bg-card border border-border rounded-lg shadow-lg p-3 whitespace-nowrap text-sm">
+                                            <p class="font-semibold text-primary mb-2">Selected Schools:</p>
+                                            <ul class="space-y-1 text-muted-foreground">
+                                                <li v-for="(schoolId, idx) in form.schools_of_choice.slice(0, 4)"
+                                                    :key="schoolId" class="text-xs">
+                                                    {{ idx + 1 }}. {{ getSchoolName(schoolId) }}
+                                                </li>
+                                                <li v-if="form.schools_of_choice.length > 4" class="text-xs italic">
+                                                    +{{ form.schools_of_choice.length - 4 }} more
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="relative">
                                 <input
                                     id="school_search"
                                     v-model="schoolSearch"
                                     type="text"
-                                    placeholder="Search and select schools..."
+                                    placeholder="Search and select a school..."
                                     class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                     @focus="handleSchoolFocus"
                                     @blur="handleSchoolBlur"
                                 />
-                                <div v-if="showSchoolDropdown" class="absolute z-10 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                                <!-- Dropdown positioned below input with proper overflow handling and prevent blur on selection -->
+                                <!-- Changed z-10 to z-50 for proper layering -->
+                                <div v-if="showSchoolDropdown"
+                                     class="fixed z-50 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto"
+                                     :style="{
+                                       top: schoolInputTop + 'px',
+                                       left: schoolInputLeft + 'px',
+                                       width: schoolInputWidth + 'px'
+                                     }">
                                     <div v-if="filteredSchools.length === 0" class="p-3 text-sm text-muted-foreground">
                                         No schools found
                                     </div>
                                     <div
                                         v-for="school in filteredSchools"
                                         :key="school.id"
-                                        @click="toggleSchool(school.id)"
+                                        @mousedown.prevent="toggleSchool(school.id)"
                                         class="px-4 py-2 cursor-pointer hover:bg-muted transition-colors flex items-center"
                                     >
                                         <input
                                             type="checkbox"
                                             :checked="form.schools_of_choice.includes(school.id)"
                                             class="mr-2"
-                                            @change="toggleSchool(school.id)"
+                                            @mousedown.prevent
                                         />
                                         {{ school.name }}
                                     </div>
                                 </div>
                             </div>
-                            <!-- Display selected schools -->
+                            <!-- Display selected schools as tags -->
                             <div v-if="form.schools_of_choice.length > 0" class="mt-3 flex flex-wrap gap-2">
                                 <div
                                     v-for="schoolId in form.schools_of_choice"
@@ -228,11 +278,38 @@
                             </div>
                         </div>
 
-                        <!-- Country Preferences multi-select with search -->
+                        <!-- Country Preferences - single selection with tooltip showing selected items (max 4) -->
                         <div class="space-y-2">
-                            <label for="country_search"
-                                   class="text-sm font-medium">Country Preferences *</label>
-                            <div class="relative z-20">
+                            <div class="flex items-center gap-2">
+                                <label for="country_search"
+                                       class="text-sm font-medium">Country Preferences * <span
+                                    class="text-xs text-muted-foreground">(Max 4 selections)</span></label>
+                                <!-- Tooltip showing selected countries count -->
+                                <div v-if="form.country_of_preference.length > 0" class="group relative">
+                                    <div
+                                        class="w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold cursor-help">
+                                        {{ form.country_of_preference.length }}
+                                    </div>
+                                    <!-- Tooltip displaying selected countries (up to 4) -->
+                                    <div
+                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50">
+                                        <div
+                                            class="bg-card border border-border rounded-lg shadow-lg p-3 whitespace-nowrap text-sm">
+                                            <p class="font-semibold text-primary mb-2">Selected Countries:</p>
+                                            <ul class="space-y-1 text-muted-foreground">
+                                                <li v-for="(countryId, idx) in form.country_of_preference.slice(0, 4)"
+                                                    :key="countryId" class="text-xs">
+                                                    {{ idx + 1 }}. {{ getCountryName(countryId) }}
+                                                </li>
+                                                <li v-if="form.country_of_preference.length > 4" class="text-xs italic">
+                                                    +{{ form.country_of_preference.length - 4 }} more
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="relative">
                                 <input
                                     id="country_search"
                                     v-model="countrySearch"
@@ -242,28 +319,36 @@
                                     @focus="handleCountryFocus"
                                     @blur="handleCountryBlur"
                                 />
-                                <!-- Added z-50 and proper positioning to prevent overlap -->
-                                <div v-if="showCountryDropdown" class="absolute z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
-                                    <div v-if="filteredCountries.length === 0" class="p-3 text-sm text-muted-foreground">
+                                <!-- Dropdown positioned below input with proper overflow handling and prevent blur on selection -->
+                                <!-- Changed z-10 to z-50 for proper layering -->
+                                <div v-if="showCountryDropdown"
+                                     class="fixed z-50 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto"
+                                     :style="{
+                                       top: countryInputTop + 'px',
+                                       left: countryInputLeft + 'px',
+                                       width: countryInputWidth + 'px'
+                                     }">
+                                    <div v-if="filteredCountries.length === 0"
+                                         class="p-3 text-sm text-muted-foreground">
                                         No countries found
                                     </div>
                                     <div
                                         v-for="country in filteredCountries"
                                         :key="country.id"
-                                        @click="toggleCountry(country.id)"
+                                        @mousedown.prevent="toggleCountry(country.id)"
                                         class="px-4 py-2 cursor-pointer hover:bg-muted transition-colors flex items-center"
                                     >
                                         <input
                                             type="checkbox"
                                             :checked="form.country_of_preference.includes(country.id)"
                                             class="mr-2"
-                                            @change="toggleCountry(country.id)"
+                                            @mousedown.prevent
                                         />
                                         {{ country.name }}
                                     </div>
                                 </div>
                             </div>
-                            <!-- Display selected countries -->
+                            <!-- Display selected countries as tags -->
                             <div v-if="form.country_of_preference.length > 0" class="mt-3 flex flex-wrap gap-2">
                                 <div
                                     v-for="countryId in form.country_of_preference"
@@ -322,10 +407,13 @@
                             <div v-if="form.application_documents.length > 0" class="mt-4">
                                 <p class="text-sm font-medium mb-2">Uploaded Files:</p>
                                 <ul class="space-y-2">
-                                    <li v-for="(file, index) in form.application_documents" :key="index" class="text-sm text-muted-foreground flex items-center justify-between bg-muted/50 p-3 rounded border border-border">
+                                    <li v-for="(file, index) in form.application_documents" :key="index"
+                                        class="text-sm text-muted-foreground flex items-center justify-between bg-muted/50 p-3 rounded border border-border">
                                         <div class="flex items-center gap-2 flex-1">
-                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                                 viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                             </svg>
                                             <div>
                                                 <div class="font-medium text-foreground">{{ file.name }}</div>
@@ -346,7 +434,7 @@
                                 ref="documentInput"
                                 type="file"
                                 multiple
-                                accept=".pdf,.doc,.docx"
+                                accept=".pdf,.doc,.docx.png"
                                 class="hidden"
                                 @change="handleFileUpload"
                             />
@@ -361,17 +449,156 @@
                     >
                         Cancel
                     </router-link>
-                    <!-- Disable button while loading -->
+                    <!-- Changed to show review modal on submit instead of direct submission -->
                     <button
-                        type="submit"
-                        :disabled="loading"
-                        class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        type="button"
+                        @click="showReviewModal = true"
+                        class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
                     >
-                        {{ loading ? 'Submitting...' : 'Submit Application' }}
+                        <span>Review & Submit</span>
                     </button>
                 </div>
             </form>
         </main>
+
+        <!-- Added review modal for confirming details before submission -->
+        <div v-if="showReviewModal" class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <!-- Added sticky header with backdrop blur and background gradient -->
+            <div class="bg-card rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-border shadow-2xl">
+                <div class="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border p-6 flex items-center justify-between backdrop-blur-2xl">
+                    <div>
+                        <h2 class="text-xl font-bold">Review Your Application</h2>
+                        <p class="text-sm text-muted-foreground mt-1">Please verify your details before submitting</p>
+                    </div>
+                    <button
+                        type="button"
+                        @click="showReviewModal = false"
+                        class="text-muted-foreground hover:text-foreground transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Removed backdrop blur from content, now only on overlay and header -->
+                <div class="p-6 space-y-6">
+                    <!-- Personal Information Review -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Personal Information</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">First Name</p>
+                                <p class="font-medium">{{ form.first_name }}</p>
+                            </div>
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Last Name</p>
+                                <p class="font-medium">{{ form.last_name }}</p>
+                            </div>
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Email</p>
+                                <p class="font-medium break-all text-sm">{{ form.email }}</p>
+                            </div>
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Phone</p>
+                                <p class="font-medium">{{ form.phone_number }}</p>
+                            </div>
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Country</p>
+                                <p class="font-medium">{{ form.country }}</p>
+                            </div>
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Gender</p>
+                                <p class="font-medium">{{ form.gender }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information Review -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Academic Information</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Class of Degree</p>
+                                <p class="font-medium">{{ form.class_of_degree }}</p>
+                            </div>
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Desired Course</p>
+                                <p class="font-medium">{{ getCourseName(form.course_id) }}</p>
+                            </div>
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Schools of Choice</p>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span v-for="schoolId in form.schools_of_choice" :key="schoolId"
+                                          class="px-2 py-1 bg-primary/20 text-primary rounded text-xs font-medium">
+                                        {{ getSchoolName(schoolId) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-1">Country Preferences</p>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span v-for="countryId in form.country_of_preference" :key="countryId"
+                                          class="px-2 py-1 bg-primary/20 text-primary rounded text-xs font-medium">
+                                        {{ getCountryName(countryId) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Notes Review -->
+                    <div v-if="form.additional_notes" class="space-y-4">
+                        <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Additional Notes</h3>
+                        <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
+                            <p class="text-sm text-muted-foreground whitespace-pre-wrap">{{ form.additional_notes }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Documents Review -->
+                    <div v-if="form.application_documents.length > 0" class="space-y-4">
+                        <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Attached Documents</h3>
+                        <div class="space-y-2">
+                            <div v-for="(file, index) in form.application_documents" :key="index"
+                                 class="p-3 bg-muted/30 rounded-lg border border-border/50 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <div>
+                                    <p class="font-medium text-sm">{{ file.name }}</p>
+                                    <p class="text-xs text-muted-foreground">{{ (file.size / 1024).toFixed(2) }} KB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-border">
+                        <button
+                            type="button"
+                            @click="showReviewModal = false"
+                            class="px-6 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-all duration-200">
+                            Go Back & Edit
+                        </button>
+                        <button
+                            type="button"
+                            @click="handleSubmit"
+                            :disabled="loading"
+                            class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            <svg v-if="loading" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>{{ loading ? 'Submitting...' : 'Confirm & Submit' }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -488,6 +715,13 @@ export default {
         const handleSchoolFocus = () => {
             showSchoolDropdown.value = true;
             schoolSearch.value = '';
+            const input = document.getElementById('school_search');
+            if (input) {
+                const rect = input.getBoundingClientRect();
+                schoolInputTop.value = rect.bottom;
+                schoolInputLeft.value = rect.left;
+                schoolInputWidth.value = rect.width;
+            }
             if (schools.value.length === 0) {
                 fetchSchools();
             }
@@ -496,6 +730,13 @@ export default {
         const handleCountryFocus = () => {
             showCountryDropdown.value = true;
             countrySearch.value = '';
+            const input = document.getElementById('country_search');
+            if (input) {
+                const rect = input.getBoundingClientRect();
+                countryInputTop.value = rect.bottom;
+                countryInputLeft.value = rect.left;
+                countryInputWidth.value = rect.width;
+            }
             if (countries.value.length === 0) {
                 fetchCountries();
             }
@@ -553,11 +794,12 @@ export default {
         });
 
         const toggleSchool = (schoolId) => {
-            const index = form.value.schools_of_choice.indexOf(schoolId);
-            if (index > -1) {
-                form.value.schools_of_choice.splice(index, 1);
+            if (form.value.schools_of_choice.includes(schoolId)) {
+                form.value.schools_of_choice = form.value.schools_of_choice.filter(id => id !== schoolId);
             } else {
-                form.value.schools_of_choice.push(schoolId);
+                if (form.value.schools_of_choice.length < 4) {
+                    form.value.schools_of_choice.push(schoolId);
+                }
             }
         };
 
@@ -566,11 +808,12 @@ export default {
         };
 
         const toggleCountry = (countryId) => {
-            const index = form.value.country_of_preference.indexOf(countryId);
-            if (index > -1) {
-                form.value.country_of_preference.splice(index, 1);
+            if (form.value.country_of_preference.includes(countryId)) {
+                form.value.country_of_preference = form.value.country_of_preference.filter(id => id !== countryId);
             } else {
-                form.value.country_of_preference.push(countryId);
+                if (form.value.country_of_preference.length < 4) {
+                    form.value.country_of_preference.push(countryId);
+                }
             }
         };
 
@@ -624,6 +867,9 @@ export default {
             form.value.application_documents.splice(index, 1);
         };
 
+        // Added review modal state
+        const showReviewModal = ref(false);
+
         const handleSubmit = async () => {
             try {
                 loading.value = true;
@@ -638,6 +884,8 @@ export default {
 
                 successMessage.value = response.data?.message || 'Application submitted successfully!';
                 success.value = true;
+                // Close modal after successful submission
+                showReviewModal.value = false;
 
                 setTimeout(() => {
                     router.push('/students');
@@ -668,6 +916,13 @@ export default {
             }, 200);
         };
 
+        const schoolInputTop = ref(0);
+        const schoolInputLeft = ref(0);
+        const schoolInputWidth = ref(0);
+        const countryInputTop = ref(0);
+        const countryInputLeft = ref(0);
+        const countryInputWidth = ref(0);
+
         onMounted(() => {
             fetchCourses();
             fetchSchools();
@@ -690,6 +945,12 @@ export default {
             showCourseDropdown,
             showSchoolDropdown,
             showCountryDropdown,
+            schoolInputTop,
+            schoolInputLeft,
+            schoolInputWidth,
+            countryInputTop,
+            countryInputLeft,
+            countryInputWidth,
             filteredCourses,
             filteredSchools,
             filteredCountries,
@@ -711,7 +972,8 @@ export default {
             handleCountryBlur,
             handleCourseFocus,
             handleSchoolFocus,
-            handleCountryFocus
+            handleCountryFocus,
+            showReviewModal // Expose modal state
         };
     }
 };
