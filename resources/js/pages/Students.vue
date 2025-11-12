@@ -7,18 +7,23 @@
             </div>
 
             <div v-if="loading" class="flex items-center justify-center py-12">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <!-- Improved loading spinner styling -->
+                <div class="flex flex-col items-center gap-4">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    <p class="text-muted-foreground">Loading applications...</p>
+                </div>
             </div>
 
-            <!-- Added error state to show if data fails to load -->
-            <div v-else-if="error" class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm mb-6">
+            <div v-else-if="error"
+                 class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm mb-6">
                 {{ error }}
                 <button @click="fetchStudents" class="ml-4 underline hover:no-underline">Retry</button>
             </div>
 
             <div v-else class="glass-card rounded-xl p-6 animate-slide-up" style="animation-delay: 0.1s;">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div class="flex-1 flex items-center space-x-4">
+                    <div
+                        class="flex-1 flex flex-col md:flex-row items-stretch md:items-center space-y-4 md:space-y-0 md:space-x-4">
                         <div class="flex-1 relative">
                             <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +56,7 @@
                     </div>
                     <router-link
                         to="/applications/create"
-                        class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2"
+                        class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center md:justify-start"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -74,7 +79,6 @@
                         <tr class="border-b border-border">
                             <th class="text-left py-4 px-4 text-sm font-semibold">Student</th>
                             <th class="text-left py-4 px-4 text-sm font-semibold">Course</th>
-                            <th class="text-left py-4 px-4 text-sm font-semibold">Country</th>
                             <th class="text-left py-4 px-4 text-sm font-semibold">Phone</th>
                             <th class="text-left py-4 px-4 text-sm font-semibold">Status</th>
                             <th class="text-left py-4 px-4 text-sm font-semibold">Applied</th>
@@ -83,7 +87,7 @@
                         </thead>
                         <tbody>
                         <tr
-                            v-for="student in filteredStudents"
+                            v-for="student in students"
                             :key="student.id"
                             class="border-b border-border hover:bg-muted/50 transition-all duration-200"
                         >
@@ -103,7 +107,6 @@
                                 <div class="text-sm font-medium">{{ student.course }}</div>
                                 <div class="text-xs text-muted-foreground">{{ student.degree }}</div>
                             </td>
-                            <td class="py-4 px-4 text-sm">{{ student.country }}</td>
                             <td class="py-4 px-4 text-sm text-muted-foreground">{{ student.phone }}</td>
                             <td class="py-4 px-4">
                                     <span
@@ -116,7 +119,6 @@
                             <td class="py-4 px-4 text-sm text-muted-foreground">{{ student.date }}</td>
                             <td class="py-4 px-4">
                                 <div class="flex items-center space-x-2">
-                                    <!-- View details icon (info icon) -->
                                     <button
                                         @click="viewDetails(student.id)"
                                         class="p-2 hover:bg-muted rounded-lg transition-all duration-200 hover:scale-110 text-muted-foreground hover:text-primary"
@@ -126,7 +128,6 @@
                                                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     </button>
-                                    <!-- Edit icon (pencil icon) now opens full edit form -->
                                     <button
                                         @click="editStudent(student.id)"
                                         class="p-2 hover:bg-muted rounded-lg transition-all duration-200 hover:scale-110 text-muted-foreground hover:text-primary"
@@ -143,7 +144,57 @@
                     </table>
                 </div>
 
-                <div v-if="filteredStudents.length === 0" class="text-center py-12">
+                <!-- Fixed pagination to use API metadata instead of client-side calculation -->
+                <div v-if="students.length > 0" class="mt-6 space-y-4">
+                    <!-- Items per page selector -->
+                    <div class="flex items-center justify-between flex-wrap gap-4">
+                        <div class="flex items-center gap-3">
+                            <label for="itemsPerPage" class="text-sm text-muted-foreground">Items per page:</label>
+                            <select v-model.number="itemsPerPage" id="itemsPerPage"
+                                    class="px-3 py-2 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="text-sm text-muted-foreground">
+                            Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total }} results
+                        </div>
+
+                        <!-- Pagination buttons -->
+                        <div class="flex items-center justify-center gap-2">
+                            <button
+                                @click="updatePage(Math.max(1, currentPage - 1))"
+                                :disabled="currentPage === 1"
+                                class="px-3 py-2 border border-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+                            >
+                                Previous
+                            </button>
+                            <div class="flex items-center gap-1">
+                                <button
+                                    v-for="page in paginationButtons"
+                                    :key="page"
+                                    @click="updatePage(page)"
+                                    :class="currentPage === page ? 'bg-primary text-primary-foreground' : 'border border-border hover:bg-muted'"
+                                    class="px-3 py-2 rounded-lg transition-all"
+                                >
+                                    {{ page }}
+                                </button>
+                            </div>
+                            <button
+                                @click="updatePage(Math.min(pagination.lastPage, currentPage + 1))"
+                                :disabled="currentPage === pagination.lastPage"
+                                class="px-3 py-2 border border-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="students.length === 0" class="text-center py-12">
                     <svg class="w-16 h-16 mx-auto text-muted-foreground mb-4" stroke="currentColor"
                          viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -153,108 +204,295 @@
                 </div>
             </div>
 
-            <!-- Added View Details Modal -->
-            <div v-if="showDetailsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div class="bg-card rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto border border-border">
-                    <div class="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between">
-                        <h2 class="text-xl font-bold">Application Details</h2>
-                        <button @click="showDetailsModal = false" class="text-muted-foreground hover:text-foreground">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <!-- Improved view details modal with modern design -->
+            <div v-if="showDetailsModal"
+                 class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto">
+                <div
+                    class="bg-card rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border shadow-2xl">
+                    <div
+                        class="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border p-4 md:p-6 flex items-center justify-between backdrop-blur-2xl">
+                        <div>
+                            <h2 class="text-lg md:text-xl font-bold">Application Details</h2>
+                            <p class="text-xs md:text-sm text-muted-foreground mt-1">Complete student information</p>
+                        </div>
+                        <button @click="showDetailsModal = false"
+                                class="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
+                            <svg class="w-5 md:w-6 h-5 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
-                    <div v-if="selectedStudent" class="p-6 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-muted-foreground">First Name</p>
-                                <p class="font-medium">{{ selectedStudent.first_name }}</p>
+                    <div v-if="selectedStudent" class="p-4 md:p-6 space-y-6">
+                        <!-- Personal Info Section -->
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Personal
+                                Information</h3>
+                            <!-- responsive grid: 1 column on mobile, 2 on md and above -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                                <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-1">First Name</p>
+                                    <p class="font-medium text-sm">{{ selectedStudent.first_name }}</p>
+                                </div>
+                                <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-1">Last Name</p>
+                                    <p class="font-medium text-sm">{{ selectedStudent.last_name }}</p>
+                                </div>
+                                <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-1">Email</p>
+                                    <p class="font-medium break-all text-sm">{{ selectedStudent.email }}</p>
+                                </div>
+                                <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-1">Phone</p>
+                                    <p class="font-medium text-sm">{{ selectedStudent.phone_number }}</p>
+                                </div>
+                                <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-1">Country</p>
+                                    <p class="font-medium text-sm">{{ selectedStudent.country }}</p>
+                                </div>
+                                <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-1">Gender</p>
+                                    <p class="font-medium text-sm">{{ selectedStudent.gender || 'N/A' }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-muted-foreground">Last Name</p>
-                                <p class="font-medium">{{ selectedStudent.last_name }}</p>
+                        </div>
+
+                        <!-- Academic Info Section -->
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Academic
+                                Information</h3>
+                            <!-- responsive grid for academic info -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                                <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-1">Class of Degree</p>
+                                    <p class="font-medium text-sm">{{ selectedStudent.class_of_degree }}</p>
+                                </div>
+                                <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-1">Course</p>
+                                    <p class="font-medium text-sm">{{ selectedStudent.course?.name || 'N/A' }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-muted-foreground">Email</p>
-                                <p class="font-medium">{{ selectedStudent.email }}</p>
+                            <!-- Universities section -->
+                            <div v-if="selectedStudent.universities && selectedStudent.universities.length > 0"
+                                 class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-3">Universities of Choice</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span v-for="university in selectedStudent.universities" :key="university.id"
+                                          class="px-2 md:px-3 py-1 bg-primary/20 text-primary rounded text-xs font-medium">
+                                        {{ university.name }}
+                                    </span>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-muted-foreground">Phone</p>
-                                <p class="font-medium">{{ selectedStudent.phone_number }}</p>
+                            <!-- Countries section -->
+                            <div v-if="selectedStudent.countries && selectedStudent.countries.length > 0"
+                                 class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs text-muted-foreground font-medium mb-3">Countries of Preference</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span v-for="country in selectedStudent.countries" :key="country.id"
+                                          class="px-2 md:px-3 py-1 bg-primary/20 text-primary rounded text-xs font-medium">
+                                        {{ country.name }}
+                                    </span>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-muted-foreground">Country</p>
-                                <p class="font-medium">{{ selectedStudent.country }}</p>
+                        </div>
+
+                        <!-- Status Section -->
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Status</h3>
+                            <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                <span :class="getStatusClass(selectedStudent.status)"
+                                      class="px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium inline-block">
+                                    {{ selectedStudent.status }}
+                                </span>
                             </div>
-                            <div>
-                                <p class="text-sm text-muted-foreground">Status</p>
-                                <p class="font-medium">{{ selectedStudent.status }}</p>
+                        </div>
+
+                        <!-- Application Documents Section -->
+                        <div
+                            v-if="selectedStudent.application_documents && selectedStudent.application_documents.length > 0"
+                            class="space-y-4">
+                            <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Application
+                                Documents</h3>
+                            <!-- document links now open in modal instead of new tab -->
+                            <div class="grid grid-cols-1 gap-3">
+                                <div v-for="(doc, index) in getValidDocuments()"
+                                     :key="index"
+                                     @click.stop="viewingDocument = doc"
+                                     class="p-3 md:p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg hover:bg-blue-500/20 transition-all duration-200 flex items-center space-x-3 group text-left cursor-pointer">
+                                    <svg
+                                        class="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform flex-shrink-0"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs md:text-sm font-medium text-blue-500 group-hover:underline truncate">
+                                            {{ getDocumentName(doc) }}</p>
+                                        <p class="text-xs text-muted-foreground">Click to view</p>
+                                    </div>
+                                    <svg
+                                        class="w-4 h-4 ml-auto text-muted-foreground group-hover:text-blue-500 transition-colors flex-shrink-0"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                </div>
                             </div>
-                            <div class="col-span-2">
-                                <p class="text-sm text-muted-foreground">Course</p>
-                                <p class="font-medium">{{ selectedStudent.course?.name || 'N/A' }}</p>
+                        </div>
+                        <div v-else
+                             class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50 text-xs md:text-sm text-muted-foreground">
+                            No application documents uploaded
+                        </div>
+
+                        <!-- Additional Info Section -->
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Additional
+                                Information</h3>
+                            <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                <p class="text-xs md:text-sm text-muted-foreground whitespace-pre-wrap">
+                                    {{ selectedStudent.additional_notes || 'No additional notes' }}
+                                </p>
                             </div>
-                            <div class="col-span-2">
-                                <p class="text-sm text-muted-foreground">Additional Notes</p>
-                                <p class="font-medium">{{ selectedStudent.additional_notes || 'N/A' }}</p>
+                        </div>
+
+                        <!-- Agent Info Section -->
+                        <div v-if="selectedStudent.agent" class="space-y-4">
+                            <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Agent
+                                Information</h3>
+                            <div class="p-3 md:p-4 bg-primary/5 rounded-lg border border-primary/20">
+                                <p class="font-medium text-sm"><b>Agency Name: </b>{{
+                                        selectedStudent.agent.agency_name
+                                    }}</p>
+                                <p class="text-xs md:text-sm text-muted-foreground"><b>Agent
+                                    Name: </b>{{ selectedStudent.agent.first_name }} {{
+                                        selectedStudent.agent.last_name
+                                    }}</p>
+                                <p class="text-xs md:text-sm text-muted-foreground"><b>Agent
+                                    Email: </b>{{ selectedStudent.agent.email }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Added document viewer modal -->
+            <div v-if="viewingDocument" @click.stop="viewingDocument = null"
+                 class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
+                <div
+                    class="bg-card rounded-xl max-w-4xl w-full max-h-[90vh] border border-border shadow-2xl flex flex-col">
+                    <div
+                        class="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border p-6 flex items-center justify-end backdrop-blur-2xl">
+                        <div class="min-w-0 flex-1">
+                            <h2 class="text-lg md:text-xl font-bold truncate">Document Viewer</h2>
+                            <p class="text-xs md:text-sm text-muted-foreground mt-1">{{
+                                    getDocumentName(viewingDocument)
+                                }}</p>
+                        </div>
+                        <button @click="viewingDocument = null"
+                                class="text-muted-foreground hover:text-foreground transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto bg-black/5">
+                        <!-- iframe for document preview instead of opening in new tab -->
+                        <iframe :src="getDocumentUrl(viewingDocument)" class="w-full h-full"/>
+                    </div>
+                    <div class="border-t border-border p-4 bg-muted/30 flex items-center justify-end gap-3">
+                        <a @click.stop.prevent="downloadFile(viewingDocument)"
+                           class="px-3 md:px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-all text-xs md:text-sm font-medium flex items-center gap-2 whitespace-nowrap cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download
+                        </a>
+
+                        <a :href="getDocumentUrl(viewingDocument)" target="_blank" rel="noopener noreferrer"
+                           class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all text-sm font-medium">
+                            Open in New Tab
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Replaced basic edit modal with full application form that mirrors CreateApplication -->
-            <div v-if="showEditModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div v-if="showEditModal"
+                 class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto">
                 <div class="bg-card rounded-lg w-full max-w-4xl border border-border my-8">
-                    <div class="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between">
+                    <div
+                        class="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border p-6 flex items-center justify-between backdrop-blur-2xl">
                         <h2 class="text-xl font-bold">Edit Student Application</h2>
                         <button @click="showEditModal = false" class="text-muted-foreground hover:text-foreground">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
                     <div class="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+                        <!-- Display validation errors -->
+                        <div v-if="editErrors && Object.keys(editErrors).length > 0"
+                             class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                            <p class="text-sm text-red-500 font-medium mb-2">Please fix the following errors:</p>
+                            <ul class="space-y-1">
+                                <li v-for="(messages, field) in editErrors" :key="field" class="text-sm text-red-500">
+                                    <strong>{{ field }}:</strong> {{ messages.join(', ') }}
+                                </li>
+                            </ul>
+                        </div>
+
                         <!-- Personal Information Section -->
                         <div class="space-y-4">
                             <h3 class="text-lg font-bold">Personal Information</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium">First Name</label>
-                                    <input v-model="editForm.first_name" type="text" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    <input v-model="editForm.first_name" type="text"
+                                           class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"/>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium">Middle Name</label>
-                                    <input v-model="editForm.middle_name" type="text" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    <input v-model="editForm.middle_name" type="text"
+                                           class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"/>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium">Last Name</label>
-                                    <input v-model="editForm.last_name" type="text" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    <input v-model="editForm.last_name" type="text"
+                                           class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"/>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium">Gender</label>
-                                    <select v-model="editForm.gender" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <select v-model="editForm.gender"
+                                            class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                                         <option value="">Select gender</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
+                                <!-- Disabled email and phone fields in edit form -->
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium">Email</label>
-                                    <input v-model="editForm.email" type="email" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    <label class="text-sm font-medium">Email (Read-only)</label>
+                                    <input v-model="editForm.email" type="email" disabled
+                                           class="w-full px-4 py-3 bg-muted border border-border rounded-lg cursor-not-allowed opacity-60"/>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium">Phone Number</label>
-                                    <input v-model="editForm.phone_number" type="tel" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    <label class="text-sm font-medium">Phone Number (Read-only)</label>
+                                    <input v-model="editForm.phone_number" type="tel" disabled
+                                           class="w-full px-4 py-3 bg-muted border border-border rounded-lg cursor-not-allowed opacity-60"/>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium">Country of Origin</label>
-                                    <input v-model="editForm.country" type="text" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                                    <input v-model="editForm.country" type="text"
+                                           class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"/>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium">Class of Degree</label>
-                                    <select v-model="editForm.class_of_degree" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <select v-model="editForm.class_of_degree"
+                                            class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                                         <option value="">Select class</option>
                                         <option value="First Class">First Class</option>
                                         <option value="Second Class Upper">Second Class Upper</option>
@@ -269,34 +507,323 @@
                         <!-- Academic Preferences Section -->
                         <div class="space-y-4">
                             <h3 class="text-lg font-bold">Academic Preferences</h3>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium">Desired Course</label>
-                                <input v-model="editForm.course_id" type="text" placeholder="Course selection" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                            <div class="space-y-6 relative">
+                                <!-- Desired Course with searchable dropdown -->
+                                <div class="space-y-2 group">
+                                    <label class="text-sm font-medium">Desired Course</label>
+                                    <div class="relative">
+                                        <input
+                                            v-model="courseSearch"
+                                            type="text"
+                                            placeholder="Search and select a course..."
+                                            class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                            @focus="handleEditCourseFocus"
+                                            @blur="handleEditCourseBlur"
+                                        />
+                                        <!-- Course dropdown -->
+                                        <div v-if="showEditCourseDropdown"
+                                             class="absolute z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                                            <div v-if="filteredEditCourses.length === 0"
+                                                 class="p-3 text-sm text-muted-foreground">
+                                                No courses found
+                                            </div>
+                                            <div
+                                                v-for="course in filteredEditCourses"
+                                                :key="course.id"
+                                                @click="editForm.course_id = course.id; courseSearch = course.name; showEditCourseDropdown = false"
+                                                class="px-4 py-2 cursor-pointer hover:bg-muted transition-colors"
+                                            >
+                                                {{ course.name }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="editForm.course_id" class="mt-2 text-sm text-muted-foreground">
+                                        Selected: {{ getEditCourseName(editForm.course_id) }}
+                                    </div>
+                                </div>
+
+                                <!-- Schools of Choice - multiple selection -->
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <label class="text-sm font-medium">Schools of Choice <span
+                                            class="text-xs text-muted-foreground">(Max 4 selections)</span></label>
+                                        <!-- Tooltip showing selected schools count -->
+                                        <div v-if="editForm.schools_of_choice && editForm.schools_of_choice.length > 0"
+                                             class="group relative">
+                                            <div
+                                                class="w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold cursor-help">
+                                                {{ editForm.schools_of_choice.length }}
+                                            </div>
+                                            <!-- Tooltip displaying selected schools (up to 4) -->
+                                            <div
+                                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50">
+                                                <div
+                                                    class="bg-card border border-border rounded-lg shadow-lg p-3 whitespace-nowrap text-sm">
+                                                    <p class="font-semibold text-primary mb-2">Selected Schools:</p>
+                                                    <ul class="space-y-1 text-muted-foreground">
+                                                        <li v-for="(schoolId, idx) in editForm.schools_of_choice.slice(0, 4)"
+                                                            :key="schoolId" class="text-xs">
+                                                            {{ idx + 1 }}. {{ getEditSchoolName(schoolId) }}
+                                                        </li>
+                                                        <li v-if="editForm.schools_of_choice.length > 4"
+                                                            class="text-xs italic">
+                                                            +{{ editForm.schools_of_choice.length - 4 }} more
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="relative">
+                                        <input
+                                            v-model="schoolSearch"
+                                            type="text"
+                                            placeholder="Search and select a school..."
+                                            class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                            @focus="handleEditSchoolFocus"
+                                            @blur="handleEditSchoolBlur"
+                                        />
+                                        <!-- Schools dropdown -->
+                                        <div v-if="showEditSchoolDropdown"
+                                             class="absolute z-50 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto"
+                                             :style="{
+                                               top: editSchoolInputTop + 'px',
+                                               left: editSchoolInputLeft + 'px',
+                                               width: editSchoolInputWidth + 'px'
+                                             }">
+                                            <div v-if="filteredEditSchools.length === 0"
+                                                 class="p-3 text-sm text-muted-foreground">
+                                                No schools found
+                                            </div>
+                                            <div
+                                                v-for="school in filteredEditSchools"
+                                                :key="school.id"
+                                                @mousedown.prevent="toggleEditSchool(school.id)"
+                                                class="px-4 py-2 cursor-pointer hover:bg-muted transition-colors flex items-center"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    :checked="editForm.schools_of_choice && editForm.schools_of_choice.includes(String(school.id))"
+                                                    class="mr-2"
+                                                    @mousedown.prevent
+                                                />
+                                                {{ school.name }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Display selected schools as tags -->
+                                    <div v-if="editForm.schools_of_choice && editForm.schools_of_choice.length > 0"
+                                         class="mt-3 flex flex-wrap gap-2">
+                                        <div
+                                            v-for="schoolId in editForm.schools_of_choice"
+                                            :key="schoolId"
+                                            class="px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-sm flex items-center gap-2"
+                                        >
+                                            {{ getEditSchoolName(schoolId) }}
+                                            <button
+                                                type="button"
+                                                @click="removeEditSchool(schoolId)"
+                                                class="text-primary hover:text-primary/70"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Country Preferences - multiple selection -->
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <label class="text-sm font-medium">Country Preferences <span
+                                            class="text-xs text-muted-foreground">(Max 4 selections)</span></label>
+                                        <!-- Tooltip showing selected countries count -->
+                                        <div
+                                            v-if="editForm.country_of_preference && editForm.country_of_preference.length > 0"
+                                            class="group relative">
+                                            <div
+                                                class="w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold cursor-help">
+                                                {{ editForm.country_of_preference.length }}
+                                            </div>
+                                            <!-- Tooltip displaying selected countries (up to 4) -->
+                                            <div
+                                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50">
+                                                <div
+                                                    class="bg-card border border-border rounded-lg shadow-lg p-3 whitespace-nowrap text-sm">
+                                                    <p class="font-semibold text-primary mb-2">Selected Countries:</p>
+                                                    <ul class="space-y-1 text-muted-foreground">
+                                                        <li v-for="(countryId, idx) in editForm.country_of_preference.slice(0, 4)"
+                                                            :key="countryId" class="text-xs">
+                                                            {{ idx + 1 }}. {{ getEditCountryName(countryId) }}
+                                                        </li>
+                                                        <li v-if="editForm.country_of_preference.length > 4"
+                                                            class="text-xs italic">
+                                                            +{{ editForm.country_of_preference.length - 4 }} more
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="relative">
+                                        <input
+                                            v-model="countrySearch"
+                                            type="text"
+                                            placeholder="Search and select countries..."
+                                            class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                            @focus="handleEditCountryFocus"
+                                            @blur="handleEditCountryBlur"
+                                        />
+                                        <!-- Countries dropdown -->
+                                        <div v-if="showEditCountryDropdown"
+                                             class="absolute z-50 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto"
+                                             :style="{
+                                               top: editCountryInputTop + 'px',
+                                               left: editCountryInputLeft + 'px',
+                                               width: editCountryInputWidth + 'px'
+                                             }">
+                                            <div v-if="filteredEditCountries.length === 0"
+                                                 class="p-3 text-sm text-muted-foreground">
+                                                No countries found
+                                            </div>
+                                            <div
+                                                v-for="country in filteredEditCountries"
+                                                :key="country.id"
+                                                @mousedown.prevent="toggleEditCountry(country.id)"
+                                                class="px-4 py-2 cursor-pointer hover:bg-muted transition-colors flex items-center"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    :checked="editForm.country_of_preference && editForm.country_of_preference.includes(String(country.id))"
+                                                    class="mr-2"
+                                                    @mousedown.prevent
+                                                />
+                                                {{ country.name }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Display selected countries as tags -->
+                                    <div
+                                        v-if="editForm.country_of_preference && editForm.country_of_preference.length > 0"
+                                        class="mt-3 flex flex-wrap gap-2">
+                                        <div
+                                            v-for="countryId in editForm.country_of_preference"
+                                            :key="countryId"
+                                            class="px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-sm flex items-center gap-2"
+                                        >
+                                            {{ getEditCountryName(countryId) }}
+                                            <button
+                                                type="button"
+                                                @click="removeEditCountry(countryId)"
+                                                class="text-primary hover:text-primary/70"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Additional Information Section -->
+                        <!-- Additional Info Section -->
                         <div class="space-y-4">
                             <h3 class="text-lg font-bold">Additional Information</h3>
                             <div class="space-y-2">
-                                <label class="text-sm font-medium">Status</label>
-                                <select v-model="editForm.status" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                                    <option value="Pending">Pending</option>
-                                    <option value="Approved">Approved</option>
-                                    <option value="In Review">In Review</option>
-                                    <option value="Rejected">Rejected</option>
-                                </select>
+                                <label for="additionalNotes" class="text-sm font-medium">Notes</label>
+                                <textarea
+                                    v-model="editForm.additional_notes"
+                                    id="additionalNotes"
+                                    placeholder="Add any additional notes..."
+                                    rows="4"
+                                    class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                                ></textarea>
                             </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium">Additional Notes</label>
-                                <textarea v-model="editForm.additional_notes" rows="4" class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"></textarea>
+                        </div>
+
+                        <!-- Document upload section to edit form -->
+                        <div class="space-y-2">
+                            <label for="editDocuments" class="text-sm font-medium">Application Documents</label>
+                            <div
+                                class="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-all duration-300 cursor-pointer"
+                                :class="{ 'bg-primary/5 border-primary': editIsDragOver }"
+                                @click="$refs.editDocumentInput.click()"
+                                @drop.prevent="handleEditDrop"
+                                @dragover.prevent="editIsDragOver = true"
+                                @dragleave.prevent="editIsDragOver = false"
+                            >
+                                <svg class="w-12 h-12 mx-auto text-muted-foreground mb-4" fill="none"
+                                     stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p class="text-sm text-muted-foreground mb-2">Click to upload or drag and drop</p>
+                                <p class="text-xs text-muted-foreground">JPG, JPEG, PNG, PDF (max. 10MB each)</p>
+                            </div>
+                            <div v-if="editForm.application_documents && editForm.application_documents.length > 0"
+                                 class="mt-4">
+                                <p class="text-sm font-medium mb-2">Uploaded Files:</p>
+                                <ul class="space-y-2">
+                                    <li v-for="(file, index) in editForm.application_documents" :key="index"
+                                        class="text-sm text-muted-foreground flex items-center justify-between bg-muted/50 p-3 rounded border border-border">
+                                        <div class="flex items-center gap-2 flex-1">
+                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                                 viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      stroke-width="2"
+                                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            <div>
+                                                <div class="font-medium text-foreground">
+                                                    {{ typeof file === 'object' ? file.name : file }}
+                                                </div>
+                                                <div class="text-xs" v-if="typeof file === 'object'">
+                                                    {{ (file.size / 1024).toFixed(2) }} KB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            @click="removeEditFile(index)"
+                                            class="text-destructive hover:text-destructive/70 text-xs font-medium ml-2"
+                                        >
+                                            Remove
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <input
+                                ref="editDocumentInput"
+                                type="file"
+                                multiple
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                class="hidden"
+                                @change="handleEditFileUpload"
+                            />
+                        </div>
+
+                        <!-- Added loading overlay with theme-colored spinner after successful submission -->
+                        <div v-if="editSuccess" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                            <div
+                                class="bg-card rounded-xl p-8 text-center border border-border shadow-2xl animate-scale-in">
+                                <svg class="w-16 h-16 text-primary mx-auto mb-4 animate-spin" fill="none"
+                                     stroke="currentColor" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <h3 class="text-xl font-bold mb-2">Application Updated</h3>
+                                <p class="text-muted-foreground text-sm">Redirecting to student dashboard...</p>
                             </div>
                         </div>
 
                         <!-- Action Buttons -->
                         <div class="flex items-center justify-end gap-3 pt-4 border-t border-border">
-                            <button @click="showEditModal = false" class="px-6 py-3 border border-border rounded-lg hover:bg-muted transition-all">Cancel</button>
-                            <button @click="saveEdit" :disabled="editLoading" class="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-all">
+                            <button @click="showEditModal = false"
+                                    class="px-6 py-3 border border-border rounded-lg hover:bg-muted transition-all">
+                                Cancel
+                            </button>
+                            <button @click="saveEdit" :disabled="editLoading"
+                                    class="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-all">
                                 {{ editLoading ? 'Saving...' : 'Save Changes' }}
                             </button>
                         </div>
@@ -308,8 +835,8 @@
 </template>
 
 <script>
-import {ref, computed, onMounted} from 'vue';
-import {studentsAPI, applicationsAPI} from '../services/api';
+import {ref, computed, onMounted, watch, nextTick} from 'vue';
+import {studentsAPI, applicationsAPI, dashboardAPI, coursesAPI, schoolsAPI, countriesAPI} from '../services/api';
 
 export default {
     name: 'Students',
@@ -318,6 +845,8 @@ export default {
         const searchQuery = ref('');
         const statusFilter = ref('');
         const countryFilter = ref('');
+        const currentPage = ref(1);
+        const itemsPerPage = ref(10);
 
         const loading = ref(true);
         const error = ref(null);
@@ -326,8 +855,14 @@ export default {
         const showDetailsModal = ref(false);
         const showEditModal = ref(false);
         const editLoading = ref(false);
+        const editErrors = ref({});
+        const editIsDragOver = ref(false);
+        const editSuccess = ref(false);
+        const viewingDocument = ref(null); // added document viewer state
 
+        // Edit form fields
         const editForm = ref({
+            id: null, // Added id for update
             first_name: '',
             middle_name: '',
             last_name: '',
@@ -336,9 +871,12 @@ export default {
             phone_number: '',
             country: '',
             class_of_degree: '',
-            course_id: '',
+            course_id: '', // Changed to empty string for consistency with update
+            schools_of_choice: [],
+            country_of_preference: [],
             status: '',
-            additional_notes: ''
+            additional_notes: '',
+            application_documents: []
         });
 
         const stats = ref([
@@ -348,19 +886,62 @@ export default {
             {value: 0, label: 'In Review'}
         ]);
 
+        const pagination = ref({
+            total: 0,
+            from: 0,
+            to: 0,
+            currentPage: 1,
+            perPage: 10,
+            lastPage: 1
+        });
+
+        const editCourses = ref([]);
+        const editSchools = ref([]);
+        const editCountries = ref([]);
+        const courseSearch = ref('');
+        const schoolSearch = ref('');
+        const countrySearch = ref('');
+        const showEditCourseDropdown = ref(false);
+        const showEditSchoolDropdown = ref(false);
+        const showEditCountryDropdown = ref(false);
+        const editSchoolInputTop = ref(0);
+        const editSchoolInputLeft = ref(0);
+        const editSchoolInputWidth = ref(0);
+        const editCountryInputTop = ref(0);
+        const editCountryInputLeft = ref(0);
+        const editCountryInputWidth = ref(0);
+
+        const fetchStats = async () => {
+            try {
+                const response = await dashboardAPI.getStats();
+                const statsData = response.data.data || response.data;
+
+                stats.value = [
+                    {value: statsData.total_applications || 0, label: 'Total Applications'},
+                    {value: statsData.approved_applications || 0, label: 'Approved'},
+                    {value: statsData.pending_applications || 0, label: 'Pending'},
+                    {value: statsData.in_review_applications || 0, label: 'In Review'}
+                ];
+            } catch (err) {
+                console.error('[v0] Error fetching stats:', err);
+            }
+        };
+
         const fetchStudents = async () => {
             try {
                 loading.value = true;
                 error.value = null;
-                const response = await studentsAPI.getAll();
 
-                const studentsData = Array.isArray(response.data) ? response.data : response.data.data || [];
+                const response = await studentsAPI.getAll(currentPage.value, itemsPerPage.value);
+
+                const paginationData = response.data;
+                const studentsData = paginationData.data || [];
 
                 students.value = studentsData.map(student => ({
                     id: student.id,
                     name: `${student.first_name} ${student.last_name}`,
                     email: student.email,
-                    initials: `${student.first_name[0]}${student.last_name[0]}`,
+                    initials: `${student.first_name ? student.first_name[0] : ''}${student.last_name ? student.last_name[0] : ''}`,
                     course: student.course?.name || 'N/A',
                     degree: student.class_of_degree || 'N/A',
                     country: student.country,
@@ -368,21 +949,19 @@ export default {
                     status: student.status || 'Pending',
                     statusClass: getStatusClass(student.status || 'Pending'),
                     date: student.created_at ? new Date(student.created_at).toLocaleDateString() : 'N/A',
-                    // Store full student data for modals
                     fullData: student
                 }));
 
-                const statusCounts = students.value.reduce((acc, student) => {
-                    acc[student.status] = (acc[student.status] || 0) + 1;
-                    return acc;
-                }, {});
-
-                stats.value = [
-                    {value: students.value.length, label: 'Total Applications'},
-                    {value: statusCounts['Approved'] || 0, label: 'Approved'},
-                    {value: statusCounts['Pending'] || 0, label: 'Pending'},
-                    {value: statusCounts['In Review'] || 0, label: 'In Review'}
-                ];
+                if (paginationData.meta) {
+                    pagination.value = {
+                        total: paginationData.meta.total,
+                        from: paginationData.meta.from,
+                        to: paginationData.meta.to,
+                        currentPage: paginationData.meta.current_page,
+                        perPage: paginationData.meta.per_page,
+                        lastPage: paginationData.meta.last_page
+                    };
+                }
 
             } catch (err) {
                 console.error('[v0] Error fetching students:', err);
@@ -414,7 +993,16 @@ export default {
             const student = students.value.find(s => s.id === studentId);
             if (student) {
                 selectedStudent.value = student.fullData;
+
+                let schoolIds = student.fullData.schools_of_choice || [];
+                let countryIds = student.fullData.country_of_preference || [];
+
+                // Convert to string IDs for consistency with API
+                schoolIds = schoolIds.map(id => String(id));
+                countryIds = countryIds.map(id => String(id));
+
                 editForm.value = {
+                    id: student.fullData.id,
                     first_name: student.fullData.first_name || '',
                     middle_name: student.fullData.middle_name || '',
                     last_name: student.fullData.last_name || '',
@@ -424,53 +1012,391 @@ export default {
                     country: student.fullData.country || '',
                     class_of_degree: student.fullData.class_of_degree || '',
                     course_id: student.fullData.course_id || '',
+                    schools_of_choice: schoolIds,
+                    country_of_preference: countryIds,
                     status: student.fullData.status || 'Pending',
-                    additional_notes: student.fullData.additional_notes || ''
+                    additional_notes: student.fullData.additional_notes || '',
+                    application_documents: student.fullData.application_documents || []
                 };
+
+                editErrors.value = {};
+                courseSearch.value = student.fullData.course?.name || '';
+                schoolSearch.value = '';
+                countrySearch.value = '';
+
+                // Pre-populate dropdown data if available directly from student data
+                editCourses.value = student.fullData.course ? [student.fullData.course] : [];
+                editSchools.value = student.fullData.universities || [];
+                editCountries.value = student.fullData.countries || [];
+
                 showEditModal.value = true;
+                editSuccess.value = false; // Reset success overlay state
             }
         };
 
         const saveEdit = async () => {
             try {
                 editLoading.value = true;
-                await applicationsAPI.patch(selectedStudent.value.id, editForm.value);
-                showEditModal.value = false;
-                await fetchStudents();
+                editErrors.value = {};
+
+                const dataToSend = {
+                    first_name: editForm.value.first_name || '',
+                    middle_name: editForm.value.middle_name || '',
+                    last_name: editForm.value.last_name || '',
+                    gender: editForm.value.gender || '',
+                    country: editForm.value.country || '',
+                    class_of_degree: editForm.value.class_of_degree || '',
+                    course_id: editForm.value.course_id || '',
+                    status: editForm.value.status || 'Pending',
+                    additional_notes: editForm.value.additional_notes || '',
+                    schools_of_choice: editForm.value.schools_of_choice && editForm.value.schools_of_choice.length > 0 ? editForm.value.schools_of_choice.map(id => parseInt(id)) : [],
+                    country_of_preference: editForm.value.country_of_preference && editForm.value.country_of_preference.length > 0 ? editForm.value.country_of_preference.map(id => parseInt(id)) : [],
+                    application_documents: []
+                };
+
+                // Separate existing documents from new files
+                const newFiles = [];
+                editForm.value.application_documents.forEach((doc) => {
+                    if (doc instanceof File) {
+                        newFiles.push(doc);
+                    }
+                });
+
+                dataToSend.application_documents = newFiles;
+
+                console.log("[v0] Sending update request with data:", dataToSend);
+                await applicationsAPI.patch(selectedStudent.value.id, dataToSend);
+
+                console.log("[v0] Update successful");
+                editSuccess.value = true; // Show success loader
+                setTimeout(() => {
+                    showEditModal.value = false;
+                    editSuccess.value = false;
+                    fetchStudents();
+                    fetchStats();
+                }, 2000); // Adjust timing for overlay visibility
+
             } catch (err) {
                 console.error('[v0] Error updating student:', err);
-                error.value = 'Failed to update student. Please try again.';
+                if (err.response?.data?.errors) {
+                    editErrors.value = err.response.data.errors || {};
+                } else if (err.response?.data?.message) {
+                    error.value = err.response.data.message;
+                } else {
+                    error.value = 'An unexpected error occurred. Please try again.';
+                }
             } finally {
                 editLoading.value = false;
             }
         };
 
-        const filteredStudents = computed(() => {
-            let filtered = students.value;
+        const handleEditFileUpload = (event) => {
+            const files = Array.from(event.target.files);
+            const maxSize = 10 * 1024 * 1024; // 10MB
 
-            if (searchQuery.value) {
-                const query = searchQuery.value.toLowerCase();
-                filtered = filtered.filter(student =>
-                    student.name.toLowerCase().includes(query) ||
-                    student.email.toLowerCase().includes(query) ||
-                    student.course.toLowerCase().includes(query)
-                );
+            files.forEach(file => {
+                if (file.size > maxSize) {
+                    // Handle error: file too large
+                    console.warn(`File ${file.name} is too large.`);
+                    return;
+                }
+                const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+                if (!allowedTypes.includes(file.type)) {
+                    // Handle error: invalid file type
+                    console.warn(`File ${file.name} has an invalid type.`);
+                    return;
+                }
+                editForm.value.application_documents.push(file);
+            });
+            event.target.value = ''; // Clear the input
+        };
+
+        const handleEditDrop = (event) => {
+            editIsDragOver.value = false;
+            handleEditFileUpload({target: {files: event.dataTransfer.files}});
+        };
+
+        const removeEditFile = (index) => {
+            editForm.value.application_documents.splice(index, 1);
+        };
+
+        const getValidDocuments = () => {
+            return selectedStudent.value?.application_documents.filter(doc => typeof doc === 'string') || [];
+        };
+
+        const getDocumentName = (docUrl) => {
+            try {
+                const url = new URL(docUrl);
+                const pathname = url.pathname;
+                // Extract filename from the end of the pathname
+                const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
+                return filename || 'Document';
+            } catch (e) {
+                // If URL parsing fails, it's likely a relative path from Laravel
+                const filename = docUrl.substring(docUrl.lastIndexOf('/') + 1);
+                return filename || 'Document';
+            }
+        };
+
+        const getDocumentUrl = (docPath) => {
+            if (docPath && !docPath.startsWith('http')) {
+                // Return full URL to bypass Vue Router - Laravel serves uploads from public/uploads
+                const cleanPath = docPath.replace(/\\/g, '/').replace(/^\/+/, '');
+                return `${window.location.origin}/${cleanPath}`;
+            }
+            return docPath;
+        };
+
+        const fetchEditCourses = async () => {
+            try {
+                const response = await coursesAPI.getAll();
+                // Assuming the structure is consistent, adjust path if needed
+                const data = response.data?.data || [];
+                editCourses.value = Array.isArray(data) ? data : [];
+            } catch (err) {
+                console.error('[v0] Error fetching courses:', err);
+                editCourses.value = [];
+            }
+        };
+
+        const fetchEditSchools = async () => {
+            try {
+                const response = await schoolsAPI.getAll();
+                // Assuming the structure is consistent, adjust path if needed
+                const data = response.data?.data || [];
+                editSchools.value = Array.isArray(data) ? data : [];
+            } catch (err) {
+                console.error('[v0] Error fetching schools:', err);
+                editSchools.value = [];
+            }
+        };
+
+        const fetchEditCountries = async () => {
+            try {
+                const response = await countriesAPI.getAll();
+                // Assuming the structure is consistent, adjust path if needed
+                const data = response.data?.data || [];
+                editCountries.value = Array.isArray(data) ? data : [];
+            } catch (err) {
+                console.error('[v0] Error fetching countries:', err);
+                editCountries.value = [];
+            }
+        };
+
+        const filteredEditCourses = computed(() => {
+            const courseList = Array.isArray(editCourses.value) ? editCourses.value : [];
+            if (!courseSearch.value) return courseList;
+            return courseList.filter(course =>
+                course.name.toLowerCase().includes(courseSearch.value.toLowerCase())
+            );
+        });
+
+        const filteredEditSchools = computed(() => {
+            const schoolList = Array.isArray(editSchools.value) ? editSchools.value : [];
+            if (!schoolSearch.value) return schoolList;
+            return schoolList.filter(school =>
+                school.name.toLowerCase().includes(schoolSearch.value.toLowerCase())
+            );
+        });
+
+        const filteredEditCountries = computed(() => {
+            const countryList = Array.isArray(editCountries.value) ? editCountries.value : [];
+            if (!countrySearch.value) return countryList;
+            return countryList.filter(country =>
+                country.name.toLowerCase().includes(countrySearch.value.toLowerCase())
+            );
+        });
+
+        const handleEditCourseFocus = () => {
+            showEditCourseDropdown.value = true;
+            if (editCourses.value.length === 0) {
+                fetchEditCourses();
+            }
+        };
+
+        const handleEditCourseBlur = () => {
+            // Use nextTick to allow click event on dropdown items to fire before closing
+            setTimeout(() => {
+                showEditCourseDropdown.value = false;
+            }, 150);
+        };
+
+        const handleEditSchoolFocus = () => {
+            showEditSchoolDropdown.value = true;
+            const input = document.querySelector('input[placeholder*="Search and select a school"]');
+            if (input) {
+                const rect = input.getBoundingClientRect();
+                editSchoolInputTop.value = rect.bottom + window.scrollY;
+                editSchoolInputLeft.value = rect.left + window.scrollX;
+                editSchoolInputWidth.value = rect.width;
+            }
+            if (editSchools.value.length === 0) {
+                fetchEditSchools();
+            }
+        };
+
+        const handleEditSchoolBlur = () => {
+            setTimeout(() => {
+                showEditSchoolDropdown.value = false;
+            }, 150);
+        };
+
+        const handleEditCountryFocus = () => {
+            showEditCountryDropdown.value = true;
+            // Optionally clear search or pre-fill if already selected
+            // countrySearch.value = '';
+            const input = document.querySelector('input[placeholder*="Search and select countries"]');
+            if (input) {
+                const rect = input.getBoundingClientRect();
+                editCountryInputTop.value = rect.bottom + window.scrollY;
+                editCountryInputLeft.value = rect.left + window.scrollX;
+                editCountryInputWidth.value = rect.width;
+            }
+            if (editCountries.value.length === 0) {
+                fetchEditCountries();
+            }
+        };
+
+        const handleEditCountryBlur = () => {
+            setTimeout(() => {
+                showEditCountryDropdown.value = false;
+            }, 150);
+        };
+
+        const toggleEditSchool = (schoolId) => {
+            if (!editForm.value.schools_of_choice) {
+                editForm.value.schools_of_choice = [];
+            }
+            const schoolIdStr = String(schoolId);
+            const index = editForm.value.schools_of_choice.findIndex(id => String(id) === schoolIdStr);
+            if (index !== -1) {
+                editForm.value.schools_of_choice.splice(index, 1);
+            } else {
+                if (editForm.value.schools_of_choice.length < 4) {
+                    editForm.value.schools_of_choice.push(schoolIdStr);
+                } else {
+                    console.warn('Max 4 schools of choice allowed.');
+                }
+            }
+        };
+
+        const removeEditSchool = (schoolId) => {
+            if (editForm.value.schools_of_choice) {
+                const index = editForm.value.schools_of_choice.findIndex(id => String(id) === String(schoolId));
+                if (index !== -1) {
+                    editForm.value.schools_of_choice.splice(index, 1);
+                }
+            }
+        };
+
+        const toggleEditCountry = (countryId) => {
+            if (!editForm.value.country_of_preference) {
+                editForm.value.country_of_preference = [];
+            }
+            const countryIdStr = String(countryId);
+            const index = editForm.value.country_of_preference.findIndex(id => String(id) === countryIdStr);
+            if (index !== -1) {
+                editForm.value.country_of_preference.splice(index, 1);
+            } else {
+                if (editForm.value.country_of_preference.length < 4) {
+                    editForm.value.country_of_preference.push(countryIdStr);
+                } else {
+                    console.warn('Max 4 country preferences allowed.');
+                }
+            }
+        };
+
+        const removeEditCountry = (countryId) => {
+            if (editForm.value.country_of_preference) {
+                const index = editForm.value.country_of_preference.findIndex(id => String(id) === String(countryId));
+                if (index !== -1) {
+                    editForm.value.country_of_preference.splice(index, 1);
+                }
+            }
+        };
+
+        const getEditCourseName = (courseId) => {
+            // Handle case where a course is pre-selected from student data but not fetched globally yet
+            if (editCourses.value.length === 1 && editCourses.value[0].id === courseId) {
+                return editCourses.value[0].name;
+            }
+            const course = editCourses.value.find(c => c.id === courseId);
+            return course ? course.name : (courseId || ''); // Fallback to ID if name not found
+        };
+
+        const getEditSchoolName = (schoolId) => {
+            const school = editSchools.value.find(s => String(s.id) === String(schoolId));
+            return school ? school.name : '';
+        };
+
+        const getEditCountryName = (countryId) => {
+            const country = editCountries.value.find(c => String(c.id) === String(countryId));
+            return country ? country.name : '';
+        };
+
+        const paginationButtons = computed(() => {
+            const buttons = [];
+            const maxButtons = 5;
+            let start = Math.max(1, currentPage.value - Math.floor(maxButtons / 2));
+            let end = Math.min(pagination.value.lastPage, start + maxButtons - 1);
+
+            if (end - start + 1 < maxButtons) {
+                start = Math.max(1, end - maxButtons + 1);
             }
 
-            if (statusFilter.value) {
-                filtered = filtered.filter(student => student.status === statusFilter.value);
+            for (let i = start; i <= end; i++) {
+                buttons.push(i);
             }
 
-            if (countryFilter.value) {
-                filtered = filtered.filter(student => student.country === countryFilter.value);
-            }
+            return buttons;
+        });
 
-            return filtered;
+        const updatePage = async (newPage) => {
+            if (newPage >= 1 && newPage <= pagination.value.lastPage) {
+                currentPage.value = newPage;
+                await fetchStudents(); // Fetch fresh data for the new page
+            }
+        };
+
+        watch(itemsPerPage, async () => {
+            currentPage.value = 1;
+            await fetchStudents();
+        });
+
+        watch([searchQuery, statusFilter, countryFilter], async () => {
+            currentPage.value = 1;
+            await fetchStudents();
         });
 
         onMounted(() => {
             fetchStudents();
+            fetchStats();
+            // Fetch lookup data only when needed for the edit form
         });
+
+        const downloadFile = async (docPath) => {
+            try {
+                const fileUrl = getDocumentUrl(docPath);
+
+                const response = await fetch(fileUrl, {mode: 'cors'});
+                if (!response.ok) throw new Error(`Failed to fetch file: ${response.status}`);
+
+                const blob = await response.blob();
+                const fileName = getDocumentName(fileUrl);
+
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch (err) {
+                console.error('[v0] Error downloading file:', err);
+                alert('Failed to download the file. Please try again.');
+            }
+        };
+
 
         return {
             loading,
@@ -480,8 +1406,13 @@ export default {
             countryFilter,
             stats,
             students,
-            filteredStudents,
+            currentPage,
+            itemsPerPage,
+            pagination,
+            paginationButtons,
             fetchStudents,
+            fetchStats,
+            updatePage,
             viewDetails,
             editStudent,
             saveEdit,
@@ -489,7 +1420,50 @@ export default {
             showEditModal,
             selectedStudent,
             editForm,
-            editLoading
+            editLoading,
+            editErrors,
+            editSuccess,
+            getStatusClass,
+            editIsDragOver,
+            handleEditFileUpload,
+            handleEditDrop,
+            removeEditFile,
+            getValidDocuments,
+            getDocumentName,
+            getDocumentUrl,
+            viewingDocument,
+            editCourses,
+            editSchools,
+            editCountries,
+            courseSearch,
+            schoolSearch,
+            countrySearch,
+            showEditCourseDropdown,
+            showEditSchoolDropdown,
+            showEditCountryDropdown,
+            editSchoolInputTop,
+            editSchoolInputLeft,
+            editSchoolInputWidth,
+            editCountryInputTop,
+            editCountryInputLeft,
+            editCountryInputWidth,
+            filteredEditCourses,
+            filteredEditSchools,
+            filteredEditCountries,
+            toggleEditSchool,
+            removeEditSchool,
+            toggleEditCountry,
+            removeEditCountry,
+            getEditCourseName,
+            getEditSchoolName,
+            getEditCountryName,
+            handleEditCourseFocus,
+            handleEditCourseBlur,
+            handleEditSchoolFocus,
+            handleEditSchoolBlur,
+            handleEditCountryFocus,
+            handleEditCountryBlur,
+            downloadFile
         };
     }
 };
