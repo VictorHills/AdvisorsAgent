@@ -1,5 +1,5 @@
 <template>
-    <nav class="border-b border-primary bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+    <nav v-if="!isHidden" class="border-b border-primary bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div class="container mx-auto px-6">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-8">
@@ -171,6 +171,10 @@ export default {
         const mobileMenuOpen = ref(false);
         const showUserMenu = ref(false);
 
+        const isHidden = computed(() => {
+            return route.path === '/forgot-password';
+        });
+
         const userInitials = computed(() => {
             if (currentUser.value) {
                 return `${currentUser.value.first_name?.[0] || ''}${currentUser.value.last_name?.[0] || ''}`;
@@ -223,7 +227,8 @@ export default {
             mobileMenuOpen,
             toggleMobileMenu,
             showUserMenu,
-            handleLogout
+            handleLogout,
+            isHidden
         };
     }
 };
