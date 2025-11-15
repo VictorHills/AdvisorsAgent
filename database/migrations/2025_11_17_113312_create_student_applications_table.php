@@ -15,13 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('agent_id');
             $table->unsignedBigInteger('bdm_officer_id')->nullable();
             $table->unsignedBigInteger('course_id');
-            $table->string('first_name');
-            $table->string('middle_name')->nullable();
-            $table->string('last_name');
-            $table->string('gender');
-            $table->string('email')->unique();
-            $table->string('phone_number')->unique();
-            $table->string('country');
+            $table->unsignedBigInteger('student_id');
             $table->string('class_of_degree');
             $table->text('additional_notes')->nullable();
             $table->string('signature')->nullable();
@@ -31,6 +25,31 @@ return new class extends Migration {
             $table->string('status')->default('Pending');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('agent_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+
+            $table->foreign('bdm_officer_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+
+            $table->foreign('course_id')
+                ->references('id')
+                ->on('courses')
+                ->onDelete('cascade');
+
+            $table->foreign('student_id')
+                ->references('id')
+                ->on('students')
+                ->onDelete('cascade');
+
+            $table->index('status');
+            $table->index('student_id');
+            $table->index('course_id');
+            $table->index(['agent_id', 'bdm_officer_id']);
         });
     }
 
@@ -39,6 +58,8 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('student_applications');
+        Schema::enableForeignKeyConstraints();
     }
 };
