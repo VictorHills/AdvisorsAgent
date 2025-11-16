@@ -6,6 +6,7 @@ use Database\Factories\StudentApplicationsFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StudentApplications extends Model
@@ -28,13 +29,7 @@ class StudentApplications extends Model
         'agent_id',
         'bdm_officer_id',
         'course_id',
-        'first_name',
-        'middle_name',
-        'last_name',
-        'gender',
-        'email',
-        'phone_number',
-        'country',
+        'student_id',
         'class_of_degree',
         'additional_notes',
         'signature',
@@ -50,6 +45,15 @@ class StudentApplications extends Model
         'application_documents' => 'array',
     ];
 
+    /**
+     * The attributes that should be mutated to date.
+     *
+     * @var array
+     */
+    protected array $dates = [
+        'deleted_at'
+    ];
+
     public function agent(): BelongsTo
     {
         return $this->belongsTo(User::class, 'agent_id');
@@ -63,5 +67,10 @@ class StudentApplications extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Courses::class, 'course_id');
+    }
+
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(Students::class, 'student_applications');
     }
 }
