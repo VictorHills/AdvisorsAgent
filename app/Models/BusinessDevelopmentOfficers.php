@@ -24,6 +24,15 @@ class BusinessDevelopmentOfficers extends Model
         'region',
     ];
 
+    /**
+     * The attributes that should be mutated to date.
+     *
+     * @var array
+     */
+    protected array $dates = [
+        'deleted_at'
+    ];
+
     public function applications(): BusinessDevelopmentOfficers|HasMany
     {
         return $this->hasMany(StudentApplications::class, 'bdm_officer_id');
