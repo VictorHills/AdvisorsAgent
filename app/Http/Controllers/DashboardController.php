@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\StudentApplications;
+use App\Models\Students;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -22,17 +23,18 @@ class DashboardController extends Controller
         $inReviewApplications = StudentApplications::where('agent_id', $agentId)
             ->where('status', 'In Review')
             ->count();
-        $totalStudents = StudentApplications::where('agent_id', $agentId)
+        $totalStudents = Students::where('agent_id', $agentId)
             ->distinct('email')
             ->count();
 
-        return response()->json([
+        $data = [
             'total_applications' => $totalApplications,
             'pending_applications' => $pendingApplications,
             'approved_applications' => $approvedApplications,
             'in_review_applications' => $inReviewApplications,
             'total_students' => $totalStudents,
-        ]);
+        ];
+        return $this->respondSuccessWithData(message: 'Application stats retrieved successfully', data: $data);
     }
 
     public function applicationsTrend()

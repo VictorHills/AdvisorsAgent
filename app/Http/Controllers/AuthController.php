@@ -77,13 +77,12 @@ class AuthController extends Controller
             return response()->json(['error' => 'Could not create token'], 500);
         }
 
-        $user = auth()->user();
-
-        return response()->json([
-            'user' => $user,
+        $data = [
+            'user' => auth()->user(),
             'token' => $token,
-            'message' => 'Login successful'
-        ]);
+        ];
+
+        return $this->respondSuccessWithData(message: 'Login successful', data: $data);
     }
 
     // Logout user
