@@ -6,6 +6,7 @@ use App\Http\Requests\CreateStudentApplicationRequest;
 use App\Http\Requests\UpdateStudentApplicationRequest;
 use App\Http\Resources\ApplicationResource;
 use App\Models\StudentApplications;
+use App\Models\Students;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -60,7 +61,7 @@ class ApplicationController extends Controller
             ->with(['course', 'agent', 'bdmOfficer'])
             ->findOrFail($id);
 
-        return response()->json(['application' => $application]);
+        return $this->respondSuccessWithData(message: 'Application created successfully', data: new ApplicationResource($application));
     }
 
     /**
@@ -69,7 +70,8 @@ class ApplicationController extends Controller
     public function store(CreateStudentApplicationRequest $createStudentApplicationRequest)
     {
         return DB::transaction(function () use ($createStudentApplicationRequest) {
-            $application = StudentApplications::create($createStudentApplicationRequest->validated());
+            $student = Students::create($createStudentApplicationRequest->validated());
+            $application = StudentApplications::create($createStudentApplicationRequest->validated() + ['student_id' => $student->id]);
 
             $filePaths = [];
             if ($createStudentApplicationRequest->hasFile('application_documents')) {
@@ -87,10 +89,7 @@ class ApplicationController extends Controller
 
             //TODO: Send emails to the following (The Student, BDM Officer, TGM Admin and Agent)
 
-            return response()->json([
-                'application' => new ApplicationResource($application),
-                'message' => 'Application created successfully'
-            ], 201);
+            return $this->respondSuccessWithData(message: 'Application created successfully', data: new ApplicationResource($application));
         });
     }
 
@@ -105,7 +104,7 @@ class ApplicationController extends Controller
 
             foreach ($updateStudentApplicationRequest->file('application_documents') as $file) {
                 if ($file->isValid()) {
-                    $path = $file->store("uploads/applications/{$application->id}", 'public');
+                    $path = $file->store("uploads/applications/$application->id", 'public');
                     $filePaths[] = $path;
                 }
             }
@@ -115,10 +114,7 @@ class ApplicationController extends Controller
         }
 
         $application->update($data);
-        return response()->json([
-            'application' => new ApplicationResource($application),
-            'message' => 'Application updated successfully'
-        ]);
+        return $this->respondSuccessWithData(message: 'Application updated successfully', data: new ApplicationResource($application));
     }
 
     public function destroy($id)
@@ -127,6 +123,6 @@ class ApplicationController extends Controller
         $application = StudentApplications::where('agent_id', $agentId)->findOrFail($id);
         $application->delete();
 
-        return response()->json(['message' => 'Application deleted successfully']);
+        return $this->respondSuccess(message: 'Application deleted successfully');
     }
 }
