@@ -69,8 +69,8 @@ class StudentApplications extends Model
         return $this->belongsTo(Courses::class, 'course_id');
     }
 
-    public function students(): BelongsToMany
+    public function student(): BelongsTo
     {
-        return $this->belongsToMany(Students::class, 'student_applications');
+        return $this->belongsTo(Students::class, 'student_id');
     }
 }
