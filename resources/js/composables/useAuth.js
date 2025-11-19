@@ -37,7 +37,7 @@ export function useAuth() {
 
         try {
             const response = await authAPI.login(credentials)
-            const {token: authToken, user: userData} = response.data
+            const {token: authToken, user: userData} = response.data.data
 
             if (!authToken || !userData) {
                 throw new Error("Invalid response from server")
