@@ -48,7 +48,7 @@
                     </div>
 
                     <router-link
-                        to="/applications/create"
+                        to="/create-student"
                         class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center md:justify-start"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -751,7 +751,7 @@
                                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
                                 <p class="text-sm text-muted-foreground mb-2">Click to upload or drag and drop</p>
-                                <p class="text-xs text-muted-foreground">JPG, JPEG, PNG, PDF (max. 10MB each)</p>
+                                <p class="text-xs text-muted-foreground">PDF, DOCX (max. 10MB each)</p>
                             </div>
                             <div v-if="editForm.application_documents && editForm.application_documents.length > 0"
                                  class="mt-4">
