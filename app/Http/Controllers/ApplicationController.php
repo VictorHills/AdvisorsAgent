@@ -18,36 +18,6 @@ class ApplicationController extends Controller
         $agentId = auth()->id();
         $query = StudentApplications::where('agent_id', $agentId);
 
-        // Search filter
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'like', "%$search%")
-                    ->orWhere('last_name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%")
-                    ->orWhereHas('course', function ($q) use ($search) {
-                        $q->where('name', 'like', "%$search%");
-                    });
-            });
-        }
-
-        // Status filter
-        if ($request->has('status') && $request->status) {
-            $query->where('status', $request->status);
-        }
-
-        // Course filter
-        if ($request->has('course_id') && $request->course_id) {
-            $query->whereHas('course', function ($q) use ($request) {
-                $q->where('id', 'like', '%' . $request->course_id . '%');
-            });
-        }
-
-        // Country filter
-        if ($request->has('country') && $request->country) {
-            $query->where('country', $request->country);
-        }
-
         $perPage = $request->get('per_page', 10);
         $applications = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
