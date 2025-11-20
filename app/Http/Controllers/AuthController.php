@@ -104,9 +104,15 @@ class AuthController extends Controller
 
     public function restPassword(ResetPasswordRequest $resetPasswordRequest)
     {
-        $check_token = OTP::where('email', $resetPasswordRequest->email)
+        $field = ($resetPasswordRequest->destination === 'email') ? 'email' : 'phone';
+        $check_token = OTP::where($field, $resetPasswordRequest->$field)
             ->where('token', $resetPasswordRequest->token)
             ->first();
+
+        $user = User::where('email', $resetPasswordRequest->email)->first();
+        if (!$user) {
+            return $this->respondBadRequest(message: 'User not found');
+        }
 
         if ($resetPasswordRequest->password == null) {
             return $this->respondBadRequest(message: 'Password cannot be empty');
@@ -124,8 +130,6 @@ class AuthController extends Controller
             return $this->respondBadRequest(message: 'Token has expired');
         }
 
-        $user = User::where('email', $resetPasswordRequest->email)->first();
-
         if (Hash::check($resetPasswordRequest->password, $user->password)) {
             return $this->respondBadRequest(message: 'New password cannot be the same as the old password');
         }
@@ -139,13 +143,18 @@ class AuthController extends Controller
         return $this->respondSuccess(message: 'Password reset successfully');
     }
 
-    public function otp(ResetPasswordRequest $resetPasswordRequest)
+    public function sendOtp(ResetPasswordRequest $resetPasswordRequest)
     {
         $expires_at = now()->addMinutes(10);
         $otp = rand(100000, 999999);
 
         $user = User::where('email', $resetPasswordRequest->email)->first();
-        $user_full_name = $user->first_name . ' ' . $user->last_name;
+
+        if ($user) {
+            $user_full_name = $user->first_name . ' ' . $user->last_name;
+        } else {
+            $user_full_name = 'User';
+        }
 
         $check_token = OTP::where('email', $resetPasswordRequest->email)
             ->latest()
