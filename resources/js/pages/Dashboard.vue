@@ -61,29 +61,30 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 glass-card rounded-xl p-6 animate-slide-up border-t-2 border-primary">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-xl font-bold">Student Applications</h2>
-                            <router-link
-                                to="/applications/create"
-                                class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-all duration-200"
-                            >
-                                + New Application
-                            </router-link>
-                        </div>
+
 
                         <div class="overflow-x-auto">
                             <table class="w-full">
                                 <thead>
                                 <tr class="border-b-2 border-primary">
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Student
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Student Full Name
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Course
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Email
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Country
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Phone
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Gender
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Country
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Enrolled Date
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -102,20 +103,13 @@
                                             </div>
                                             <div>
                                                 <div class="font-medium">{{ student.name }}</div>
-                                                <div class="text-sm text-muted-foreground">{{ student.email }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="py-4 px-4 text-sm">{{ student.course }}</td>
+                                    <td class="py-4 px-4 text-sm">{{ student.email }}</td>
+                                    <td class="py-4 px-4 text-sm">{{ student.phone }}</td>
+                                    <td class="py-4 px-4 text-sm">{{ student.gender }}</td>
                                     <td class="py-4 px-4 text-sm">{{ student.country }}</td>
-                                    <td class="py-4 px-4">
-                                        <span
-                                            :class="student.statusClass"
-                                            class="px-3 py-1 rounded-full text-xs font-medium transition-all duration-200"
-                                        >
-                                            {{ student.status }}
-                                        </span>
-                                    </td>
                                     <td class="py-4 px-4 text-sm text-muted-foreground">{{ student.date }}</td>
                                 </tr>
                                 </tbody>
@@ -146,7 +140,7 @@
                                 </router-link>
 
                                 <router-link
-                                    to="/applications/create"
+                                    to="/create-student"
                                     class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105"
                                 >
                                     <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
@@ -196,7 +190,7 @@
 <script>
 import {computed, onMounted, ref} from 'vue';
 import {useTheme} from '../composables/useTheme';
-import {applicationsAPI, dashboardAPI} from '../services/api';
+import {applicationsAPI, dashboardAPI, studentsAPI} from '../services/api';
 import LineChart from '../components/LineChart.vue';
 import DoughnutChart from '../components/DoughnutChart.vue';
 import BarChart from '../components/BarChart.vue';
@@ -226,12 +220,12 @@ export default {
             try {
                 loading.value = true;
 
-                const [statsRes, trendRes, statusRes, monthlyRes, applicationsRes] = await Promise.all([
+                const [statsRes, trendRes, statusRes, monthlyRes, studentRes] = await Promise.all([
                     dashboardAPI.getStats(),
                     dashboardAPI.getApplicationsTrend(),
                     dashboardAPI.getApplicationsStatus(),
                     dashboardAPI.getMonthlyApplications(),
-                    applicationsAPI.getAll()
+                    studentsAPI.getAll()
                 ]);
 
                 const statsData = statsRes.data.data || statsRes.data;
@@ -279,17 +273,16 @@ export default {
                 statusChartData.value = statusRes.data.data || statusRes.data;
                 monthlyChartData.value = monthlyRes.data.data || monthlyRes.data;
 
-                const applicationsData = Array.isArray(applicationsRes.data) ? applicationsRes.data : (applicationsRes.data.data || []);
+                const applicationsData = Array.isArray(studentRes.data) ? studentRes.data : (studentRes.data.data || []);
 
                 students.value = applicationsData.map(app => ({
                     id: app.id,
-                    name: `${app.first_name} ${app.last_name}`,
+                    name: `${app.first_name} ${app.middle_name} ${app.last_name}`,
                     email: app.email,
+                    phone: app.phone_number,
+                    gender: app.gender,
                     initials: `${app.first_name[0]}${app.last_name[0]}`,
-                    course: app.course?.name || 'N/A',
                     country: app.country,
-                    status: app.status,
-                    statusClass: getStatusClass(app.status),
                     date: new Date(app.created_at).toLocaleDateString()
                 }));
 
@@ -323,7 +316,7 @@ export default {
             return statusMap[status] || 'bg-gray-500/20 text-gray-500';
         };
 
-        const limitedStudents = computed(() => students.value.slice(0, 5));
+        const limitedStudents = computed(() => students.value.slice(0, 8));
         const limitedRecentActivity = computed(() => recentActivity.value.slice(0, 5));
 
         onMounted(() => {

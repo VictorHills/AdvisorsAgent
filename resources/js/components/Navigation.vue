@@ -190,7 +190,7 @@ export default {
             },
             {
                 label: 'Students',
-                path: '/students',
+                path: '/student-application',
                 icon: 'M12 4v16m8-8H4v-2a3 3 0 00-5.356-1.857M17 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'
             },
             {
