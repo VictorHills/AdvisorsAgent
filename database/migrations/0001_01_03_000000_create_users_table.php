@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('agency_name')->nullable();
             $table->string('business_registration_number')->nullable();
             $table->string('email')->unique();
+            $table->string('phone')->unique();
             $table->string('role_name');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
