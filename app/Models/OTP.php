@@ -13,6 +13,7 @@ class OTP extends Model
 
     protected $fillable = [
         'email',
+        'phone',
         'token',
         'expires_at',
     ];

@@ -12,20 +12,18 @@ return new class extends Migration {
     {
         Schema::create('o_t_p_s', function (Blueprint $table) {
             $table->id();
-            $table->string('email');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
             $table->string('token');
             $table->timestamp('expires_at');
             $table->timestamps();
             $table->softDeletes();
 
             $table->index('email');
+            $table->index('phone');
             $table->index('token');
             $table->unique(['email', 'token']);
-
-            $table->foreign('email')
-                ->references('email')
-                ->on('users')
-                ->onDelete('cascade');
+            $table->unique(['phone', 'token']);
         });
     }
 
