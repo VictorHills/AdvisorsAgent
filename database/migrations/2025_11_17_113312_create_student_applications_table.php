@@ -36,11 +36,6 @@ return new class extends Migration {
                 ->on('users')
                 ->onDelete('cascade');
 
-            $table->foreign('course_id')
-                ->references('id')
-                ->on('courses')
-                ->onDelete('cascade');
-
             $table->foreign('student_id')
                 ->references('id')
                 ->on('students')
