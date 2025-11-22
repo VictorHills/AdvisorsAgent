@@ -54,6 +54,7 @@ export const dashboardAPI = {
 export const applicationsAPI = {
     getAll: () => api.get("/applications"),
     getOne: (id) => api.get(`/applications/${id}`),
+    getByStudentId: (studentId) => api.get(`/students/${studentId}`),
     create: (data) => {
         const formData = new FormData()
 
