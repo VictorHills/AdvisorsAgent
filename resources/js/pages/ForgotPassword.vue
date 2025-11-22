@@ -26,15 +26,19 @@
 
                 <!-- Step 1: Enter Email -->
                 <form v-if="currentStep === 1" @submit.prevent="handleEmailSubmit" class="space-y-6">
-                    <div v-if="error" class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm flex items-start space-x-2">
+                    <div v-if="error"
+                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm flex items-start space-x-2">
                         <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <span>{{ error }}</span>
                     </div>
 
                     <div class="space-y-2 group">
-                        <label for="email" class="text-sm font-medium transition-colors group-focus-within:text-primary">Email Address</label>
+                        <label for="email"
+                               class="text-sm font-medium transition-colors group-focus-within:text-primary">Email
+                            Address</label>
                         <input
                             id="email"
                             v-model="form.email"
@@ -56,15 +60,19 @@
 
                 <!-- Step 2: Enter Code and New Password -->
                 <form v-if="currentStep === 2" @submit.prevent="handleResetSubmit" class="space-y-6">
-                    <div v-if="error" class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm flex items-start space-x-2">
+                    <div v-if="error"
+                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm flex items-start space-x-2">
                         <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <span>{{ error }}</span>
                     </div>
 
                     <div class="space-y-2 group">
-                        <label for="reset-code" class="text-sm font-medium transition-colors group-focus-within:text-primary">Reset Code</label>
+                        <label for="reset-code"
+                               class="text-sm font-medium transition-colors group-focus-within:text-primary">Reset
+                            Code</label>
                         <input
                             id="reset-code"
                             v-model="form.code"
@@ -77,7 +85,9 @@
                     </div>
 
                     <div class="space-y-2 group">
-                        <label for="new-password" class="text-sm font-medium transition-colors group-focus-within:text-primary">New Password</label>
+                        <label for="new-password"
+                               class="text-sm font-medium transition-colors group-focus-within:text-primary">New
+                            Password</label>
                         <div class="relative">
                             <input
                                 id="new-password"
@@ -94,19 +104,25 @@
                                 class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
                                 tabindex="-1"
                             >
-                                <svg v-if="!showNewPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                <svg v-if="!showNewPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                     viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     <circle cx="12" cy="12" r="3" stroke-width="2"/>
                                 </svg>
-                                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18M10.584 10.587A2.999 2.999 0 0115 12c0 .513-.129.996-.356 1.417M6.71 6.707C4.934 7.92 3.59 9.74 2.958 12c1.274 4.057 5.065 7 9.542 7 1.53 0 2.983-.345 4.287-.965M9.88 4.6A10.66 10.66 0 0112 5c4.477 0 8.268 2.943 9.542 7a11.02 11.02 0 01-2.363 3.78"/>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M3 3l18 18M10.584 10.587A2.999 2.999 0 0115 12c0 .513-.129.996-.356 1.417M6.71 6.707C4.934 7.92 3.59 9.74 2.958 12c1.274 4.057 5.065 7 9.542 7 1.53 0 2.983-.345 4.287-.965M9.88 4.6A10.66 10.66 0 0112 5c4.477 0 8.268 2.943 9.542 7a11.02 11.02 0 01-2.363 3.78"/>
                                 </svg>
                             </button>
                         </div>
                     </div>
 
                     <div class="space-y-2 group">
-                        <label for="confirm-password" class="text-sm font-medium transition-colors group-focus-within:text-primary">Confirm Password</label>
+                        <label for="confirm-password"
+                               class="text-sm font-medium transition-colors group-focus-within:text-primary">Confirm
+                            Password</label>
                         <div class="relative">
                             <input
                                 id="confirm-password"
@@ -123,12 +139,16 @@
                                 class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
                                 tabindex="-1"
                             >
-                                <svg v-if="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                <svg v-if="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                     viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     <circle cx="12" cy="12" r="3" stroke-width="2"/>
                                 </svg>
-                                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18M10.584 10.587A2.999 2.999 0 0115 12c0 .513-.129.996-.356 1.417M6.71 6.707C4.934 7.92 3.59 9.74 2.958 12c1.274 4.057 5.065 7 9.542 7 1.53 0 2.983-.345 4.287-.965M9.88 4.6A10.66 10.66 0 0112 5c4.477 0 8.268 2.943 9.542 7a11.02 11.02 0 01-2.363 3.78"/>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M3 3l18 18M10.584 10.587A2.999 2.999 0 0115 12c0 .513-.129.996-.356 1.417M6.71 6.707C4.934 7.92 3.59 9.74 2.958 12c1.274 4.057 5.065 7 9.542 7 1.53 0 2.983-.345 4.287-.965M9.88 4.6A10.66 10.66 0 0112 5c4.477 0 8.268 2.943 9.542 7a11.02 11.02 0 01-2.363 3.78"/>
                                 </svg>
                             </button>
                         </div>
@@ -156,15 +176,18 @@
                     <div class="flex justify-center">
                         <div class="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center">
                             <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M5 13l4 4L19 7"/>
                             </svg>
                         </div>
                     </div>
                     <div>
                         <h2 class="text-2xl font-bold mb-2">Password Reset Successful</h2>
-                        <p class="text-muted-foreground">Your password has been successfully reset. You can now log in with your new password.</p>
+                        <p class="text-muted-foreground">Your password has been successfully reset. You can now log in
+                            with your new password.</p>
                     </div>
-                    <router-link to="/login" class="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200">
+                    <router-link to="/login"
+                                 class="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200">
                         Back to Login
                     </router-link>
                 </div>
@@ -184,41 +207,52 @@
                     <div class="glass-card p-8 rounded-2xl space-y-4 hover:shadow-xl transition-all duration-300">
                         <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
                         </div>
                         <h2 class="text-2xl font-bold">Secure Password Reset</h2>
                         <p class="text-muted-foreground">
-                            Your account security is our priority. Follow the simple steps to reset your password and regain access to your agent dashboard.
+                            Your account security is our priority. Follow the simple steps to reset your password and
+                            regain access to your agent dashboard.
                         </p>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4">
-                        <div class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div
+                            class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                             <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div
+                                    class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <span class="text-primary font-bold">1</span>
                                 </div>
                                 <div>
                                     <div class="font-semibold">Enter Email</div>
-                                    <div class="text-sm text-muted-foreground mt-1">Provide your registered email address</div>
+                                    <div class="text-sm text-muted-foreground mt-1">Provide your registered email
+                                        address
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div
+                            class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                             <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div
+                                    class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <span class="text-primary font-bold">2</span>
                                 </div>
                                 <div>
                                     <div class="font-semibold">Verify Code</div>
-                                    <div class="text-sm text-muted-foreground mt-1">Enter the code sent to your email</div>
+                                    <div class="text-sm text-muted-foreground mt-1">Enter the code sent to your email
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div
+                            class="glass-card p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                             <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div
+                                    class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <span class="text-primary font-bold">3</span>
                                 </div>
                                 <div>
@@ -256,6 +290,7 @@ export default {
         const showConfirmPassword = ref(false);
 
         const form = ref({
+            destination: 'email',
             email: '',
             code: '',
             new_password: '',
@@ -265,8 +300,17 @@ export default {
         const handleEmailSubmit = async () => {
             try {
                 error.value = null;
+
+                if (!form.value.email && form.value.destination === 'email') {
+                    error.value = 'Please enter a valid email address.';
+                    return;
+                }
+
                 loading.value = true;
-                await authAPI.getOtp(form.value.email);
+                await authAPI.getOtp({
+                    destination: form.value.destination,
+                    email: form.value.email
+                });
                 currentStep.value = 2;
             } catch (err) {
                 error.value = err.response?.data?.message || 'Failed to send reset code. Please try again.';
@@ -291,6 +335,7 @@ export default {
 
                 loading.value = true;
                 await authAPI.resetPassword({
+                    destination: 'email',
                     email: form.value.email,
                     token: form.value.code,
                     password: form.value.new_password,
