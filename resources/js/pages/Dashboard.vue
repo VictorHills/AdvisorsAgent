@@ -1,12 +1,12 @@
 <template>
     <div class="min-h-screen bg-background animate-fade-in">
-
         <main class="container mx-auto px-6 py-8">
             <div v-if="loading" class="flex items-center justify-center py-12">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
 
             <div v-else>
+                <!-- Stats Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <div v-for="(stat, index) in stats" :key="index"
                          class="glass-card p-6 rounded-xl animate-slide-up hover:shadow-lg hover:border-primary transition-all duration-300 hover:-translate-y-1"
@@ -26,73 +26,68 @@
                     </div>
                 </div>
 
-                <!--                <div class="mb-8">
-                                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
-                                         style="animation-delay: 0.3s;">
-                                        <h3 class="font-bold mb-6">Monthly Applications Overview</h3>
-                                        <div class="h-80">
-                                            <BarChart v-if="monthlyChartData && Object.keys(monthlyChartData).length > 0" :data="monthlyChartData"/>
-                                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">
-                                                No data available
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                <!-- Monthly Applications Bar Chart -->
+                <div class="mb-8">
+                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                         style="animation-delay: 0.3s;">
+                        <h3 class="font-bold mb-6">Monthly Applications Overview</h3>
+                        <div class="h-80">
+                            <BarChart v-if="monthlyChartData" :data="monthlyChartData"/>
+                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
+                                available
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
-                                         style="animation-delay: 0.4s;">
-                                        <h3 class="font-bold mb-6">Applications Trend</h3>
-                                        <div class="h-64">
-                                            <LineChart :data="applicationsChartData"/>
-                                        </div>
-                                    </div>
-                                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
-                                         style="animation-delay: 0.5s;">
-                                        <h3 class="font-bold mb-6">Applications by Status</h3>
-                                        <div class="h-64">
-                                            <DoughnutChart v-if="statusChartData && Object.keys(statusChartData).length > 0" :data="statusChartData"/>
-                                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">
-                                                No data available
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>-->
+                <!-- Line Chart & Doughnut Chart -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                         style="animation-delay: 0.4s;">
+                        <h3 class="font-bold mb-6">Applications Trend</h3>
+                        <div class="h-64">
+                            <LineChart v-if="applicationsChartData" :data="applicationsChartData"/>
+                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
+                                available
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                         style="animation-delay: 0.5s;">
+                        <h3 class="font-bold mb-6">Applications by Status</h3>
+                        <div class="h-64">
+                            <DoughnutChart v-if="statusChartData" :data="statusChartData"/>
+                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
+                                available
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Students Table & Sidebar -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 glass-card rounded-xl p-6 animate-slide-up border-t-2 border-primary">
-
-
                         <div class="overflow-x-auto">
                             <table class="w-full">
                                 <thead>
                                 <tr class="border-b-2 border-primary">
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                                        Student Full Name
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Student
+                                        Full Name
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                                        Email
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Phone</th>
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Gender
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                                        Phone
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Country
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                                        Gender
-                                    </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                                        Country
-                                    </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                                        Enrolled Date
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Enrolled
+                                        Date
                                     </th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr
-                                    v-for="student in limitedStudents"
-                                    :key="student.id"
-                                    class="border-b border-border hover:bg-muted/50 hover:border-l-2 hover:border-l-primary transition-all duration-200 cursor-pointer"
-                                >
+                                <tr v-for="student in limitedStudents" :key="student.id"
+                                    class="border-b border-border hover:bg-muted/50 hover:border-l-2 hover:border-l-primary transition-all duration-200 cursor-pointer">
                                     <td class="py-4 px-4">
                                         <div class="flex items-center space-x-3">
                                             <div
@@ -117,15 +112,14 @@
                         </div>
                     </div>
 
+                    <!-- Sidebar -->
                     <div class="space-y-6">
                         <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
                              style="animation-delay: 0.2s;">
                             <h3 class="font-bold mb-4">Quick Actions</h3>
                             <div class="space-y-3">
-                                <router-link
-                                    to="/applications/create"
-                                    class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105"
-                                >
+                                <router-link to="/applications/create"
+                                             class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
                                     <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
                                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
                                              viewBox="0 0 24 24">
@@ -138,11 +132,8 @@
                                         <div class="text-xs text-muted-foreground">Submit student application</div>
                                     </div>
                                 </router-link>
-
-                                <router-link
-                                    to="/create-student"
-                                    class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105"
-                                >
+                                <router-link to="/create-student"
+                                             class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
                                     <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
                                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
                                              viewBox="0 0 24 24">
@@ -155,7 +146,6 @@
                                         <div class="text-xs text-muted-foreground">Add a new student</div>
                                     </div>
                                 </router-link>
-
                             </div>
                         </div>
 
@@ -166,8 +156,7 @@
                                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                             </div>
                             <div v-else-if="limitedRecentActivity.length === 0"
-                                 class="text-center py-8 text-muted-foreground text-sm">
-                                No recent activity
+                                 class="text-center py-8 text-muted-foreground text-sm">No recent activity
                             </div>
                             <div v-else class="space-y-4">
                                 <div v-for="activity in limitedRecentActivity" :key="activity.id"
@@ -188,47 +177,41 @@
 </template>
 
 <script>
-import {computed, onMounted, ref} from 'vue';
-import {useTheme} from '../composables/useTheme';
-import {applicationsAPI, dashboardAPI, studentsAPI} from '../services/api';
-import LineChart from '../components/LineChart.vue';
-import DoughnutChart from '../components/DoughnutChart.vue';
-import BarChart from '../components/BarChart.vue';
-import Navigation from '../components/Navigation.vue';
+import {computed, onMounted, ref} from 'vue'
+import {dashboardAPI, studentsAPI} from '../services/api'
+import LineChart from '../components/LineChart.vue'
+import DoughnutChart from '../components/DoughnutChart.vue'
+import BarChart from '../components/BarChart.vue'
 
 export default {
     name: 'Dashboard',
     components: {
         LineChart,
-        // DoughnutChart,
-        // BarChart,
+        DoughnutChart,
+        BarChart,
         Navigation
     },
     setup() {
-        const {isDark, toggleTheme} = useTheme();
-
-        const loading = ref(true);
-        const loadingActivity = ref(true);
-        const stats = ref([]);
-        const applicationsChartData = ref({});
-        const statusChartData = ref({});
-        const monthlyChartData = ref({});
-        const students = ref([]);
-        const recentActivity = ref([]);
+        const loading = ref(true)
+        const loadingActivity = ref(true)
+        const stats = ref([])
+        const applicationsChartData = ref(null)
+        const statusChartData = ref(null)
+        const monthlyChartData = ref(null)
+        const students = ref([])
+        const recentActivity = ref([])
 
         const fetchDashboardData = async () => {
             try {
-                loading.value = true;
+                loading.value = true
 
-                const [statsRes, trendRes, statusRes, monthlyRes, studentRes] = await Promise.all([
-                    dashboardAPI.getStats(),
-                    dashboardAPI.getApplicationsTrend(),
-                    dashboardAPI.getApplicationsStatus(),
-                    dashboardAPI.getMonthlyApplications(),
-                    studentsAPI.getAll()
-                ]);
+                // Real API calls for stats and students
+                const [statsRes, studentRes] = await Promise.all([
+                    dashboardAPI.getStats().catch(e => ({data: {data: {}}})),
+                    studentsAPI.getAll().catch(e => ({data: []}))
+                ])
 
-                const statsData = statsRes.data.data || statsRes.data;
+                const statsData = statsRes.data.data || statsRes.data
 
                 stats.value = [
                     {
@@ -267,62 +250,56 @@ export default {
                         iconColor: 'text-amber-500',
                         icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
                     }
-                ];
+                ]
 
-                applicationsChartData.value = trendRes.data.data || trendRes.data;
-                statusChartData.value = statusRes.data.data || statusRes.data;
-                monthlyChartData.value = monthlyRes.data.data || monthlyRes.data;
+                const [trendRes, statusRes, monthlyRes] = await Promise.all([
+                    dashboardAPI.getApplicationsTrend(),
+                    dashboardAPI.getApplicationsStatus(),
+                    dashboardAPI.getMonthlyApplications()
+                ])
+                monthlyChartData.value = monthlyRes.data.data || monthlyRes.data
+                statusChartData.value = statusRes.data.data || statusRes.data
+                applicationsChartData.value = trendRes.data.data || trendRes.data
 
-                const applicationsData = Array.isArray(studentRes.data) ? studentRes.data : (studentRes.data.data || []);
-
-                students.value = applicationsData.map(app => ({
-                    id: app.id,
-                    name: `${app.first_name} ${app.middle_name} ${app.last_name}`,
-                    email: app.email,
-                    phone: app.phone_number,
-                    gender: app.gender,
-                    initials: `${app.first_name[0]}${app.last_name[0]}`,
-                    country: app.country,
-                    date: new Date(app.created_at).toLocaleDateString()
-                }));
+                const studentsData = Array.isArray(studentRes.data) ? studentRes.data : (studentRes.data.data || [])
+                students.value = studentsData.map(s => ({
+                    id: s.id,
+                    name: `${s.first_name} ${s.middle_name || ''} ${s.last_name}`.trim(),
+                    email: s.email,
+                    phone: s.phone_number,
+                    gender: s.gender,
+                    initials: `${s.first_name?.[0] || ''}${s.last_name?.[0] || ''}`,
+                    country: s.country,
+                    date: new Date(s.created_at).toLocaleDateString()
+                }))
 
             } catch (error) {
-                console.error('[v0] Error fetching dashboard data:', error);
+                console.error('Error fetching dashboard data:', error)
             } finally {
-                loading.value = false;
+                loading.value = false
             }
-        };
+        }
 
         const fetchRecentActivity = async () => {
             try {
-                loadingActivity.value = true;
-                const response = await dashboardAPI.getRecentActivity();
-                recentActivity.value = response.data;
+                loadingActivity.value = true
+                const response = await dashboardAPI.getRecentActivity()
+                recentActivity.value = response.data.data || response.data || []
             } catch (error) {
-                console.error('[v0] Error fetching recent activity:', error);
-                recentActivity.value = [];
+                console.error('Error fetching recent activity:', error)
+                recentActivity.value = []
             } finally {
-                loadingActivity.value = false;
+                loadingActivity.value = false
             }
-        };
+        }
 
-        const getStatusClass = (status) => {
-            const statusMap = {
-                'Application Submitted': 'bg-emerald-500/20 text-emerald-500',
-                'Pending': 'bg-blue-500/20 text-blue-500',
-                'Student Enrolled': 'bg-amber-500/20 text-amber-500',
-                'Rejected': 'bg-red-500/20 text-red-500'
-            };
-            return statusMap[status] || 'bg-gray-500/20 text-gray-500';
-        };
-
-        const limitedStudents = computed(() => students.value.slice(0, 8));
-        const limitedRecentActivity = computed(() => recentActivity.value.slice(0, 5));
+        const limitedStudents = computed(() => students.value.slice(0, 8))
+        const limitedRecentActivity = computed(() => recentActivity.value.slice(0, 5))
 
         onMounted(() => {
-            fetchDashboardData();
-            fetchRecentActivity();
-        });
+            fetchDashboardData()
+            fetchRecentActivity()
+        })
 
         return {
             loading,
@@ -334,10 +311,8 @@ export default {
             students,
             limitedStudents,
             limitedRecentActivity,
-            recentActivity,
-            isDark,
-            toggleTheme
-        };
+            recentActivity
+        }
     }
-};
+}
 </script>
