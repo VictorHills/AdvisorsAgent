@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApplicationStatus;
 use App\Models\StudentApplications;
 use App\Models\Students;
 use Carbon\Carbon;
+use Database\Factories\ApplicationStatusFactory;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -75,7 +77,7 @@ class DashboardController extends Controller
             $inReviewData[] = $inReview;
         }
 
-        return response()->json([
+        $data = [
             'labels' => $labels,
             'datasets' => [
                 [
@@ -95,7 +97,8 @@ class DashboardController extends Controller
                     'data' => $inReviewData,
                 ],
             ],
-        ]);
+        ];
+        return $this->respondSuccessWithData(message: 'Applications Trend retrieved successfully', data: $data);
     }
 
     public function applicationsStatus()
@@ -107,13 +110,14 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->get();
 
-        $labels = $statusCounts->pluck('status')->toArray();
-        $data = $statusCounts->pluck('count')->toArray();
+        $application_statuses = ApplicationStatus::pluck('status_name')->toArray();
+        $statusCount = $statusCounts->pluck('count')->toArray();
 
-        return response()->json([
-            'labels' => $labels,
-            'data' => $data,
-        ]);
+        $data = [
+            'labels' => $application_statuses,
+            'data' => $statusCount,
+        ];
+        return $this->respondSuccessWithData(message: 'Applications Statuses retrieved successfully', data: $data);
     }
 
     public function monthlyApplications()
@@ -133,10 +137,12 @@ class DashboardController extends Controller
             $data[] = $count;
         }
 
-        return response()->json([
+        $data = [
             'labels' => $labels,
             'data' => $data,
-        ]);
+        ];
+
+        return $this->respondSuccessWithData(message: 'Monthly Applications retrieved successfully', data: $data);
     }
 
     public function recentActivity()
