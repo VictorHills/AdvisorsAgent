@@ -144,30 +144,4 @@ export const mockStudents = [
     }
 ]
 
-export const mockRecentActivity = [
-    {
-        id: 1,
-        text: "New application submitted by John Smith",
-        time: "2 minutes ago"
-    },
-    {
-        id: 2,
-        text: "Sarah Johnson's application approved",
-        time: "15 minutes ago"
-    },
-    {
-        id: 3,
-        text: "Michael Williams enrolled successfully",
-        time: "1 hour ago"
-    },
-    {
-        id: 4,
-        text: "New student Emma Brown registered",
-        time: "3 hours ago"
-    },
-    {
-        id: 5,
-        text: "Application status updated for Daniel Garcia",
-        time: "5 hours ago"
-    }
-]
+
