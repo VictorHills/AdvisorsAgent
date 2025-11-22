@@ -114,23 +114,18 @@
                             <td class="py-4 px-4 text-sm text-muted-foreground">{{ student.date }}</td>
                             <td class="py-4 px-4">
                                 <div class="flex items-center space-x-2">
+                                    <!-- Replaced View Details and Edit buttons with View Applications button -->
                                     <button
-                                        @click="viewDetails(student.id)"
-                                        class="p-2 hover:bg-muted rounded-lg transition-all duration-200 hover:scale-110 text-muted-foreground hover:text-primary"
-                                        title="View Details">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                    </button>
-                                    <button
-                                        @click="editStudent(student.id)"
-                                        class="p-2 hover:bg-muted rounded-lg transition-all duration-200 hover:scale-110 text-muted-foreground hover:text-primary"
-                                        title="Edit">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
+                                        @click="viewApplications(student.id)"
+                                        class="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 animate-fade-in"
+                                        title="View Applications">
+                                        <span class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            <span>View Applications</span>
+                                        </span>
                                     </button>
                                 </div>
                             </td>
@@ -825,6 +820,105 @@
                     </div>
                 </div>
             </div>
+
+            <!-- View Applications Modal with animation -->
+            <div v-if="showApplicationsModal"
+                 class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto">
+                <div
+                    class="bg-card rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-border shadow-2xl animate-fade-in">
+                    <div
+                        class="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border p-4 md:p-6 flex items-center justify-between backdrop-blur-2xl">
+                        <div>
+                            <h2 class="text-lg md:text-xl font-bold">Applications</h2>
+                            <p class="text-xs md:text-sm text-muted-foreground mt-1"
+                               v-if="studentApplications.length > 0">
+                                Viewing {{ studentApplications.length }} application(s) for this student
+                            </p>
+                        </div>
+                        <button @click="showApplicationsModal = false"
+                                class="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
+                            <svg class="w-5 md:w-6 h-5 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-4 md:p-6 space-y-4">
+                        <div v-if="applicationLoadingModal" class="flex items-center justify-center py-12">
+                            <div class="flex flex-col items-center gap-4">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                                <p class="text-muted-foreground">Loading applications...</p>
+                            </div>
+                        </div>
+                        <div v-else-if="studentApplications.length === 0" class="text-center py-12">
+                            <svg class="w-16 h-16 mx-auto text-muted-foreground mb-4" stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                            </svg>
+                            <p class="text-muted-foreground">No applications found for this student</p>
+                        </div>
+                        <div v-else class="space-y-4">
+                            <div v-for="application in studentApplications" :key="application.id"
+                                 class="p-4 border border-border rounded-lg hover:border-primary/50 transition-all duration-200 animate-slide-up">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Course</p>
+                                        <p class="font-medium text-sm">{{ application.course?.name || 'N/A' }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Status</p>
+                                        <span :class="getStatusClass(application.status)"
+                                              class="inline-block px-3 py-1 rounded text-xs font-medium">
+                                            {{ application.status }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Universities</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span v-for="university in application.schools_of_choice_details"
+                                                  :key="university.id"
+                                                  class="px-2 py-1 bg-primary/20 text-primary rounded text-xs font-medium">
+                                                {{ university.name }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Applied Date</p>
+                                        <p class="font-medium text-sm">
+                                            {{ new Date(application.created_at).toLocaleDateString() }}</p>
+                                    </div>
+                                    <!-- Added countries of preference display -->
+                                    <div>
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Countries of
+                                            Preference</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span v-for="country in application.country_of_preference_details"
+                                                  :key="country.id"
+                                                  class="px-2 py-1 bg-blue-500/20 text-blue-500 rounded text-xs font-medium">
+                                                {{ country.name }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <!-- Added class of degree display -->
+                                    <div>
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Class of Degree</p>
+                                        <p class="font-medium text-sm">{{ application.class_of_degree || 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <!-- Improved notes display with better styling -->
+                                <div v-if="application.additional_notes" class="mt-4 pt-4 border-t border-border/50">
+                                    <p class="text-xs text-muted-foreground font-medium mb-2">Additional Notes</p>
+                                    <p class="text-sm text-foreground leading-relaxed">{{
+                                            application.additional_notes
+                                        }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 </template>
@@ -842,7 +936,6 @@ export default {
         const countryFilter = ref('');
         const currentPage = ref(1);
         const itemsPerPage = ref(10);
-
         const loading = ref(true);
         const error = ref(null);
         const students = ref([]);
@@ -853,7 +946,27 @@ export default {
         const editErrors = ref({});
         const editIsDragOver = ref(false);
         const editSuccess = ref(false);
-        const viewingDocument = ref(null); // added document viewer state
+        const viewingDocument = ref(null);
+        const showApplicationsModal = ref(false);
+        const studentApplications = ref([]);
+        const applicationLoadingModal = ref(false);
+        const selectedStudentIdForApps = ref(null);
+        const editCourses = ref([]);
+        const editSchools = ref([]);
+        const editCountries = ref([]);
+        const courseSearch = ref('');
+        const schoolSearch = ref('');
+        const countrySearch = ref('');
+        const showEditCourseDropdown = ref(false);
+        const showEditSchoolDropdown = ref(false);
+        const showEditCountryDropdown = ref(false);
+        const editSchoolInputTop = ref(0);
+        const editSchoolInputLeft = ref(0);
+        const editSchoolInputWidth = ref(0);
+        const editCountryInputTop = ref(0);
+        const editCountryInputLeft = ref(0);
+        const editCountryInputWidth = ref(0);
+        const selectedStudentDetails = ref(null);
 
         // Edit form fields
         const editForm = ref({
@@ -889,22 +1002,6 @@ export default {
             perPage: 10,
             lastPage: 1
         });
-
-        const editCourses = ref([]);
-        const editSchools = ref([]);
-        const editCountries = ref([]);
-        const courseSearch = ref('');
-        const schoolSearch = ref('');
-        const countrySearch = ref('');
-        const showEditCourseDropdown = ref(false);
-        const showEditSchoolDropdown = ref(false);
-        const showEditCountryDropdown = ref(false);
-        const editSchoolInputTop = ref(0);
-        const editSchoolInputLeft = ref(0);
-        const editSchoolInputWidth = ref(0);
-        const editCountryInputTop = ref(0);
-        const editCountryInputLeft = ref(0);
-        const editCountryInputWidth = ref(0);
 
         const fetchStats = async () => {
             try {
@@ -967,6 +1064,33 @@ export default {
             }
         };
 
+        const fetchStudentApplications = async (studentId) => {
+            applicationLoadingModal.value = true;
+            try {
+                const response = await applicationsAPI.getByStudentId(studentId);
+                const responseData = response.data;
+
+                if (responseData.data && responseData.data.applications) {
+                    studentApplications.value = responseData.data.applications;
+                } else if (responseData.applications) {
+                    studentApplications.value = responseData.applications;
+                } else if (Array.isArray(responseData.data)) {
+                    studentApplications.value = responseData.data;
+                } else if (Array.isArray(responseData)) {
+                    studentApplications.value = responseData;
+                } else {
+                    studentApplications.value = [];
+                }
+
+                console.log('Applications loaded:', studentApplications.value);
+            } catch (err) {
+                console.error(`Error fetching applications for student ${studentId}:`, err);
+                studentApplications.value = [];
+            } finally {
+                applicationLoadingModal.value = false;
+            }
+        };
+
         const getStatusClass = (status) => {
             const statusMap = {
                 'Approved': 'bg-emerald-500/20 text-emerald-500',
@@ -975,6 +1099,13 @@ export default {
                 'Rejected': 'bg-red-500/20 text-red-500'
             };
             return statusMap[status] || 'bg-gray-500/20 text-gray-500';
+        };
+
+        const viewApplications = async (studentId) => {
+            selectedStudentIdForApps.value = studentId;
+            studentApplications.value = []; // Clear previous applications
+            showApplicationsModal.value = true; // Open modal FIRST
+            await fetchStudentApplications(studentId); // Then fetch data
         };
 
         const viewDetails = (studentId) => {
@@ -1409,7 +1540,7 @@ export default {
             fetchStudents,
             fetchStats,
             updatePage,
-            viewDetails,
+            viewDetails, // Keep viewDetails for the modal, if needed elsewhere
             editStudent,
             saveEdit,
             showDetailsModal,
@@ -1459,7 +1590,12 @@ export default {
             handleEditSchoolBlur,
             handleEditCountryFocus,
             handleEditCountryBlur,
-            downloadFile
+            downloadFile,
+            viewApplications, // Add the new function to the returned object
+            showApplicationsModal,
+            studentApplications,
+            applicationLoadingModal,
+            selectedStudentIdForApps // Added this export
         };
     }
 };

@@ -17,8 +17,8 @@ class ApplicationResource extends JsonResource
     public function toArray(Request $request): array
     {
         $response = parent::toArray($request);
-        $response['student'] = $this->student;
-        $response['bdmOfficer'] = $this->bdmOfficer;
+        $response['student'] = $this->student ?? null;
+        $response['bdmOfficer'] = $this->bdmOfficer ?? null;
 
         $response['course'] = [
             'id' => $this->course->id ?? null,
@@ -30,7 +30,7 @@ class ApplicationResource extends JsonResource
             'name' => $this->agent->first_name ?? null . ' ' . $this->agent->last_name ?? null,
             'email' => $this->agent->email ?? null,
             'phone' => $this->agent->phone ?? null,
-        ];
+        ] ?? null;
 
         $response['schools_of_choice_details'] = Universities::whereIn('id', $this->schools_of_choice ?? [])
             ->get(['id', 'name', 'logo']);
