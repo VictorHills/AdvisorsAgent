@@ -25,9 +25,3 @@ export const mockMonthlyApplications = {
     ],
     data: [12, 19, 15, 25, 32, 28, 35, 42, 38, 45, 52, 21]
 }
-
-export const mockApplicationsStatus = {
-    labels: ["Pending", "Approved", "In Review", "Rejected"],
-    data: [21, 89, 46, 12]
-}
-
