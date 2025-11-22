@@ -188,7 +188,7 @@
             <div class="greeting">Hello, {{ $user_full_name }}</div>
 
             <p class="description">
-                You've requested to verify your account with Advisors Academy.
+                You've requested an OTP with Advisors Academy.
                 Use the code below to complete your verification:
             </p>
 

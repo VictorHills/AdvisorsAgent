@@ -4,8 +4,9 @@ import Register from "../pages/Register.vue"
 import Dashboard from "../pages/Dashboard.vue"
 import CreateApplication from "../pages/CreateApplication.vue"
 import Team from "../pages/Team.vue"
-import Students from "../pages/Students.vue"
+import StudentApplication from "../pages/StudentApplication.vue"
 import ForgotPassword from "../pages/ForgotPassword.vue"
+import CreateStudent from "../pages/CreateStudent.vue";
 
 const routes = [
     {path: "/", redirect: "/login"},
@@ -13,7 +14,13 @@ const routes = [
     {path: "/register", component: Register, name: "register"},
     {path: "/forgot-password", component: ForgotPassword, name: "forgot-password"},
     {path: "/dashboard", component: Dashboard, name: "dashboard", meta: {requiresAuth: true}},
-    {path: "/students", component: Students, name: "students", meta: {requiresAuth: true}},
+    {path: "/create-student", component: CreateStudent, name: "create-student", meta: {requiresAuth: true}},
+    {
+        path: "/student-application",
+        component: StudentApplication,
+        name: "student-application",
+        meta: {requiresAuth: true}
+    },
     {
         path: "/applications/create",
         component: CreateApplication,
