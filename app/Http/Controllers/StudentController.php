@@ -26,11 +26,11 @@ class StudentController extends Controller
     public function show($id)
     {
         $agentId = auth()->id();
-        $student = StudentApplications::where('agent_id', $agentId)
-            ->with(['course', 'agent', 'bdmOfficer'])
-            ->findOrFail($id);
+        $student = Students::where('agent_id', $agentId)
+            ->where('id', $id)
+            ->first();
 
-        return response()->json(['student' => $student]);
+        return $this->respondSuccessWithData(message: "Student retrieved successfully", data: new StudentsResource($student));
     }
 
     public function store(CreateStudentRequest $createStudentRequest)
