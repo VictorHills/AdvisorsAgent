@@ -41,6 +41,7 @@ export const authAPI = {
     getUser: () => api.get("/user"),
     getOtp: (data) => api.post("/auth/otp", data),
     resetPassword: (data) => api.post("/auth/reset-password", data),
+    verifyOtp: (email, token, destination) => api.post("/auth/verify-otp", {email, token, destination}),
 }
 
 export const dashboardAPI = {
@@ -142,8 +143,10 @@ export const applicationsAPI = {
 }
 
 export const studentsAPI = {
-    getAll: (page = 1, perPage = 10) => api.get("/students", { params: { page, per_page: perPage } }),
+    getAll: (page = 1, perPage = 10) => api.get("/students", {params: {page, per_page: perPage}}),
     getOne: (id) => api.get(`/students/${id}`),
+    validateStudent: (email) => api.post("/students/validate", {email}),
+    create: (data) => api.post("/students", data),
 }
 
 export const bdmOfficersAPI = {
@@ -153,21 +156,35 @@ export const bdmOfficersAPI = {
 
 export const coursesAPI = {
     getAll: () => api.get("/courses"),
-    search: (searchTerm = "", perPage = 10) => api.get("/courses", { params: { search: searchTerm, per_page: perPage } }),
+    search: (searchTerm = "", perPage = 10) => api.get("/courses", {params: {search: searchTerm, per_page: perPage}}),
     getOne: (id) => api.get(`/courses/${id}`),
 }
 
 export const schoolsAPI = {
     getAll: () => api.get("/schools"),
-    search: (searchTerm = "", perPage = 10) => api.get("/schools", { params: { search: searchTerm, per_page: perPage } }),
+    search: (searchTerm = "", perPage = 10) => api.get("/schools", {params: {search: searchTerm, per_page: perPage}}),
     getOne: (id) => api.get(`/schools/${id}`),
 }
 
 export const countriesAPI = {
     getAll: () => api.get("/countries"),
     search: (searchTerm = "", perPage = 10) =>
-        api.get("/countries", { params: { search: searchTerm, per_page: perPage } }),
+        api.get("/countries", {params: {search: searchTerm, per_page: perPage}}),
     getOne: (id) => api.get(`/countries/${id}`),
+}
+
+export const adminDashboardAPI = {
+    getStats: () => api.get("/admin/dashboard/stats"),
+    getApplicationsTrend: () => api.get("/admin/dashboard/applications-trend"),
+    getApplicationsStatus: () => api.get("/admin/dashboard/applications-status"),
+    getMonthlyApplications: () => api.get("/admin/dashboard/monthly-applications"),
+    getRecentActivity: () => api.get("/admin/dashboard/recent-activity"),
+}
+
+export const adminStudentsAPI = {
+    getAll: (page = 1, perPage = 10) => api.get("/admin/students", {params: {page, per_page: perPage}}),
+    getOne: (id) => api.get(`/admin/students/${id}`),
+    update: (data) => api.post("/admin/students", data),
 }
 
 export default api

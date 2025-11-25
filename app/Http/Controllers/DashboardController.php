@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApplicationStatus;
+use App\Models\Countries;
 use App\Models\StudentApplications;
 use App\Models\Students;
 use Carbon\Carbon;
@@ -16,25 +17,44 @@ class DashboardController extends Controller
         $agentId = auth()->id();
 
         $totalApplications = StudentApplications::where('agent_id', $agentId)->count();
-        $pendingApplications = StudentApplications::where('agent_id', $agentId)
-            ->where('status', 'Pending')
+
+        $visa_application_granted = StudentApplications::where('agent_id', $agentId)
+            ->where('status', 'visa_application_granted')
             ->count();
-        $approvedApplications = StudentApplications::where('agent_id', $agentId)
-            ->where('status', 'Approved')
+
+        $cas_ceo_loa_i20_stage = StudentApplications::where('agent_id', $agentId)
+            ->where('status', 'cas_ceo_loa_i20_stage')
             ->count();
-        $inReviewApplications = StudentApplications::where('agent_id', $agentId)
-            ->where('status', 'In Review')
+
+        $unconditional_offers_received = StudentApplications::where('agent_id', $agentId)
+            ->where('status', 'unconditional_offers_received')
             ->count();
+
+        $application_done_successfully = StudentApplications::where('agent_id', $agentId)
+            ->where('status', 'application_done_successfully')
+            ->count();
+
+        $document_in_check = StudentApplications::where('agent_id', $agentId)
+            ->where('status', 'document_in_check')
+            ->count();
+
+        $application_rejected = StudentApplications::where('agent_id', $agentId)
+            ->where('status', 'application_rejected')
+            ->count();
+
         $totalStudents = Students::where('agent_id', $agentId)
             ->distinct('email')
             ->count();
 
         $data = [
-            'total_applications' => $totalApplications,
-            'pending_applications' => $pendingApplications,
-            'approved_applications' => $approvedApplications,
-            'in_review_applications' => $inReviewApplications,
             'total_students' => $totalStudents,
+            'total_applications' => $totalApplications,
+            'visa_application_granted' => $visa_application_granted,
+            'cas_ceo_loa_i20_stage' => $cas_ceo_loa_i20_stage,
+            'unconditional_offers_received' => $unconditional_offers_received,
+            'application_done_successfully' => $application_done_successfully,
+            'document_in_check' => $document_in_check,
+            'application_rejected' => $application_rejected,
         ];
         return $this->respondSuccessWithData(message: 'Application stats retrieved successfully', data: $data);
     }
@@ -45,9 +65,12 @@ class DashboardController extends Controller
         $days = 7;
         $labels = [];
         $totalData = [];
-        $approvedData = [];
-        $pendingData = [];
-        $inReviewData = [];
+        $visa_application_granted_data = [];
+        $cas_ceo_loa_i20_stage_data = [];
+        $unconditional_offers_received_data = [];
+        $application_done_successfully_data = [];
+        $document_in_check_data = [];
+        $application_rejected_data = [];
 
         for ($i = $days - 1; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
@@ -58,23 +81,41 @@ class DashboardController extends Controller
                 ->count();
             $totalData[] = $total;
 
-            $approved = StudentApplications::where('agent_id', $agentId)
-                ->where('status', 'Approved')
+            $visa_application_granted = StudentApplications::where('agent_id', $agentId)
+                ->where('status', 'visa_application_granted')
                 ->whereDate('created_at', $date)
                 ->count();
-            $approvedData[] = $approved;
+            $visa_application_granted_data[] = $visa_application_granted;
 
-            $pending = StudentApplications::where('agent_id', $agentId)
-                ->where('status', 'Pending')
+            $cas_ceo_loa_i20_stage = StudentApplications::where('agent_id', $agentId)
+                ->where('status', 'cas_ceo_loa_i20_stage')
                 ->whereDate('created_at', $date)
                 ->count();
-            $pendingData[] = $pending;
+            $cas_ceo_loa_i20_stage_data[] = $cas_ceo_loa_i20_stage;
 
-            $inReview = StudentApplications::where('agent_id', $agentId)
-                ->where('status', 'In Review')
+            $unconditional_offers_received = StudentApplications::where('agent_id', $agentId)
+                ->where('status', 'unconditional_offers_received')
                 ->whereDate('created_at', $date)
                 ->count();
-            $inReviewData[] = $inReview;
+            $unconditional_offers_received_data[] = $unconditional_offers_received;
+
+            $application_done_successfully = StudentApplications::where('agent_id', $agentId)
+                ->where('status', 'application_done_successfully')
+                ->whereDate('created_at', $date)
+                ->count();
+            $application_done_successfully_data[] = $application_done_successfully;
+
+            $application_rejected = StudentApplications::where('agent_id', $agentId)
+                ->where('status', 'application_rejected')
+                ->whereDate('created_at', $date)
+                ->count();
+            $application_rejected_data[] = $application_rejected;
+
+            $document_in_check = StudentApplications::where('agent_id', $agentId)
+                ->where('status', 'document_in_check')
+                ->whereDate('created_at', $date)
+                ->count();
+            $document_in_check_data[] = $document_in_check;
         }
 
         $data = [
@@ -85,16 +126,29 @@ class DashboardController extends Controller
                     'data' => $totalData,
                 ],
                 [
-                    'label' => 'Approved',
-                    'data' => $approvedData,
+                    'label' => 'Document In Check',
+                    'data' => $document_in_check_data,
                 ],
                 [
-                    'label' => 'Pending',
-                    'data' => $pendingData,
+                    'label' => 'Application Done Successfully',
+                    'data' => $application_done_successfully_data,
                 ],
                 [
-                    'label' => 'In Review',
-                    'data' => $inReviewData,
+                    'label' => 'Unconditional Offers Received',
+                    'data' => $unconditional_offers_received_data,
+                ],
+                [
+                    'label' => 'CAS/CEO/LOA/I20 Stage',
+                    'data' => $cas_ceo_loa_i20_stage_data,
+                ],
+                [
+                    'label' => 'Visa Application Granted',
+                    'data' => $visa_application_granted_data,
+                ],
+
+                [
+                    'label' => 'Application Rejected',
+                    'data' => $application_rejected_data,
                 ],
             ],
         ];
@@ -110,14 +164,15 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->get();
 
-        $application_statuses = ApplicationStatus::pluck('status_name')->toArray();
-        $statusCount = $statusCounts->pluck('count')->toArray();
+        $labels = $statusCounts->pluck('status')->toArray();
+        $data = $statusCounts->pluck('count')->toArray();
 
         $data = [
-            'labels' => $application_statuses,
-            'data' => $statusCount,
+            'labels' => $labels,
+            'data' => $data,
         ];
-        return $this->respondSuccessWithData(message: 'Applications Statuses retrieved successfully', data: $data);
+
+        return $this->respondSuccessWithData(message: 'Applications Status retrieved successfully', data: $data);
     }
 
     public function monthlyApplications()
@@ -169,6 +224,22 @@ class DashboardController extends Controller
                 ];
             });
 
-        return response()->json($activities);
+        return $this->respondSuccessWithData(message: 'Recent Activity retrieved successfully', data: $activities);
+    }
+
+    public function countryDistribution()
+    {
+        $agentId = auth()->id();
+
+        $student_applications = StudentApplications::where('agent_id', $agentId)->pluck('country_of_preference')
+            ->flatten()
+            ->toArray();
+
+        $countries = Countries::whereIn('id', $student_applications)->get()->map(function ($country) {
+            return $country->name;
+        });
+
+
+        return $this->respondSuccessWithData(message: 'Country Distribution retrieved successfully', data: $countries);
     }
 }
