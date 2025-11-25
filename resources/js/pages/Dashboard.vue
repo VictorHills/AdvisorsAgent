@@ -13,8 +13,10 @@
                          :style="{ animationDelay: `${index * 0.1}s` }">
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-lg flex items-center justify-center" :class="stat.bgColor">
-                                <svg class="w-6 h-6" :class="stat.iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="stat.icon"/>
+                                <svg class="w-6 h-6" :class="stat.iconColor" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          :d="stat.icon"/>
                                 </svg>
                             </div>
                             <span class="text-xs font-medium" :class="stat.changeColor">{{ stat.change }}</span>
@@ -26,30 +28,39 @@
 
                 <!-- Monthly Applications Bar Chart -->
                 <div class="mb-8">
-                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary" style="animation-delay: 0.3s;">
+                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                         style="animation-delay: 0.3s;">
                         <h3 class="font-bold mb-6">Monthly Applications Overview</h3>
                         <div class="h-80">
                             <BarChart v-if="monthlyChartData" :data="monthlyChartData"/>
-                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data available</div>
+                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
+                                available
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Line Chart & Status Chart -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary" style="animation-delay: 0.4s;">
+                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                         style="animation-delay: 0.4s;">
                         <h3 class="font-bold mb-6">Applications Trend</h3>
                         <div class="h-80">
                             <LineChart v-if="applicationsChartData" :data="applicationsChartData"/>
-                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data available</div>
+                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
+                                available
+                            </div>
                         </div>
                     </div>
-                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary" style="animation-delay: 0.5s;">
+                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                         style="animation-delay: 0.5s;">
                         <h3 class="font-bold mb-6">Applications by Status</h3>
                         <div class="h-80 overflow-y-auto">
                             <div :style="{ height: statusChartHeight }">
                                 <HorizontalBarChart v-if="statusChartData" :data="statusChartData"/>
-                                <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data available</div>
+                                <div v-else class="flex items-center justify-center h-full text-muted-foreground">No
+                                    data available
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -62,12 +73,18 @@
                             <table class="w-full">
                                 <thead>
                                 <tr class="border-b-2 border-primary">
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Student Full Name</th>
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Student
+                                        Full Name
+                                    </th>
                                     <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
                                     <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Phone</th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Gender</th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Country</th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Enrolled Date</th>
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Gender
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Country
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Enrolled
+                                        Date
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -75,10 +92,15 @@
                                     class="border-b border-border hover:bg-muted/50 hover:border-l-2 hover:border-l-primary transition-all duration-200 cursor-pointer">
                                     <td class="py-4 px-4">
                                         <div class="flex items-center space-x-3">
-                                            <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                                                <span class="text-primary text-sm font-medium">{{ student.initials }}</span>
+                                            <div
+                                                class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                                <span class="text-primary text-sm font-medium">
+                                                    {{ student.initials }}
+                                                </span>
                                             </div>
-                                            <div><div class="font-medium">{{ student.name }}</div></div>
+                                            <div>
+                                                <div class="font-medium">{{ student.name }}</div>
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="py-4 px-4 text-sm">{{ student.email }}</td>
@@ -94,13 +116,18 @@
 
                     <!-- Sidebar -->
                     <div class="space-y-6">
-                        <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary" style="animation-delay: 0.2s;">
+                        <!-- Quick Actions - Only show for Agents -->
+                        <div v-if="isAgent" class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                             style="animation-delay: 0.2s;">
                             <h3 class="font-bold mb-4">Quick Actions</h3>
                             <div class="space-y-3">
-                                <router-link to="/applications/create" class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
+                                <router-link to="/applications/create"
+                                             class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
                                     <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
-                                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M12 4v16m8-8H4"/>
                                         </svg>
                                     </div>
                                     <div>
@@ -108,10 +135,13 @@
                                         <div class="text-xs text-muted-foreground">Submit student application</div>
                                     </div>
                                 </router-link>
-                                <router-link to="/create-student" class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
+                                <router-link to="/create-student"
+                                             class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
                                     <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
-                                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M12 4v16m8-8H4"/>
                                         </svg>
                                     </div>
                                     <div>
@@ -122,14 +152,18 @@
                             </div>
                         </div>
 
-                        <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary" style="animation-delay: 0.3s;">
+                        <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                             style="animation-delay: 0.3s;">
                             <h3 class="font-bold mb-4">Recent Activity</h3>
                             <div v-if="loadingActivity" class="flex items-center justify-center py-8">
                                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                             </div>
-                            <div v-else-if="limitedRecentActivity.length === 0" class="text-center py-8 text-muted-foreground text-sm">No recent activity</div>
+                            <div v-else-if="limitedRecentActivity.length === 0"
+                                 class="text-center py-8 text-muted-foreground text-sm">No recent activity
+                            </div>
                             <div v-else class="space-y-4">
-                                <div v-for="activity in limitedRecentActivity" :key="activity.id" class="flex items-start space-x-3 hover:bg-muted/50 p-2 rounded-lg transition-all duration-200">
+                                <div v-for="activity in limitedRecentActivity" :key="activity.id"
+                                     class="flex items-start space-x-3 hover:bg-muted/50 p-2 rounded-lg transition-all duration-200">
                                     <div class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm break-words">{{ activity.text }}</p>
@@ -146,8 +180,9 @@
 </template>
 
 <script>
-import { computed, onMounted, ref } from 'vue'
-import { dashboardAPI, studentsAPI } from '../services/api'
+import {computed, onMounted, ref} from 'vue'
+import {dashboardAPI, studentsAPI} from '../services/api'
+import {useAuth} from '../composables/useAuth'
 import LineChart from '../components/LineChart.vue'
 import DoughnutChart from '../components/DoughnutChart.vue'
 import BarChart from '../components/BarChart.vue'
@@ -155,14 +190,17 @@ import HorizontalBarChart from '../components/HorizontalBarChart.vue'
 
 export default {
     name: 'Dashboard',
-    components: { LineChart, DoughnutChart, BarChart, HorizontalBarChart },
+    components: {LineChart, DoughnutChart, BarChart, HorizontalBarChart},
     setup() {
+        const {userRole, isCounselor, isAgent} = useAuth()
+
         const loading = ref(true)
         const loadingActivity = ref(true)
         const stats = ref([])
         const applicationsChartData = ref(null)
         const statusChartData = ref(null)
         const monthlyChartData = ref(null)
+        const studentCountryData = ref([])
         const students = ref([])
         const recentActivity = ref([])
 
@@ -170,15 +208,23 @@ export default {
             try {
                 loading.value = true
 
-                // Real API calls for stats and students
+                // Use different endpoints based on user role
+                const statsPromise = isCounselor.value
+                    ? dashboardAPI.getCounselorStats()
+                    : dashboardAPI.getStats()
+
+                const studentsPromise = isCounselor.value
+                    ? studentsAPI.getCounselorStudents()
+                    : studentsAPI.getAll()
+
                 const [statsRes, studentRes] = await Promise.all([
-                    dashboardAPI.getStats().catch(e => ({ data: { data: {} } })),
-                    studentsAPI.getAll().catch(e => ({ data: [] }))
+                    statsPromise.catch(e => ({data: {data: {}}})),
+                    studentsPromise.catch(e => ({data: []}))
                 ])
 
                 const statsData = statsRes.data.data || statsRes.data
 
-                stats.value = [
+                const baseStats = [
                     {
                         value: statsData.total_students || 0,
                         label: 'Total Students',
@@ -187,7 +233,22 @@ export default {
                         bgColor: 'bg-primary/20',
                         iconColor: 'text-primary',
                         icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
-                    },
+                    }
+                ];
+
+                if (isCounselor.value) {
+                    baseStats.push({
+                        value: statsData.total_agents || 0,
+                        label: 'Total Agents',
+                        change: '+12%',
+                        changeColor: 'text-primary',
+                        bgColor: 'bg-primary/20',
+                        iconColor: 'text-primary',
+                        icon: 'M17 20a4 4 0 10-8 0m8 0H9m8 0h5v-2a4 4 0 00-4-4h-1m-6 6H4v-2a4 4 0 014-4h1m4-10a4 4 0 11-8 0 4 4 0 018 0zm6 4a3 3 0 11-6 0 3 3 0 016 0z'
+                    });
+                }
+
+                baseStats.push(
                     {
                         value: statsData.total_applications || 0,
                         label: 'Total Applications',
@@ -205,8 +266,11 @@ export default {
                         bgColor: 'bg-success/20',
                         iconColor: 'text-success',
                         icon: 'M5 13l4 4L19 7'
-                    },
-                    {
+                    }
+                );
+
+                if (!isCounselor.value) {
+                    baseStats.push({
                         value: statsData.cas_ceo_loa_i20_stage || 0,
                         label: 'CAS/CEO/LOA/I20 Stage',
                         change: '+2%',
@@ -214,7 +278,10 @@ export default {
                         bgColor: 'bg-primary/20',
                         iconColor: 'text-primary',
                         icon: 'M12 6v6l4 2'
-                    },
+                    });
+                }
+
+                baseStats.push(
                     {
                         value: statsData.document_in_check || 0,
                         label: 'Documents in Check',
@@ -233,18 +300,33 @@ export default {
                         iconColor: 'text-danger',
                         icon: 'M6 18L18 6M6 6l12 12'
                     }
-                ];
+                );
+
+                stats.value = baseStats;
+
+                const trendPromise = isCounselor.value
+                    ? dashboardAPI.getCounselorApplicationsTrend()
+                    : dashboardAPI.getApplicationsTrend()
+
+                const statusPromise = isCounselor.value
+                    ? dashboardAPI.getCounselorApplicationsStatus()
+                    : dashboardAPI.getApplicationsStatus()
+
+                const monthlyPromise = isCounselor.value
+                    ? dashboardAPI.getCounselorMonthlyApplications()
+                    : dashboardAPI.getMonthlyApplications()
 
                 const [trendRes, statusRes, monthlyRes] = await Promise.all([
-                    dashboardAPI.getApplicationsTrend(),
-                    dashboardAPI.getApplicationsStatus(),
-                    dashboardAPI.getMonthlyApplications()
+                    trendPromise,
+                    statusPromise,
+                    monthlyPromise
                 ])
+
                 monthlyChartData.value = monthlyRes.data.data || monthlyRes.data
                 statusChartData.value = statusRes.data.data || statusRes.data
                 applicationsChartData.value = trendRes.data.data || trendRes.data
 
-                // Real API for students
+                // Process students data
                 const studentsData = Array.isArray(studentRes.data) ? studentRes.data : (studentRes.data.data || [])
                 students.value = studentsData.map(s => ({
                     id: s.id,
@@ -267,7 +349,9 @@ export default {
         const fetchRecentActivity = async () => {
             try {
                 loadingActivity.value = true
-                const response = await dashboardAPI.getRecentActivity()
+                const response = isCounselor.value
+                    ? await dashboardAPI.getCounselorRecentActivity()
+                    : await dashboardAPI.getRecentActivity()
                 recentActivity.value = response.data.data || response.data || []
             } catch (error) {
                 console.error('Error fetching recent activity:', error)
@@ -278,9 +362,10 @@ export default {
         }
 
         const limitedStudents = computed(() => students.value.slice(0, 8))
-        const limitedRecentActivity = computed(() => recentActivity.value.slice(0, 5))
+        const limitedRecentActivity = isCounselor.value
+            ? computed(() => recentActivity.value.slice(0, 9))
+            : computed(() => recentActivity.value.slice(0, 5))
 
-        // Dynamic height based on number of statuses (30px per status, minimum 200px)
         const statusChartHeight = computed(() => {
             const count = statusChartData.value?.labels?.length || 0
             const height = Math.max(count * 35, 200)
@@ -299,11 +384,14 @@ export default {
             applicationsChartData,
             statusChartData,
             monthlyChartData,
+            studentCountryData,
             statusChartHeight,
             students,
             limitedStudents,
             limitedRecentActivity,
-            recentActivity
+            recentActivity,
+            isCounselor,
+            isAgent
         }
     }
 }
