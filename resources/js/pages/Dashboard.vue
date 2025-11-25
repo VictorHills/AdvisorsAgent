@@ -40,6 +40,20 @@
                     </div>
                 </div>
 
+                <!-- Monthly Applications Bar Chart -->
+                <div class="mb-8" v-if="isCounselor">
+                    <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
+                         style="animation-delay: 0.3s;">
+                        <h3 class="font-bold mb-6">Monthly Agent SignUp</h3>
+                        <div class="h-80">
+                            <BarChart v-if="monthlyAgentSignUpData" :data="monthlyAgentSignUpData"/>
+                            <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
+                                available
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Line Chart & Status Chart -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                     <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
@@ -200,6 +214,7 @@ export default {
         const applicationsChartData = ref(null)
         const statusChartData = ref(null)
         const monthlyChartData = ref(null)
+        const monthlyAgentSignUpData = ref(null)
         const studentCountryData = ref([])
         const students = ref([])
         const recentActivity = ref([])
@@ -316,12 +331,16 @@ export default {
                     ? dashboardAPI.getCounselorMonthlyApplications()
                     : dashboardAPI.getMonthlyApplications()
 
-                const [trendRes, statusRes, monthlyRes] = await Promise.all([
+                const monthlyAgentPromise = dashboardAPI.getCounselorMonthlyAgentApplications()
+
+                const [trendRes, statusRes, monthlyRes, monthlyAgent] = await Promise.all([
                     trendPromise,
                     statusPromise,
-                    monthlyPromise
+                    monthlyPromise,
+                    monthlyAgentPromise
                 ])
 
+                monthlyAgentSignUpData.value = monthlyAgent.data.data || monthlyRes.data
                 monthlyChartData.value = monthlyRes.data.data || monthlyRes.data
                 statusChartData.value = statusRes.data.data || statusRes.data
                 applicationsChartData.value = trendRes.data.data || trendRes.data
@@ -391,7 +410,8 @@ export default {
             limitedRecentActivity,
             recentActivity,
             isCounselor,
-            isAgent
+            isAgent,
+            monthlyAgentSignUpData
         }
     }
 }

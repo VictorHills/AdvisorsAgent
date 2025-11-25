@@ -48,6 +48,7 @@
                     </div>
 
                     <router-link
+                        v-if="!isCounselor"
                         to="/create-student"
                         class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center md:justify-start"
                     >
@@ -58,6 +59,7 @@
                     </router-link>
 
                     <router-link
+                        v-if="!isCounselor"
                         to="/applications/create"
                         class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center md:justify-start"
                     >
@@ -68,7 +70,7 @@
                     </router-link>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
                     <div v-for="(stat, index) in stats" :key="index"
                          class="p-4 bg-muted/50 rounded-lg border border-border hover:border-primary/50 transition-all duration-200">
                         <div class="text-2xl font-bold mb-1">{{ stat.value }}</div>
@@ -829,10 +831,10 @@
                     <div
                         class="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border p-4 md:p-6 flex items-center justify-between backdrop-blur-2xl">
                         <div>
-                            <h2 class="text-lg md:text-xl font-bold">Applications</h2>
-                            <p class="text-xs md:text-sm text-muted-foreground mt-1"
-                               v-if="studentApplications.length > 0">
-                                Viewing {{ studentApplications.length }} application(s) for this student
+                            <h2 class="text-lg md:text-xl font-bold">Student Applications</h2>
+                            <p class="text-xs md:text-sm text-muted-foreground mt-1" v-if="selectedStudentDetails">
+                                {{ selectedStudentDetails.first_name }} {{ selectedStudentDetails.middle_name }}
+                                {{ selectedStudentDetails.last_name }}
                             </p>
                         </div>
                         <button @click="showApplicationsModal = false"
@@ -843,78 +845,168 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="p-4 md:p-6 space-y-4">
+
+                    <div class="p-4 md:p-6 space-y-6">
+                        <!-- Loading State -->
                         <div v-if="applicationLoadingModal" class="flex items-center justify-center py-12">
                             <div class="flex flex-col items-center gap-4">
                                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                                 <p class="text-muted-foreground">Loading applications...</p>
                             </div>
                         </div>
-                        <div v-else-if="studentApplications.length === 0" class="text-center py-12">
-                            <svg class="w-16 h-16 mx-auto text-muted-foreground mb-4" stroke="currentColor"
-                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
-                            </svg>
-                            <p class="text-muted-foreground">No applications found for this student</p>
-                        </div>
-                        <div v-else class="space-y-4">
-                            <div v-for="application in studentApplications" :key="application.id"
-                                 class="p-4 border border-border rounded-lg hover:border-primary/50 transition-all duration-200 animate-slide-up">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-xs text-muted-foreground font-medium mb-1">Course</p>
-                                        <p class="font-medium text-sm">{{ application.course?.name || 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-muted-foreground font-medium mb-1">Status</p>
-                                        <span :class="getStatusClass(application.status)"
-                                              class="inline-block px-3 py-1 rounded text-xs font-medium">
-                                            {{ application.status }}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-muted-foreground font-medium mb-1">Universities</p>
-                                        <div class="flex flex-wrap gap-2">
-                                            <span v-for="university in application.schools_of_choice_details"
-                                                  :key="university.id"
-                                                  class="px-2 py-1 bg-primary/20 text-primary rounded text-xs font-medium">
-                                                {{ university.name }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-muted-foreground font-medium mb-1">Applied Date</p>
+
+                        <template v-else>
+                            <!-- Student Details Section -->
+                            <div v-if="selectedStudentDetails" class="space-y-4">
+                                <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Student
+                                    Information</h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                                    <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Full Name</p>
                                         <p class="font-medium text-sm">
-                                            {{ new Date(application.created_at).toLocaleDateString() }}</p>
+                                            {{ selectedStudentDetails.first_name }}
+                                            {{ selectedStudentDetails.middle_name }}
+                                            {{ selectedStudentDetails.last_name }}
+                                        </p>
                                     </div>
-                                    <!-- Added countries of preference display -->
-                                    <div>
-                                        <p class="text-xs text-muted-foreground font-medium mb-1">Countries of
-                                            Preference</p>
-                                        <div class="flex flex-wrap gap-2">
-                                            <span v-for="country in application.country_of_preference_details"
-                                                  :key="country.id"
-                                                  class="px-2 py-1 bg-blue-500/20 text-blue-500 rounded text-xs font-medium">
-                                                {{ country.name }}
-                                            </span>
-                                        </div>
+                                    <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Email</p>
+                                        <p class="font-medium text-sm break-all">{{ selectedStudentDetails.email }}</p>
                                     </div>
-                                    <!-- Added class of degree display -->
-                                    <div>
-                                        <p class="text-xs text-muted-foreground font-medium mb-1">Class of Degree</p>
-                                        <p class="font-medium text-sm">{{ application.class_of_degree || 'N/A' }}</p>
+                                    <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Phone</p>
+                                        <p class="font-medium text-sm">{{ selectedStudentDetails.phone_number }}</p>
+                                    </div>
+                                    <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Gender</p>
+                                        <p class="font-medium text-sm">{{ selectedStudentDetails.gender || 'N/A' }}</p>
+                                    </div>
+                                    <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Date of Birth</p>
+                                        <p class="font-medium text-sm">
+                                            {{
+                                                selectedStudentDetails.birth_date ? new Date(selectedStudentDetails.birth_date).toLocaleDateString() : 'N/A'
+                                            }}
+                                        </p>
+                                    </div>
+                                    <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
+                                        <p class="text-xs text-muted-foreground font-medium mb-1">Country</p>
+                                        <p class="font-medium text-sm">{{ selectedStudentDetails.country || 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <!-- Improved notes display with better styling -->
-                                <div v-if="application.additional_notes" class="mt-4 pt-4 border-t border-border/50">
-                                    <p class="text-xs text-muted-foreground font-medium mb-2">Additional Notes</p>
-                                    <p class="text-sm text-foreground leading-relaxed">{{
-                                            application.additional_notes
-                                        }}</p>
+
+                                <!-- Agent Info -->
+                                <div v-if="selectedStudentDetails.agent"
+                                     class="p-3 md:p-4 bg-primary/5 rounded-lg border border-primary/20">
+                                    <p class="text-xs text-muted-foreground font-medium mb-2">Assigned Agent</p>
+
+                                    <p class="font-medium text-sm">
+                                        <span class="text-muted-foreground">Full Name - </span>
+                                        {{ selectedStudentDetails.agent.first_name }}
+                                        {{ selectedStudentDetails.agent.last_name }}
+                                        {{ selectedStudentDetails.agent.agency_name }}
+                                    </p>
+
+                                    <p class="font-medium text-sm">
+                                        <span class="text-muted-foreground">Email - </span>
+                                        {{ selectedStudentDetails.agent.email }}
+                                    </p>
+
+                                    <p class="font-medium text-sm">
+                                        <span class="text-muted-foreground">Agency Name - </span>
+                                        {{ selectedStudentDetails.agent.agency_name }}
+                                    </p>
+
+                                    <p class="font-medium text-sm">
+                                        <span class="text-muted-foreground">Phone Number - </span>
+                                        {{ selectedStudentDetails.agent.phone }}
+                                    </p>
                                 </div>
                             </div>
-                        </div>
+
+                            <!-- Applications Section -->
+                            <div class="space-y-4">
+                                <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">
+                                    Applications ({{ studentApplications.length }})
+                                </h3>
+
+                                <div v-if="studentApplications.length === 0" class="text-center py-12">
+                                    <svg class="w-16 h-16 mx-auto text-muted-foreground mb-4" stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                    </svg>
+                                    <p class="text-muted-foreground">No applications found for this student</p>
+                                </div>
+
+                                <div v-else class="space-y-4">
+                                    <div v-for="application in studentApplications" :key="application.id"
+                                         class="p-4 border border-border rounded-lg hover:border-primary/50 transition-all duration-200 animate-slide-up">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <p class="text-xs text-muted-foreground font-medium mb-1">Course</p>
+                                                <p class="font-medium text-sm">{{
+                                                        application.course?.name || 'N/A'
+                                                    }}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-muted-foreground font-medium mb-1">Status</p>
+                                                <span :class="getStatusClass(application.status)"
+                                                      class="inline-block px-3 py-1 rounded text-xs font-medium">
+                                        {{ application.status }}
+                                    </span>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-muted-foreground font-medium mb-1">
+                                                    Universities</p>
+                                                <div class="flex flex-wrap gap-2">
+                                        <span v-for="university in application.schools_of_choice_details"
+                                              :key="university.id"
+                                              class="px-2 py-1 bg-primary/20 text-primary rounded text-xs font-medium">
+                                            {{ university.name }}
+                                        </span>
+                                                    <span v-if="!application.schools_of_choice_details?.length"
+                                                          class="text-xs text-muted-foreground">N/A</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-muted-foreground font-medium mb-1">Applied
+                                                    Date</p>
+                                                <p class="font-medium text-sm">
+                                                    {{ new Date(application.created_at).toLocaleDateString() }}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-muted-foreground font-medium mb-1">Countries of
+                                                    Preference</p>
+                                                <div class="flex flex-wrap gap-2">
+                                        <span v-for="country in application.country_of_preference_details"
+                                              :key="country.id"
+                                              class="px-2 py-1 bg-blue-500/20 text-blue-500 rounded text-xs font-medium">
+                                            {{ country.name }}
+                                        </span>
+                                                    <span v-if="!application.country_of_preference_details?.length"
+                                                          class="text-xs text-muted-foreground">N/A</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-muted-foreground font-medium mb-1">Class of
+                                                    Degree</p>
+                                                <p class="font-medium text-sm">{{
+                                                        application.class_of_degree || 'N/A'
+                                                    }}</p>
+                                            </div>
+                                        </div>
+                                        <div v-if="application.additional_notes"
+                                             class="mt-4 pt-4 border-t border-border/50">
+                                            <p class="text-xs text-muted-foreground font-medium mb-2">Additional
+                                                Notes</p>
+                                            <p class="text-sm text-foreground leading-relaxed">
+                                                {{ application.additional_notes }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -926,11 +1018,14 @@
 <script>
 import {ref, computed, onMounted, watch, nextTick} from 'vue';
 import {studentsAPI, applicationsAPI, dashboardAPI, coursesAPI, schoolsAPI, countriesAPI} from '../services/api';
+import {useAuth} from "../composables/useAuth.js";
 
 export default {
     name: 'Students',
     components: {},
     setup() {
+        const {userRole, isCounselor, isAgent} = useAuth()
+
         const searchQuery = ref('');
         const statusFilter = ref('');
         const countryFilter = ref('');
@@ -988,11 +1083,13 @@ export default {
         });
 
         const stats = ref([
+            {value: 0, label: 'Total Students'},
             {value: 0, label: 'Total Applications'},
-            {value: 0, label: 'Approved'},
-            {value: 0, label: 'Pending'},
-            {value: 0, label: 'In Review'}
+            {value: 0, label: 'Visa Granted'},
+            {value: 0, label: 'CAS/CEO/LOA/I20 Stage'},
+            {value: 0, label: 'Unconditional Offers'},
         ]);
+
 
         const pagination = ref({
             total: 0,
@@ -1009,11 +1106,14 @@ export default {
                 const statsData = response.data.data || response.data;
 
                 stats.value = [
+                    {value: statsData.total_students || 0, label: 'Total Students'},
                     {value: statsData.total_applications || 0, label: 'Total Applications'},
-                    {value: statsData.approved_applications || 0, label: 'Approved'},
-                    {value: statsData.pending_applications || 0, label: 'Pending'},
-                    {value: statsData.in_review_applications || 0, label: 'In Review'}
+                    {value: statsData.visa_application_granted || 0, label: 'Visa Granted'},
+                    {value: statsData.cas_ceo_loa_i20_stage || 0, label: 'CAS/CEO/LOA/I20 Stage'},
+                    {value: statsData.unconditional_offers_received || 0, label: 'Unconditional Offers'},
+                    {value: statsData.application_rejected || 0, label: 'Applications Rejected'},
                 ];
+
             } catch (err) {
                 console.error('[v0] Error fetching stats:', err);
             }
@@ -1070,21 +1170,30 @@ export default {
                 const response = await applicationsAPI.getByStudentId(studentId);
                 const responseData = response.data;
 
-                if (responseData.data && responseData.data.applications) {
-                    studentApplications.value = responseData.data.applications;
-                } else if (responseData.applications) {
-                    studentApplications.value = responseData.applications;
-                } else if (Array.isArray(responseData.data)) {
-                    studentApplications.value = responseData.data;
-                } else if (Array.isArray(responseData)) {
-                    studentApplications.value = responseData;
+                if (responseData.data) {
+                    selectedStudentDetails.value = {
+                        first_name: responseData.data.first_name,
+                        middle_name: responseData.data.middle_name,
+                        last_name: responseData.data.last_name,
+                        phone_number: responseData.data.phone_number,
+                        email: responseData.data.email,
+                        gender: responseData.data.gender,
+                        birth_date: responseData.data.birth_date,
+                        country: responseData.data.country,
+                        agent: responseData.data.agent
+                    };
+
+                    studentApplications.value = responseData.data.applications || [];
                 } else {
+                    selectedStudentDetails.value = null;
                     studentApplications.value = [];
                 }
 
-                console.log('Applications loaded:', studentApplications.value);
+                console.log('[v0] Student details:', selectedStudentDetails.value);
+                console.log('[v0] Applications loaded:', studentApplications.value);
             } catch (err) {
-                console.error(`Error fetching applications for student ${studentId}:`, err);
+                console.error(`[v0] Error fetching applications for student ${studentId}:`, err);
+                selectedStudentDetails.value = null;
                 studentApplications.value = [];
             } finally {
                 applicationLoadingModal.value = false;
@@ -1103,9 +1212,10 @@ export default {
 
         const viewApplications = async (studentId) => {
             selectedStudentIdForApps.value = studentId;
-            studentApplications.value = []; // Clear previous applications
-            showApplicationsModal.value = true; // Open modal FIRST
-            await fetchStudentApplications(studentId); // Then fetch data
+            studentApplications.value = [];
+            selectedStudentDetails.value = null;
+            showApplicationsModal.value = true;
+            await fetchStudentApplications(studentId);
         };
 
         const viewDetails = (studentId) => {
@@ -1540,7 +1650,7 @@ export default {
             fetchStudents,
             fetchStats,
             updatePage,
-            viewDetails, // Keep viewDetails for the modal, if needed elsewhere
+            viewDetails,
             editStudent,
             saveEdit,
             showDetailsModal,
@@ -1591,11 +1701,15 @@ export default {
             handleEditCountryFocus,
             handleEditCountryBlur,
             downloadFile,
-            viewApplications, // Add the new function to the returned object
+            viewApplications,
             showApplicationsModal,
             studentApplications,
             applicationLoadingModal,
-            selectedStudentIdForApps // Added this export
+            selectedStudentIdForApps,
+            selectedStudentDetails,
+            userRole,
+            isCounselor,
+            isAgent,
         };
     }
 };
