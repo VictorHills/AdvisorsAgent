@@ -352,13 +352,15 @@
                             <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Agent
                                 Information</h3>
                             <div class="p-3 md:p-4 bg-primary/5 rounded-lg border border-primary/20">
-                                <p class="font-medium text-sm"><b>Agency Name: </b>{{
-                                        selectedStudent.agent.agency_name
-                                    }}</p>
+                                <p class="font-medium text-sm">
+                                    <b>Agency Name: </b>
+                                    {{ selectedStudent.agent.agency_name }}
+                                </p>
                                 <p class="text-xs md:text-sm text-muted-foreground"><b>Agent
-                                    Name: </b>{{ selectedStudent.agent.first_name }} {{
-                                        selectedStudent.agent.last_name
-                                    }}</p>
+                                    Name:
+                                </b>
+                                    {{ selectedStudent.agent.first_name }} {{ selectedStudent.agent.last_name }}
+                                </p>
                                 <p class="text-xs md:text-sm text-muted-foreground"><b>Agent
                                     Email: </b>{{ selectedStudent.agent.email }}</p>
                             </div>
@@ -376,9 +378,9 @@
                         class="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border p-6 flex items-center justify-end backdrop-blur-2xl">
                         <div class="min-w-0 flex-1">
                             <h2 class="text-lg md:text-xl font-bold truncate">Document Viewer</h2>
-                            <p class="text-xs md:text-sm text-muted-foreground mt-1">{{
-                                    getDocumentName(viewingDocument)
-                                }}</p>
+                            <p class="text-xs md:text-sm text-muted-foreground mt-1">
+                                {{ getDocumentName(viewingDocument) }}
+                            </p>
                         </div>
                         <button @click="viewingDocument = null"
                                 class="text-muted-foreground hover:text-foreground transition-colors">
@@ -833,7 +835,8 @@
                         <div>
                             <h2 class="text-lg md:text-xl font-bold">Student Applications</h2>
                             <p class="text-xs md:text-sm text-muted-foreground mt-1" v-if="selectedStudentDetails">
-                                {{ selectedStudentDetails.first_name }} {{ selectedStudentDetails.middle_name }}
+                                {{ selectedStudentDetails.first_name }}
+                                {{ selectedStudentDetails.middle_name }}
                                 {{ selectedStudentDetails.last_name }}
                             </p>
                         </div>
@@ -945,9 +948,9 @@
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <p class="text-xs text-muted-foreground font-medium mb-1">Course</p>
-                                                <p class="font-medium text-sm">{{
-                                                        application.course?.name || 'N/A'
-                                                    }}</p>
+                                                <p class="font-medium text-sm">
+                                                    {{ application.course?.name || 'N/A' }}
+                                                </p>
                                             </div>
                                             <div>
                                                 <p class="text-xs text-muted-foreground font-medium mb-1">Status</p>
@@ -1102,8 +1105,15 @@ export default {
 
         const fetchStats = async () => {
             try {
-                const response = await dashboardAPI.getStats();
-                const statsData = response.data.data || response.data;
+                const statsPromise = isCounselor.value
+                    ? dashboardAPI.getCounselorStats()
+                    : dashboardAPI.getStats()
+
+                const [statsRes] = await Promise.all([
+                    statsPromise.catch(e => ({data: {data: {}}})),
+                ])
+
+                const statsData = statsRes.data.data || response.data;
 
                 stats.value = [
                     {value: statsData.total_students || 0, label: 'Total Students'},
@@ -1124,9 +1134,15 @@ export default {
                 loading.value = true;
                 error.value = null;
 
-                const response = await studentsAPI.getAll(currentPage.value, itemsPerPage.value);
+                const studentsPromise = isCounselor.value
+                    ? studentsAPI.getCounselorStudents()
+                    : studentsAPI.getAll(currentPage.value, itemsPerPage.value)
 
-                const paginationData = response.data;
+                const [studentRes] = await Promise.all([
+                    studentsPromise.catch(e => ({data: []}))
+                ])
+
+                const paginationData = studentRes.data;
                 const studentsData = paginationData.data || [];
 
                 students.value = studentsData.map(student => ({
@@ -1167,7 +1183,7 @@ export default {
         const fetchStudentApplications = async (studentId) => {
             applicationLoadingModal.value = true;
             try {
-                const response = await applicationsAPI.getByStudentId(studentId);
+                const response = await studentsAPI.getById(studentId);
                 const responseData = response.data;
 
                 if (responseData.data) {
@@ -1591,7 +1607,7 @@ export default {
         const updatePage = async (newPage) => {
             if (newPage >= 1 && newPage <= pagination.value.lastPage) {
                 currentPage.value = newPage;
-                await fetchStudents(); // Fetch fresh data for the new page
+                await fetchStudents();
             }
         };
 
