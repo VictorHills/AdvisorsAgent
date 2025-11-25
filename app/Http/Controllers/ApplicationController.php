@@ -40,7 +40,24 @@ class ApplicationController extends Controller
     public function store(CreateStudentApplicationRequest $createStudentApplicationRequest)
     {
         return DB::transaction(function () use ($createStudentApplicationRequest) {
-            $student = Students::create($createStudentApplicationRequest->validated());
+            $student = Students::where('email', $createStudentApplicationRequest->validated('email'))->first();
+
+            if (!$student) {
+                $studentData = $createStudentApplicationRequest->only([
+                    'first_name',
+                    'middle_name',
+                    'last_name',
+                    'gender',
+                    'email',
+                    'phone_number',
+                    'country',
+                    'birth_date',
+                    'class_of_degree',
+                ]);
+
+                $student = Students::create($studentData);
+            }
+
             $application = StudentApplications::create($createStudentApplicationRequest->validated() + ['student_id' => $student->id]);
 
             $filePaths = [];
