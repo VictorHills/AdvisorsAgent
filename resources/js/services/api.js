@@ -34,6 +34,18 @@ api.interceptors.response.use(
     },
 )
 
+const isCounselor = () => {
+    const userStr = localStorage.getItem('user')
+    if (!userStr) return false
+    try {
+        const user = JSON.parse(userStr)
+        const role = user.role_name?.toLowerCase() || user.role?.toLowerCase()
+        return role === 'counselor'
+    } catch (e) {
+        return false
+    }
+}
+
 export const authAPI = {
     login: (credentials) => api.post("/auth/login", credentials),
     register: (userData) => api.post("/auth/register", userData),
@@ -45,24 +57,32 @@ export const authAPI = {
 }
 
 export const dashboardAPI = {
-    getStats: () => api.get("/dashboard/stats"),
-    getApplicationsTrend: () => api.get("/dashboard/applications-trend"),
-    getApplicationsStatus: () => api.get("/dashboard/applications-status"),
-    getMonthlyApplications: () => api.get("/dashboard/monthly-applications"),
-    getRecentActivity: () => api.get("/dashboard/recent-activity"),
+    // Agent endpoints (regular)
+    getStats: () => api.get('/dashboard/stats'),
+    getApplicationsTrend: () => api.get('/dashboard/applications-trend'),
+    getApplicationsStatus: () => api.get('/dashboard/applications-status'),
+    getMonthlyApplications: () => api.get('/dashboard/monthly-applications'),
+    getRecentActivity: () => api.get('/dashboard/recent-activity'),
+
+    // Counselor endpoints
+    getCounselorStats: () => api.get('/admin/dashboard/stats'),
+    getCounselorApplicationsTrend: () => api.get('/admin/dashboard/applications-trend'),
+    getCounselorApplicationsStatus: () => api.get('/admin/dashboard/applications-status'),
+    getCounselorMonthlyApplications: () => api.get('/admin/dashboard/monthly-applications'),
+    getCounselorRecentActivity: () => api.get('/admin/dashboard/recent-activity'),
+    getCounselorMonthlyAgentApplications: () => api.get('/admin/dashboard/monthly-agent-registration'),
 }
 
 export const applicationsAPI = {
     getAll: () => api.get("/applications"),
     getOne: (id) => api.get(`/applications/${id}`),
-    getByStudentId: (studentId) => api.get(`/students/${studentId}`),
     create: (data) => {
         const formData = new FormData()
 
         // Add all form fields except files
         Object.keys(data).forEach((key) => {
             if (key !== "application_documents") {
-                if (Array.isArray(data[key])) {
+                if (Array.isArray(data[key])) {1
                     data[key].forEach((item, index) => {
                         formData.append(`${key}[${index}]`, item)
                     })
@@ -140,13 +160,29 @@ export const applicationsAPI = {
         })
     },
     delete: (id) => api.delete(`/applications/${id}`),
+
+    // Counselor endpoints
+    getCounselorApplications: () => api.get('/admin/applications'),
+    getCounselorApplicationById: (id) => api.get(`/admin/applications/${id}`),
+    updateCounselorApplicationStatus: (id, status) => api.patch(`/admin/applications/${id}/status`, { status }),
+
 }
 
 export const studentsAPI = {
-    getAll: (page = 1, perPage = 10) => api.get("/students", {params: {page, per_page: perPage}}),
-    getOne: (id) => api.get(`/students/${id}`),
+    // Agent endpoints (regular)
+    getAll: () => api.get('/students'),
+    getById: (id) => api.get(`/students/${id}`),
+    create: (studentData) => api.post('/students', studentData),
+    update: (id, studentData) => api.put(`/students/${id}`, studentData),
+    delete: (id) => api.delete(`/students/${id}`),
+    search: (query) => api.get(`/students/search?q=${query}`),
     validateStudent: (email) => api.post("/students/validate", {email}),
-    create: (data) => api.post("/students", data),
+
+    // Counselor endpoints (assigned students only)
+    getCounselorStudents: () => api.get('/admin/students'),
+    getCounselorStudentById: (id) => api.get(`/admin/students/${id}`),
+    updateCounselorStudent: (id, studentData) => api.put(`/admin/students/${id}`, studentData),
+    searchCounselorStudents: (query) => api.get(`/admin/students/search?q=${query}`),
 }
 
 export const bdmOfficersAPI = {
@@ -171,20 +207,6 @@ export const countriesAPI = {
     search: (searchTerm = "", perPage = 10) =>
         api.get("/countries", {params: {search: searchTerm, per_page: perPage}}),
     getOne: (id) => api.get(`/countries/${id}`),
-}
-
-export const adminDashboardAPI = {
-    getStats: () => api.get("/admin/dashboard/stats"),
-    getApplicationsTrend: () => api.get("/admin/dashboard/applications-trend"),
-    getApplicationsStatus: () => api.get("/admin/dashboard/applications-status"),
-    getMonthlyApplications: () => api.get("/admin/dashboard/monthly-applications"),
-    getRecentActivity: () => api.get("/admin/dashboard/recent-activity"),
-}
-
-export const adminStudentsAPI = {
-    getAll: (page = 1, perPage = 10) => api.get("/admin/students", {params: {page, per_page: perPage}}),
-    getOne: (id) => api.get(`/admin/students/${id}`),
-    update: (data) => api.post("/admin/students", data),
 }
 
 export default api
