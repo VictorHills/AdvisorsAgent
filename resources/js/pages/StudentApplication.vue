@@ -60,7 +60,7 @@
 
                     <router-link
                         v-if="!isCounselor"
-                        to="/applications/create"
+                        to="/var/www/html/AdvisorsAgent/resources/js/pages/Applications.vue/create"
                         class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center md:justify-start"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -901,7 +901,7 @@
                                 <!-- Agent Info -->
                                 <div v-if="selectedStudentDetails.agent"
                                      class="p-3 md:p-4 bg-primary/5 rounded-lg border border-primary/20">
-                                    <p class="text-xs text-muted-foreground font-medium mb-2">Assigned Agent</p>
+                                    <p class="text-xs text-muted-foreground font-medium mb-2">Agent Details</p>
 
                                     <p class="font-medium text-sm">
                                         <span class="text-muted-foreground">Full Name - </span>
@@ -994,9 +994,9 @@
                                             <div>
                                                 <p class="text-xs text-muted-foreground font-medium mb-1">Class of
                                                     Degree</p>
-                                                <p class="font-medium text-sm">{{
-                                                        application.class_of_degree || 'N/A'
-                                                    }}</p>
+                                                <p class="font-medium text-sm">
+                                                    {{ application.class_of_degree || 'N/A' }}
+                                                </p>
                                             </div>
                                         </div>
                                         <div v-if="application.additional_notes"
@@ -1019,7 +1019,7 @@
 </template>
 
 <script>
-import {ref, computed, onMounted, watch, nextTick} from 'vue';
+import {ref, computed, onMounted, watch} from 'vue';
 import {studentsAPI, applicationsAPI, dashboardAPI, coursesAPI, schoolsAPI, countriesAPI} from '../services/api';
 import {useAuth} from "../composables/useAuth.js";
 
@@ -1110,7 +1110,7 @@ export default {
                     : dashboardAPI.getStats()
 
                 const [statsRes] = await Promise.all([
-                    statsPromise.catch(e => ({data: {data: {}}})),
+                    statsPromise.catch(() => ({data: {data: {}}})),
                 ])
 
                 const statsData = statsRes.data.data || response.data;
@@ -1139,7 +1139,7 @@ export default {
                     : studentsAPI.getAll(currentPage.value, itemsPerPage.value)
 
                 const [studentRes] = await Promise.all([
-                    studentsPromise.catch(e => ({data: []}))
+                    studentsPromise.catch(() => ({data: []}))
                 ])
 
                 const paginationData = studentRes.data;
@@ -1183,8 +1183,15 @@ export default {
         const fetchStudentApplications = async (studentId) => {
             applicationLoadingModal.value = true;
             try {
-                const response = await studentsAPI.getById(studentId);
-                const responseData = response.data;
+                const studentPromise = isCounselor.value
+                    ? studentsAPI.getCounselorStudentById(studentId)
+                    : studentsAPI.getById(studentId)
+
+                const [StudentRes] = await Promise.all([
+                    studentPromise.catch(() => ({data: {}}))
+                ])
+
+                const responseData = StudentRes.data;
 
                 if (responseData.data) {
                     selectedStudentDetails.value = {

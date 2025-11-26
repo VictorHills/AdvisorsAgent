@@ -15,8 +15,8 @@ class StudentsResource extends JsonResource
     public function toArray(Request $request): array
     {
         $response = parent::toArray($request);
-        $response['bdmOfficer'] = $this->bdmOfficer;
-        $response['applications'] = ApplicationResource::collection($this->applications);
+        $response['bdmOfficer'] = $this->bdmOfficer ?? null;
+        $response['applications'] = ApplicationResource::collection($this->applications) ?? null;
 
         $response['agent'] = [
             'id' => $this->agent->id ?? null,
