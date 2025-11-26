@@ -135,7 +135,7 @@
                              style="animation-delay: 0.2s;">
                             <h3 class="font-bold mb-4">Quick Actions</h3>
                             <div class="space-y-3">
-                                <router-link to="/applications/create"
+                                <router-link to="/var/www/html/AdvisorsAgent/resources/js/pages/Applications.vue/create"
                                              class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
                                     <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
                                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
@@ -223,7 +223,6 @@ export default {
             try {
                 loading.value = true
 
-                // Use different endpoints based on user role
                 const statsPromise = isCounselor.value
                     ? dashboardAPI.getCounselorStats()
                     : dashboardAPI.getStats()
@@ -331,7 +330,9 @@ export default {
                     ? dashboardAPI.getCounselorMonthlyApplications()
                     : dashboardAPI.getMonthlyApplications()
 
-                const monthlyAgentPromise = dashboardAPI.getCounselorMonthlyAgentApplications()
+                const monthlyAgentPromise = isCounselor.value
+                    ? dashboardAPI.getCounselorMonthlyAgentApplications()
+                    : {data: []}
 
                 const [trendRes, statusRes, monthlyRes, monthlyAgent] = await Promise.all([
                     trendPromise,
