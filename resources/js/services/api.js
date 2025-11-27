@@ -1,38 +1,29 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "/api",
-    headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-Requested-With": "XMLHttpRequest",
+    baseURL: "/api", headers: {
+        "Content-Type": "application/json", Accept: "application/json", "X-Requested-With": "XMLHttpRequest",
     },
 })
 
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("auth_token")
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-        }
-        return config
-    },
-    (error) => {
-        return Promise.reject(error)
-    },
-)
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("auth_token")
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+}, (error) => {
+    return Promise.reject(error)
+},)
 
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem("auth_token")
-            localStorage.removeItem("user")
-            window.location.href = "/login"
-        }
-        return Promise.reject(error)
-    },
-)
+api.interceptors.response.use((response) => response, (error) => {
+    if (error.response?.status === 401) {
+        localStorage.removeItem("auth_token")
+        localStorage.removeItem("user")
+        window.location.href = "/login"
+    }
+    return Promise.reject(error)
+},)
 
 const isCounselor = () => {
     const userStr = localStorage.getItem('user')
@@ -74,15 +65,17 @@ export const dashboardAPI = {
 }
 
 export const applicationsAPI = {
-    getAll: () => api.get("/applications"),
+    getAll: (page, perPage) => api.get('/applications', {params: {page: page, per_page: perPage}}),
     getOne: (id) => api.get(`/applications/${id}`),
+    getStatus: (id) => api.get(`/application-status`),
     create: (data) => {
         const formData = new FormData()
 
         // Add all form fields except files
         Object.keys(data).forEach((key) => {
             if (key !== "application_documents") {
-                if (Array.isArray(data[key])) {1
+                if (Array.isArray(data[key])) {
+                    1
                     data[key].forEach((item, index) => {
                         formData.append(`${key}[${index}]`, item)
                     })
@@ -162,15 +155,15 @@ export const applicationsAPI = {
     delete: (id) => api.delete(`/applications/${id}`),
 
     // Counselor endpoints
-    getCounselorApplications: () => api.get('/admin/applications'),
+    getCounselorApplications: (page, perPage) => api.get('/admin/applications', {params: {page: page, per_page: perPage}}),
     getCounselorApplicationById: (id) => api.get(`/admin/applications/${id}`),
-    updateCounselorApplicationStatus: (id, status) => api.patch(`/admin/applications/${id}/status`, { status }),
+    updateCounselorApplicationStatus: (id, status) => api.patch(`/admin/applications/${id}`, {status}),
 
 }
 
 export const studentsAPI = {
     // Agent endpoints (regular)
-    getAll: () => api.get('/students'),
+    getAll: (page, perPage) => api.get('/students', {params: {page, per_page: perPage}}),
     getById: (id) => api.get(`/students/${id}`),
     create: (studentData) => api.post('/students', studentData),
     update: (id, studentData) => api.put(`/students/${id}`, studentData),
@@ -186,8 +179,7 @@ export const studentsAPI = {
 }
 
 export const bdmOfficersAPI = {
-    getAll: () => api.get("/bdm-officers"),
-    getOne: (id) => api.get(`/bdm-officers/${id}`),
+    getAll: () => api.get("/bdm-officers"), getOne: (id) => api.get(`/bdm-officers/${id}`),
 }
 
 export const coursesAPI = {
@@ -204,8 +196,7 @@ export const schoolsAPI = {
 
 export const countriesAPI = {
     getAll: () => api.get("/countries"),
-    search: (searchTerm = "", perPage = 10) =>
-        api.get("/countries", {params: {search: searchTerm, per_page: perPage}}),
+    search: (searchTerm = "", perPage = 10) => api.get("/countries", {params: {search: searchTerm, per_page: perPage}}),
     getOne: (id) => api.get(`/countries/${id}`),
 }
 
