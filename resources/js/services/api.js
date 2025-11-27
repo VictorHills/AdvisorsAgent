@@ -172,7 +172,7 @@ export const studentsAPI = {
     validateStudent: (email) => api.post("/students/validate", {email}),
 
     // Counselor endpoints (assigned students only)
-    getCounselorStudents: () => api.get('/admin/students'),
+    getCounselorStudents: (page, perPage) => api.get('/admin/students', {params: {page, per_page: perPage}}),
     getCounselorStudentById: (id) => api.get(`/admin/students/${id}`),
     updateCounselorStudent: (id, studentData) => api.put(`/admin/students/${id}`, studentData),
     searchCounselorStudents: (query) => api.get(`/admin/students/search?q=${query}`),
