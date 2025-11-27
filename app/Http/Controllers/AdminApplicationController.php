@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ApplicationResource;
+use App\Models\StudentApplications;
 use Illuminate\Http\Request;
 
 class AdminApplicationController extends Controller
@@ -9,9 +11,12 @@ class AdminApplicationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $perPage = $request->get('per_page', 10);
+        $applications = StudentApplications::latest()->paginate($perPage);
+
+        return ApplicationResource::collection($applications);
     }
 
     /**
