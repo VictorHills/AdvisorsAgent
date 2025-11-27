@@ -178,7 +178,7 @@
         <!-- Header with Logo -->
         <div class="header">
             <!-- Added logo to the email header -->
-            <img src="{{ config('app.logo_url') ?? 'https://your-domain.com/logo.png' }}" alt="Advisors Academy"/>
+            <img src="{{ asset('favicon.ico') }}" alt="Advisors Academy"/>
             <h1>Verify Your Account</h1>
             <p>Your One-Time Password (OTP)</p>
         </div>
