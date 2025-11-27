@@ -2,15 +2,15 @@
     <div class="min-h-screen bg-background animate-fade-in">
         <main class="container mx-auto px-6 py-8">
             <div class="mb-8 animate-slide-up">
-                <h1 class="text-3xl font-bold mb-2">Student Applications</h1>
-                <p class="text-muted-foreground">Manage and track all student applications</p>
+                <h1 class="text-3xl font-bold mb-2">Student List & Applications</h1>
+                <p class="text-muted-foreground">Manage and track all students & applications</p>
             </div>
 
             <div v-if="loading" class="flex items-center justify-center py-12">
                 <!-- Improved loading spinner styling -->
                 <div class="flex flex-col items-center gap-4">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                    <p class="text-muted-foreground">Loading applications...</p>
+                    <p class="text-muted-foreground">Loading Students...</p>
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
 
                     <router-link
                         v-if="!isCounselor"
-                        to="/create-student"
+                        to="/students/create"
                         class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center md:justify-start"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +60,7 @@
 
                     <router-link
                         v-if="!isCounselor"
-                        to="/var/www/html/AdvisorsAgent/resources/js/pages/Applications.vue/create"
+                        to="/applications/create"
                         class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center md:justify-start"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +72,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
                     <div v-for="(stat, index) in stats" :key="index"
-                         class="p-4 bg-muted/50 rounded-lg border border-border hover:border-primary/50 transition-all duration-200">
+                         class="p-4 bg-muted/50 rounded-lg border border-border hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer">
                         <div class="text-2xl font-bold mb-1">{{ stat.value }}</div>
                         <div class="text-sm text-muted-foreground">{{ stat.label }}</div>
                     </div>
@@ -91,6 +91,7 @@
                             <th class="text-left py-4 px-4 text-sm font-semibold">Actions</th>
                         </tr>
                         </thead>
+
                         <tbody>
                         <tr
                             v-for="student in students"
@@ -136,7 +137,6 @@
                     </table>
                 </div>
 
-                <!-- Fixed pagination to use API metadata instead of client-side calculation -->
                 <div v-if="students.length > 0" class="mt-6 space-y-4">
                     <!-- Items per page selector -->
                     <div class="flex items-center justify-between flex-wrap gap-4">
@@ -1013,7 +1013,6 @@
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 </template>
@@ -1077,7 +1076,7 @@ export default {
             phone_number: '',
             country: '',
             class_of_degree: '',
-            course_id: '', // Changed to empty string for consistency with update
+            course_id: '',
             schools_of_choice: [],
             country_of_preference: [],
             status: '',
@@ -1135,7 +1134,7 @@ export default {
                 error.value = null;
 
                 const studentsPromise = isCounselor.value
-                    ? studentsAPI.getCounselorStudents()
+                    ? studentsAPI.getCounselorStudents(currentPage.value, itemsPerPage.value)
                     : studentsAPI.getAll(currentPage.value, itemsPerPage.value)
 
                 const [studentRes] = await Promise.all([
@@ -1173,7 +1172,7 @@ export default {
                 }
 
             } catch (err) {
-                console.error('[v0] Error fetching students:', err);
+                console.error('Error fetching students:', err);
                 error.value = 'Failed to load student data. Please try again.';
             } finally {
                 loading.value = false;
@@ -1631,7 +1630,6 @@ export default {
         onMounted(() => {
             fetchStudents();
             fetchStats();
-            // Fetch lookup data only when needed for the edit form
         });
 
         const downloadFile = async (docPath) => {
