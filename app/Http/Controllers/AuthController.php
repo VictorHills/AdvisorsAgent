@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ResetPasswordRequest;
+use App\Mail\AdminEmail;
 use App\Mail\OtpMail;
+use App\Mail\WelcomeMail;
 use App\Models\OTP;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
@@ -47,7 +49,10 @@ class AuthController extends Controller
             'is_active' => true,
         ]);
 
-        //TODO send an email to the following (User and TGM Admin)
+        //send email to user and admin
+        $user_full_name = $user->first_name . ' ' . $user->last_name;
+        Mail::to($user->email)->send(new WelcomeMail(user_full_name: $user_full_name, email: $user->email));
+        Mail::to(config('app.admin_email'))->cc(config('app.counselor_email'))->send(new AdminEmail(user: $user));
 
         return response()->json([
             'user' => $user,
@@ -175,5 +180,27 @@ class AuthController extends Controller
         Mail::to($resetPasswordRequest->email)->send(new OtpMail($otp, $user_full_name));
 
         return $this->respondSuccess(message: 'OTP sent successfully');
+    }
+
+    public function verifyOtp(ResetPasswordRequest $resetPasswordRequest)
+    {
+        if ($resetPasswordRequest->token == null) {
+            return $this->respondBadRequest(message: 'Token cannot be empty');
+        }
+
+        $field = ($resetPasswordRequest->destination === 'email') ? 'email' : 'phone';
+        $check_token = OTP::where($field, $resetPasswordRequest->$field)
+            ->where('token', $resetPasswordRequest->token)
+            ->first();
+
+        if (!$check_token) {
+            return $this->respondBadRequest(message: 'Invalid token');
+        }
+
+        if ($check_token->expires_at <= now()) {
+            return $this->respondBadRequest(message: 'Token has expired');
+        }
+
+        return $this->respondSuccess(message: 'OTP verified successfully');
     }
 }
