@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateStudentApplicationRequest;
 use App\Http\Requests\UpdateStudentApplicationRequest;
 use App\Http\Resources\ApplicationResource;
+use App\Models\ApplicationStatus;
 use App\Models\StudentApplications;
 use App\Models\Students;
 use Illuminate\Http\Request;
@@ -111,5 +112,11 @@ class ApplicationController extends Controller
         $application->delete();
 
         return $this->respondSuccess(message: 'Application deleted successfully');
+    }
+
+    public function getApplicationStatus()
+    {
+        $applicationStatuses = ApplicationStatus::get(['id', 'status_name', 'status_code']);
+        return $this->respondSuccessWithData(message: 'Application statuses retrieved successfully', data: $applicationStatuses);
     }
 }
