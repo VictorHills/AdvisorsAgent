@@ -112,44 +112,6 @@
             line-height: 1.5;
         }
 
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: white;
-            text-decoration: none;
-            padding: 14px 40px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            margin: 25px 0;
-            transition: all 0.3s ease;
-        }
-
-        .cta-button:hover {
-            opacity: 0.9;
-        }
-
-        .divider {
-            height: 1px;
-            background: #e5e5e5;
-            margin: 30px 0;
-        }
-
-        .support-note {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 25px;
-            font-size: 13px;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .support-icon {
-            display: inline-block;
-            margin-right: 8px;
-        }
-
         .footer {
             background: #f5f5f5;
             padding: 25px;
@@ -184,7 +146,8 @@
             <div class="greeting">Hello Admin,</div>
 
             <p class="description">
-                A new application has been submitted on Advisors Academy. Below are the details of the newly created application.
+                A new application has been submitted on Advisors Academy. Below are the details of the newly created
+                application.
             </p>
 
             <div class="features">
@@ -192,22 +155,70 @@
 
                 <div class="feature-item">
                     <span class="feature-icon">👤</span>
-                    <span class="feature-text"><strong>Student Name:</strong> {{ $application->student_name }}</span>
-                </div>
-
-                <div class="feature-item">
-                    <span class="feature-icon">🎓</span>
-                    <span class="feature-text"><strong>Course:</strong> {{ $application->course_name }}</span>
+                    <span class="feature-text">
+                        <strong>Student Name:</strong>
+                        {{ $application->student->first_name }}
+                        {{ $application->student->middle_name }}
+                        {{ $application->student->last_name }}
+                    </span>
                 </div>
 
                 <div class="feature-item">
                     <span class="feature-icon">📧</span>
-                    <span class="feature-text"><strong>Email:</strong> {{ $application->student_email }}</span>
+                    <span class="feature-text">
+                        <strong>Student Email:</strong>
+                        {{ $application->student->email }}
+                    </span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">📱</span>
+                    <span class="feature-text">
+                        <strong>Student Phone Number:</strong>
+                        {{ $application->student->phone_number }}
+                    </span>
                 </div>
 
                 <div class="feature-item">
                     <span class="feature-icon">📅</span>
-                    <span class="feature-text"><strong>Submitted On:</strong> {{ $application->created_at->format('M d, Y') }}</span>
+                    <span class="feature-text">
+                        <strong>Submission Date:</strong>
+                        {{ $application->created_at->format('F j, Y, g:i a') }}
+                    </span>
+                </div>
+
+
+                <div class="feature-item">
+                    <span class="feature-icon">🎓</span>
+                    <span class="feature-text">
+                        <strong>Course Applied:</strong>
+                        {{ $application->course->name }}
+                    </span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">📚</span>
+                    <span class="feature-text">
+                        <strong>Schools Applied:</strong>
+                        <ul>
+                            @foreach ($application['schools_of_choice_details'] as $school)
+                                <li>{{ $school['name'] }} <img src="{{ $school['logo'] }}" alt="{{ $school['name'] }}"
+                                                               style="width: 30px; height: auto;"/></li>
+                            @endforeach
+                        </ul>
+                    </span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">🌍</span>
+                    <span class="feature-text">
+                        <strong>Countries Applied:</strong>
+                        <ul>
+                            @foreach ($application['country_of_preference_details'] as $country)
+                                <li>{{ $country['name'] }} (Currency: {{ $country['currency'] }})</li>
+                            @endforeach
+                        </ul>
+                    </span>
                 </div>
             </div>
 
