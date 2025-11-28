@@ -9,6 +9,8 @@ import CreateStudent from "../pages/CreateStudent.vue"
 import Applications from "../pages/Applications.vue";
 import ViewApplication from "../pages/ViewApplication.vue";
 import EditApplication from "../pages/EditApplication.vue";
+import Unauthorized from "../pages/Unauthorized.vue";
+import NotFound from "../pages/NotFound.vue";
 
 const routes = [
     {path: "/", redirect: "/login"},
@@ -62,6 +64,18 @@ const routes = [
             roles: ["agent"],
         },
     },
+    {
+        path: '/unauthorized',
+        name: 'Unauthorized',
+        component: Unauthorized,
+        meta: {requiresAuth: false}
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFound,
+        meta: {requiresAuth: false}
+    }
 ]
 
 const router = createRouter({
@@ -89,7 +103,6 @@ router.beforeEach((to, from, next) => {
         if (!isAuthenticated) {
             next("/login")
         } else if (to.meta.roles && !to.meta.roles.includes(userRole)) {
-            // User doesn't have permission for this route
             next("/dashboard")
         } else {
             next()
