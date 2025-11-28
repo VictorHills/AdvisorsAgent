@@ -7,13 +7,25 @@ import Students from "../pages/Students.vue"
 import ForgotPassword from "../pages/ForgotPassword.vue"
 import CreateStudent from "../pages/CreateStudent.vue"
 import Applications from "../pages/Applications.vue";
+import ViewApplication from "../pages/ViewApplication.vue";
+import EditApplication from "../pages/EditApplication.vue";
 
 const routes = [
     {path: "/", redirect: "/login"},
     {path: "/login", component: Login, name: "login"},
     {path: "/register", component: Register, name: "register"},
     {path: "/forgot-password", component: ForgotPassword, name: "forgot-password"},
-    {path: "/applications", component: Applications, name: "applications"},
+    {path: "/applications", component: Applications, name: "applications", meta: {requiresAuth: true}},
+    {path: '/applications/:id', name: 'ViewApplication', component: ViewApplication, meta: {requiresAuth: true}},
+    {
+        path: '/applications/:id/edit',
+        name: 'EditApplication',
+        component: EditApplication,
+        meta: {
+            requiresAuth: true,
+            roles: ["counselor"]
+        }
+    },
     {
         path: "/dashboard",
         component: Dashboard,
