@@ -85,7 +85,6 @@ Route::group(['middleware' => ['auth:api', CheckUserIsCounselor::class], 'prefix
     Route::prefix('students')->group(function () {
         Route::get('/', [AdminStudentController::class, 'index']);
         Route::get('/{id}', [AdminStudentController::class, 'show']);
-        Route::patch('/{id}', [AdminStudentController::class, 'update']);
     });
 
     Route::apiResource('applications', AdminApplicationController::class)->names([
