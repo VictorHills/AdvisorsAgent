@@ -1,5 +1,6 @@
 <template>
-    <div class="min-h-screen bg-background animate-fade-in">
+    <!-- add overflow-hidden when modals are open to prevent background scrolling -->
+    <div class="min-h-screen bg-background animate-fade-in" :class="{ 'overflow-hidden': showDetailsModal || showEditModal || showApplicationsModal }">
         <main class="container mx-auto px-6 py-8">
             <div class="mb-8 animate-slide-up">
                 <h1 class="text-3xl font-bold mb-2">Student List & Applications</h1>
@@ -264,6 +265,7 @@
                                     <p class="font-medium text-sm">{{ selectedStudent.course?.name || 'N/A' }}</p>
                                 </div>
                             </div>
+
                             <!-- Universities section -->
                             <div v-if="selectedStudent.universities && selectedStudent.universities.length > 0"
                                  class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
@@ -275,6 +277,7 @@
                                     </span>
                                 </div>
                             </div>
+
                             <!-- Countries section -->
                             <div v-if="selectedStudent.countries && selectedStudent.countries.length > 0"
                                  class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
@@ -827,7 +830,7 @@
 
             <!-- View Applications Modal with animation -->
             <div v-if="showApplicationsModal"
-                 class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto">
+                 class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                 <div
                     class="bg-card rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-border shadow-2xl animate-fade-in">
                     <div
@@ -1112,7 +1115,9 @@ export default {
                     statsPromise.catch(() => ({data: {data: {}}})),
                 ])
 
-                const statsData = statsRes.data.data || response.data;
+                // Correctly access data, checking for 'data' and then 'data.data' or just 'data'
+                const statsData = statsRes.data?.data || statsRes.data || {};
+
 
                 stats.value = [
                     {value: statsData.total_students || 0, label: 'Total Students'},
@@ -1137,11 +1142,8 @@ export default {
                     ? studentsAPI.getCounselorStudents(currentPage.value, itemsPerPage.value)
                     : studentsAPI.getAll(currentPage.value, itemsPerPage.value)
 
-                const [studentRes] = await Promise.all([
-                    studentsPromise.catch(() => ({data: []}))
-                ])
-
-                const paginationData = studentRes.data;
+                const response = await studentsPromise;
+                const paginationData = response.data;
                 const studentsData = paginationData.data || [];
 
                 students.value = studentsData.map(student => ({
@@ -1186,11 +1188,9 @@ export default {
                     ? studentsAPI.getCounselorStudentById(studentId)
                     : studentsAPI.getById(studentId)
 
-                const [StudentRes] = await Promise.all([
-                    studentPromise.catch(() => ({data: {}}))
-                ])
+                const studentRes = await studentPromise;
 
-                const responseData = StudentRes.data;
+                const responseData = studentRes.data;
 
                 if (responseData.data) {
                     selectedStudentDetails.value = {

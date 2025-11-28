@@ -14,6 +14,21 @@ export function useAuth() {
 
     const isAuthenticated = computed(() => !!token.value && !!user.value)
 
+    const userRole = computed(() => {
+        return user.value?.role_name?.toLowerCase() || user.value?.role?.toLowerCase() || null
+    })
+
+    const hasRole = (role) => {
+        return userRole.value === role.toLowerCase()
+    }
+
+    const hasAnyRole = (roles) => {
+        return roles.some((role) => hasRole(role))
+    }
+
+    const isAgent = computed(() => hasRole("agent"))
+    const isCounselor = computed(() => hasRole("counselor"))
+
     const initAuth = () => {
         const savedToken = localStorage.getItem("auth_token")
         const savedUser = localStorage.getItem("user")
@@ -71,8 +86,8 @@ export function useAuth() {
         error.value = null
 
         try {
-            const { data } = await authAPI.register(userData)
-            const { user: newUser, message } = data
+            const {data} = await authAPI.register(userData)
+            const {user: newUser, message} = data
 
             // Validate response
             if (!newUser) {
@@ -86,13 +101,10 @@ export function useAuth() {
             // Redirect to login page since user isn't logged in
             await router.push("/login")
 
-            return { success: true, message }
+            return {success: true, message}
         } catch (err) {
             const errorMessage =
-                err.response?.data?.error ||
-                err.response?.data?.message ||
-                err.message ||
-                "Registration failed"
+                err.response?.data?.error || err.response?.data?.message || err.message || "Registration failed"
 
             error.value = errorMessage
 
@@ -100,7 +112,7 @@ export function useAuth() {
             user.value = null
             localStorage.removeItem("user")
 
-            return { success: false, error: errorMessage }
+            return {success: false, error: errorMessage}
         } finally {
             loading.value = false
         }
@@ -140,6 +152,11 @@ export function useAuth() {
         loading,
         error,
         isAuthenticated,
+        userRole,
+        isAgent,
+        isCounselor,
+        hasRole,
+        hasAnyRole,
         initAuth,
         login,
         register,
