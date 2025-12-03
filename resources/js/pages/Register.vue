@@ -75,7 +75,8 @@
                                     v-model="form.first_name"
                                     type="text"
                                     required
-                                    class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    :disabled="loading"
+                                    class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="John"
                                 />
                             </div>
@@ -88,7 +89,8 @@
                                     v-model="form.last_name"
                                     type="text"
                                     required
-                                    class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    :disabled="loading"
+                                    class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="Doe"
                                 />
                             </div>
@@ -103,7 +105,8 @@
                                 v-model="form.agency_name"
                                 type="text"
                                 required
-                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                :disabled="loading"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 placeholder="Your Agency Ltd"
                             />
                         </div>
@@ -117,7 +120,8 @@
                                 v-model="form.business_registration_number"
                                 type="text"
                                 required
-                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                :disabled="loading"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 placeholder="BRN123456"
                             />
                         </div>
@@ -130,7 +134,8 @@
                                 v-model="form.email"
                                 type="email"
                                 required
-                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                :disabled="loading"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 placeholder="agent@example.com"
                             />
                         </div>
@@ -144,13 +149,15 @@
                                     v-model="form.password"
                                     :type="showPassword ? 'text' : 'password'"
                                     required
-                                    class="w-full pr-12 px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    :disabled="loading"
+                                    class="w-full pr-12 px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="••••••••"
                                 />
                                 <button
                                     type="button"
                                     @click="showPassword = !showPassword"
-                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground"
+                                    :disabled="loading"
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                                     :aria-label="showPassword ? 'Hide password' : 'Show password'"
                                 >
                                     <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
@@ -181,13 +188,15 @@
                                     v-model="form.password_confirmation"
                                     :type="showConfirm ? 'text' : 'password'"
                                     required
-                                    class="w-full pr-12 px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    :disabled="loading"
+                                    class="w-full pr-12 px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="••••••••"
                                 />
                                 <button
                                     type="button"
                                     @click="showConfirm = !showConfirm"
-                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground"
+                                    :disabled="loading"
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                                     :aria-label="showConfirm ? 'Hide confirm password' : 'Show confirm password'"
                                 >
                                     <svg v-if="!showConfirm" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
@@ -214,7 +223,8 @@
                             v-model="form.is_terms_and_condition_accepted"
                             type="checkbox"
                             required
-                            class="w-4 h-4 mt-1 rounded border-border bg-input text-primary focus:ring-primary transition-all"
+                            :disabled="loading"
+                            class="w-4 h-4 mt-1 rounded border-border bg-input text-primary focus:ring-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         <span class="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                             I agree to the <a href="#" class="text-primary hover:underline">Terms and Conditions</a> and <a
@@ -288,7 +298,8 @@ export default {
         const handleRegister = async () => {
             loading.value = true;
             try {
-                //await new Promise(resolve => setTimeout(resolve, 2000));
+                // Add a 2-second delay to see the spinner
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 await register(form.value);
             } finally {
                 loading.value = false;
