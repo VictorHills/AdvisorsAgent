@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateStudentApplicationRequest;
 use App\Http\Requests\UpdateStudentApplicationRequest;
 use App\Http\Resources\ApplicationResource;
+use App\Mail\CreateApplicationEmail;
 use App\Models\ApplicationStatus;
 use App\Models\StudentApplications;
 use App\Models\Students;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class ApplicationController extends Controller
@@ -29,7 +31,6 @@ class ApplicationController extends Controller
     {
         $agentId = auth()->id();
         $application = StudentApplications::where('agent_id', $agentId)
-            ->with(['course', 'agent', 'bdmOfficer'])
             ->findOrFail($id);
 
         return $this->respondSuccessWithData(message: 'Application created successfully', data: new ApplicationResource($application));
@@ -75,7 +76,9 @@ class ApplicationController extends Controller
                 ]);
             }
 
-            //TODO: Send emails to the following (The Student, BDM Officer, TGM Admin and Agent)
+            $application->refresh();
+            Mail::to($student->email)->cc([config('app.admin_email'), config('app.counselor_email')])
+                ->send(new CreateApplicationEmail($application));
 
             return $this->respondSuccessWithData(message: 'Application created successfully', data: new ApplicationResource($application));
         });
