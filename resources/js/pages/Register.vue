@@ -260,7 +260,7 @@ import {useTheme} from '../composables/useTheme';
 export default {
     name: 'Register',
     setup() {
-        const {register, loading, error} = useAuth();
+        const {register, error} = useAuth();
         const {isDark, toggleTheme} = useTheme();
 
         const form = ref({
@@ -277,6 +277,7 @@ export default {
 
         const showPassword = ref(false);
         const showConfirm = ref(false);
+        const loading = ref(false);
 
         const features = [
             'Access to 50+ partner universities',
@@ -285,7 +286,13 @@ export default {
         ];
 
         const handleRegister = async () => {
-            await register(form.value);
+            loading.value = true;
+            try {
+                //await new Promise(resolve => setTimeout(resolve, 2000));
+                await register(form.value);
+            } finally {
+                loading.value = false;
+            }
         };
 
         return {
