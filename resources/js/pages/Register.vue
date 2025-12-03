@@ -59,11 +59,6 @@
                 </div>
 
                 <form @submit.prevent="handleRegister" class="space-y-6">
-                    <div v-if="error"
-                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
-                        {{ error }}
-                    </div>
-
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2 group">
@@ -232,6 +227,12 @@
                         </span>
                     </label>
 
+                    <!-- Display error message as toast instead of reloading -->
+                    <div v-if="error"
+                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+                        {{ error }}
+                    </div>
+
                     <button
                         type="submit"
                         :disabled="loading"
@@ -298,8 +299,7 @@ export default {
         const handleRegister = async () => {
             loading.value = true;
             try {
-                // Add a 2-second delay to see the spinner
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                //await new Promise(resolve => setTimeout(resolve, 2000));
                 await register(form.value);
             } finally {
                 loading.value = false;

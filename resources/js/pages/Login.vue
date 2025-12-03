@@ -25,16 +25,6 @@
                 </div>
 
                 <form @submit.prevent="handleLogin" class="space-y-6">
-                    <!-- Display error message as toast instead of reloading -->
-                    <div v-if="loginError"
-                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm flex items-start space-x-2">
-                        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-                        </svg>
-                        <span>{{ loginError }}</span>
-                    </div>
-
                     <div class="space-y-4">
                         <div class="space-y-2 group">
                             <label for="email"
@@ -43,8 +33,9 @@
                                 id="email"
                                 v-model="form.email"
                                 type="email"
+                                :disabled="loading"
                                 required
-                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 placeholder="agent@example.com"
                             />
                         </div>
@@ -55,10 +46,11 @@
                             <div class="relative">
                                 <input
                                     id="password"
+                                    :disabled="loading"
                                     v-model="form.password"
                                     :type="showPassword ? 'text' : 'password'"
                                     required
-                                    class="w-full px-4 py-3 pr-11 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    class="w-full px-4 py-3 pr-11 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="••••••••"
                                 />
                                 <button
@@ -84,6 +76,12 @@
                         </div>
                     </div>
 
+                    <!-- Display error message as toast instead of reloading -->
+                    <div v-if="error"
+                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+                        {{ error }}
+                    </div>
+
                     <div class="flex items-center justify-between">
                         <label class="flex items-center space-x-2 cursor-pointer group">
                             <input
@@ -93,7 +91,9 @@
                             />
                             <span class="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Remember me</span>
                         </label>
-                        <router-link to="/forgot-password" class="text-sm text-primary hover:underline transition-all">Forgot password?</router-link>
+                        <router-link to="/forgot-password" class="text-sm text-primary hover:underline transition-all">
+                            Forgot password?
+                        </router-link>
                     </div>
 
                     <button
@@ -163,7 +163,7 @@ export default {
         }
     },
     setup() {
-        const {login, loading} = useAuth();
+        const {login, loading, error} = useAuth();
         const {isDark, toggleTheme} = useTheme();
 
         const form = ref({
@@ -172,19 +172,15 @@ export default {
             remember: false
         });
         const showPassword = ref(false);
-        const loginError = ref(null);
 
         const handleLogin = async () => {
-            loginError.value = null;
+            loading.value = true;
 
-            const result = await login(form.value);
-
-            if (!result.success) {
-                loginError.value = result.error || 'Login failed. Please try again.';
-                // Clear error after 5 seconds
-                setTimeout(() => {
-                    loginError.value = null;
-                }, 5000);
+            try {
+                //await new Promise(resolve => setTimeout(resolve, 10000));
+                await login(form.value);
+            } finally {
+                loading.value = false;
             }
         };
 
@@ -192,10 +188,10 @@ export default {
             form,
             handleLogin,
             loading,
-            loginError,
             isDark,
             toggleTheme,
-            showPassword
+            showPassword,
+            error
         };
     }
 };
