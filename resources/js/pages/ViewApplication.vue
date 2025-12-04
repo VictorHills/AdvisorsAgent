@@ -124,6 +124,45 @@
                     </div>
                 </div>
 
+                <!-- Application Documents -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        Application Documents
+                    </h2>
+                    <div v-if="application.documents && application.documents.length > 0" class="space-y-3">
+                        <div v-for="(doc, idx) in application.documents" :key="idx"
+                             class="flex items-center justify-between p-4 bg-secondary/50 rounded-lg hover:bg-secondary/70 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                <div>
+                                    <p class="font-medium">{{ getDocumentName(doc) }}</p>
+                                    <p class="text-sm text-muted-foreground">Document {{ idx + 1 }}</p>
+                                </div>
+                            </div>
+                            <a :href="getDocumentUrl(doc)"
+                               target="_blank"
+                               download
+                               class="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                    <div v-else class="text-muted-foreground p-4 bg-secondary/30 rounded-lg">
+                        No documents uploaded
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="flex gap-4 justify-end">
                     <router-link
@@ -150,17 +189,29 @@ const loading = ref(true);
 const error = ref(null);
 const application = ref({});
 const {isCounselor} = useAuth();
+const getDocumentName = (doc) => doc?.name || 'Document';
+const getDocumentUrl = (doc) => doc?.url || '#';
 
-const getStatusClass = (status) => {
+const statusColorMap = {
+    document_submission: 'bg-blue-500/20 text-blue-700',
+    document_in_check: 'bg-yellow-500/20 text-yellow-700',
+    document_check_complete: 'bg-green-500/20 text-green-700',
+    application_in_process: 'bg-blue-500/20 text-blue-700',
+    application_done_successfully: 'bg-green-500/20 text-green-700',
+    conditional_offers_received: 'bg-purple-500/20 text-purple-700',
+    conditional_offers_accepted: 'bg-purple-700/20 text-purple-900',
+    unconditional_offers_received: 'bg-indigo-500/20 text-indigo-700',
+    unconditional_offers_accepted: 'bg-indigo-700/20 text-indigo-900',
+    school_fees_payment_stage: 'bg-orange-500/20 text-orange-700',
+    cas_ceo_loa_i20_stage: 'bg-teal-500/20 text-teal-700',
+    visa_application: 'bg-blue-500/20 text-blue-700',
+    visa_application_granted: 'bg-green-500/20 text-green-700',
+    application_rejected: 'bg-red-500/20 text-red-700',
+};
+
+const getStatusClass = (statusCode) => {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-medium';
-    const statusClasses = {
-        'Pending': 'bg-yellow-500/20 text-yellow-700',
-        'Approved': 'bg-green-500/20 text-green-700',
-        'Rejected': 'bg-red-500/20 text-red-700',
-        'In Review': 'bg-blue-500/20 text-blue-700',
-        'Submitted': 'bg-purple-500/20 text-purple-700',
-    };
-    return `${baseClass} ${statusClasses[status] || 'bg-gray-500/20 text-gray-700'}`;
+    return `${baseClass} ${statusColorMap[statusCode] || 'bg-gray-500/20 text-gray-700'}`;
 };
 
 const fetchApplication = async () => {
@@ -189,6 +240,11 @@ const fetchApplication = async () => {
             classOfDegree: app.class_of_degree || 'N/A',
             schools: app.schools_of_choice_details?.map(s => s.name) || [],
             countries: app.country_of_preference_details?.map(c => c.name) || [],
+
+            documents: app.application_documents?.map(path => ({
+                name: path.split('/').pop(),
+                url: `/storage/${path}`
+            })) || [],
         };
     } catch (err) {
         console.error('Error fetching application:', err);
@@ -196,7 +252,6 @@ const fetchApplication = async () => {
     } finally {
         loading.value = false;
     }
-
 };
 
 onMounted(() => {
