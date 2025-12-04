@@ -23,15 +23,8 @@ class CreateStudentApplicationRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'email' => 'required|email',
             'course_id' => 'required|exists:advisor_db.courses,id',
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'gender' => 'required|string|in:Male,Female,Other',
-            'email' => 'required|email|unique:students,email',
-            'phone_number' => 'required|string|unique:students,phone_number',
-            'country' => 'required|string|max:255',
-            'birth_date' => 'required|date',
             'class_of_degree' => 'required|string|max:255',
             'schools_of_choice' => 'required|array',
             'country_of_preference' => 'required|array',
@@ -39,6 +32,28 @@ class CreateStudentApplicationRequest extends FormRequest
             'signature' => 'nullable|string',
             'application_documents' => 'nullable|array',
             'application_documents.*' => 'file|mimes:jpg,jpeg,png,pdf|max:10240',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email is required',
+            'email.email' => 'Email must be a valid email address',
+            'course_id.required' => 'Please select a valid course',
+            'course_id.exists' => 'Please select a valid course',
+            'class_of_degree.required' => 'Class of degree is required',
+            'class_of_degree.string' => 'Class of degree must be a string',
+            'class_of_degree.max' => 'Class of degree must not exceed 255 characters',
+            'schools_of_choice.required' => 'Schools of choice is required',
+            'schools_of_choice.array' => 'Schools of choice must be an array',
+            'country_of_preference.required' => 'Country of preference is required',
+            'country_of_preference.array' => 'Country of preference must be an array',
+            'additional_notes.string' => 'Additional notes must be a string',
+            'application_documents.array' => 'Application documents must be an array',
+            'application_documents.*.file' => 'Each application document must be a file',
+            'application_documents.*.mimes' => 'Application documents must be a file of type: jpg, jpeg, png, pdf',
+            'application_documents.*.max' => 'Each application document must not exceed 10MB in size',
         ];
     }
 }
