@@ -15,6 +15,7 @@ class ApplicationStatus extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'status_code',
         'status_name'
     ];
 

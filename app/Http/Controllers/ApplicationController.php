@@ -84,7 +84,7 @@ class ApplicationController extends Controller
             }
 
             $application->refresh();
-            Mail::to($student->email)->cc([config('app.admin_email'), config('app.counselor_email')])
+            Mail::to($student->email)->bcc([config('app.admin_email'), config('app.counselor_email'), auth()->user()->email])
                 ->send(new CreateApplicationEmail($application));
 
             return $this->respondSuccessWithData(message: 'Application created successfully', data: new ApplicationResource($application));
