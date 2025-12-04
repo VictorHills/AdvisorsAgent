@@ -2,52 +2,35 @@
 
 namespace App\Mail;
 
+use App\Http\Resources\ApplicationResource;
+use App\Models\StudentApplications;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
 class CreateApplicationEmail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+
+    public StudentApplications $application;
 
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(StudentApplications $studentApplications)
     {
-        //
+        $this->application = $studentApplications;
     }
 
     /**
-     * Get the message envelope.
+     * Build the message.
      */
-    public function envelope(): Envelope
+    public function build(): CreateApplicationEmail
     {
-        return new Envelope(
-            subject: 'Create Application Email',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'view.name',
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
+        return $this->subject('New Application Submitted')
+            ->view('emails.createApplicationEmail')
+            ->with([
+                'application' => ApplicationResource::make($this->application),
+            ]);
     }
 }
+
