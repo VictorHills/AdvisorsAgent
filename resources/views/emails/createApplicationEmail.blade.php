@@ -143,11 +143,9 @@
         </div>
 
         <div class="content">
-            <div class="greeting">Hello Admin,</div>
-
             <p class="description">
-                A new application has been submitted on Advisors Academy. Below are the details of the newly created
-                application.
+                Hello, a new application has been submitted on Advisors Academy. Below are the details of the newly
+                created application.
             </p>
 
             <div class="features">
@@ -196,14 +194,13 @@
                     </span>
                 </div>
 
-                <div class="feature-item">
+                {{--<div class="feature-item">
                     <span class="feature-icon">📚</span>
                     <span class="feature-text">
                         <strong>Schools Applied:</strong>
                         <ul>
-                            @foreach ($application['schools_of_choice_details'] as $school)
-                                <li>{{ $school['name'] }} <img src="{{ $school['logo'] }}" alt="{{ $school['name'] }}"
-                                                               style="width: 30px; height: auto;"/></li>
+                            @foreach ((array)$application->schools_of_choice_details as $school)
+                                <li>{{ $school['name'] }}</li>
                             @endforeach
                         </ul>
                     </span>
@@ -214,12 +211,12 @@
                     <span class="feature-text">
                         <strong>Countries Applied:</strong>
                         <ul>
-                            @foreach ($application['country_of_preference_details'] as $country)
+                            @foreach ((array)$application['country_of_preference_details'] as $country)
                                 <li>{{ $country['name'] }} (Currency: {{ $country['currency'] }})</li>
                             @endforeach
                         </ul>
                     </span>
-                </div>
+                </div>--}}
             </div>
 
             <p class="description">
