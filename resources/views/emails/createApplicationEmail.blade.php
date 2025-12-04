@@ -139,7 +139,7 @@
         <div class="header">
             <img src="{{ asset('favicon.ico') }}" alt="Advisors Academy"/>
             <h1>New Application Submitted</h1>
-            <p>A new application has been submitted by a user.</p>
+            <p>A new application has been submitted.</p>
         </div>
 
         <div class="content">
@@ -154,7 +154,7 @@
                 <div class="feature-item">
                     <span class="feature-icon">👤</span>
                     <span class="feature-text">
-                        <strong>Student Name:</strong>
+                        <strong>Student's Full Name:</strong>
                         {{ $application->student->first_name }}
                         {{ $application->student->middle_name }}
                         {{ $application->student->last_name }}
@@ -218,16 +218,12 @@
                     </span>
                 </div>--}}
             </div>
-
-            <p class="description">
-                Please review the application and take the necessary actions from the admin panel.
-            </p>
         </div>
 
         <div class="footer">
             <p>&copy; {{ date('Y') }} Advisors Academy. All rights reserved.</p>
             <p style="margin-top: 8px; color: #bbb;">
-                This is an automated notification sent to the administrator.
+                This is an automated notification sent from the administrator.
             </p>
         </div>
     </div>

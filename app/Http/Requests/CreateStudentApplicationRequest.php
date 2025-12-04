@@ -31,7 +31,7 @@ class CreateStudentApplicationRequest extends FormRequest
             'additional_notes' => 'nullable|string',
             'signature' => 'nullable|string',
             'application_documents' => 'nullable|array',
-            'application_documents.*' => 'file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'application_documents.*' => 'file|mimes:jpg,jpeg,png,pdf,doc|max:10240',
         ];
     }
 
