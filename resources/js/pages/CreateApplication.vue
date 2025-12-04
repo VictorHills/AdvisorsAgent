@@ -458,9 +458,20 @@
 
                         <!-- File Upload -->
                         <div class="space-y-2">
+                            <!-- Add Document List Here -->
+                            <div class="mt-4 space-y-2">
+                                <p class="text-sm font-medium">Required Documents:</p>
+                                <ul class="list-inside space-y-1 text-sm text-muted-foreground">
+                                    <li>1. CV || 2. CAS || 3. WAEC || 4. Academic Transcript or Certificate
+                                        || 5. Personal Statement
+                                    </li>
+                                    <li></li>
+                                </ul>
+                            </div>
+
                             <label class="text-sm font-medium">Application Documents</label>
                             <div
-                                class="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-all duration-300 cursor-pointer"
+                                class="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-all duration-300 cursor-pointer mt-1"
                                 :class="{ 'bg-primary/5 border-primary': isDragOver }"
                                 @click="$refs.documentInput.click()"
                                 @drop.prevent="handleDrop"
@@ -605,16 +616,17 @@
                         <div v-if="form.additional_notes" class="space-y-4">
                             <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Additional Notes</h3>
                             <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
-                                <p class="text-sm text-muted-foreground whitespace-pre-wrap">{{
-                                        form.additional_notes
-                                    }}</p>
+                                <p class="text-sm text-muted-foreground whitespace-pre-wrap">
+                                    {{ form.additional_notes }}
+                                </p>
                             </div>
                         </div>
 
                         <!-- Documents -->
                         <div v-if="form.application_documents.length > 0" class="space-y-4">
-                            <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Attached
-                                Documents</h3>
+                            <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">
+                                Attached Documents
+                            </h3>
                             <div class="space-y-2">
                                 <div v-for="(file, index) in form.application_documents" :key="index"
                                      class="p-3 bg-muted/30 rounded-lg border border-border/50 flex items-center gap-2">
@@ -625,7 +637,9 @@
                                     </svg>
                                     <div>
                                         <p class="font-medium text-sm">{{ file.name }}</p>
-                                        <p class="text-xs text-muted-foreground">{{ (file.size / 1024).toFixed(2) }} KB</p>
+                                        <p class="text-xs text-muted-foreground">
+                                            {{ (file.size / 1024).toFixed(2) }} KB
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -930,7 +944,7 @@ export default {
 
                 setTimeout(() => router.push('/applications'), 2000)
             } catch (err) {
-                error.value = err.response?.data?.message || 'Failed to submit application'
+                error.value = err.response?.data?.message || err.response?.data?.error?.message || 'Failed to submit application'
             } finally {
                 loading.value = false
             }
