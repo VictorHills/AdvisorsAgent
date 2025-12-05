@@ -67,7 +67,7 @@ export const dashboardAPI = {
 export const applicationsAPI = {
     getAll: (page, perPage) => api.get('/applications', {params: {page: page, per_page: perPage}}),
     getOne: (id) => api.get(`/applications/${id}`),
-    getStatus: (id) => api.get(`/application-status`),
+    getStatus: () => api.get(`/application-status`),
     create: (data) => {
         const formData = new FormData()
 
@@ -157,7 +157,7 @@ export const applicationsAPI = {
     // Counselor endpoints
     getCounselorApplications: (page, perPage) => api.get('/admin/applications', {params: {page: page, per_page: perPage}}),
     getCounselorApplicationById: (id) => api.get(`/admin/applications/${id}`),
-    updateCounselorApplicationStatus: (id, status) => api.patch(`/admin/applications/${id}`, {status}),
+    updateCounselorApplicationStatus: (id, data) => api.patch(`/admin/applications/${id}`, data),
 
 }
 
