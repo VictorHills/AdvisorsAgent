@@ -35,6 +35,10 @@ Route::get('schools/{id}', [SchoolController::class, 'show']);
 Route::get('countries', [CountryController::class, 'index']);
 Route::get('countries/{id}', [CountryController::class, 'show']);
 
+// Application status route
+Route::get('application-status', [ApplicationController::class, 'getApplicationStatus']);
+
+
 Route::group(['middleware' => ['auth:api', CheckUserIsAgent::class]], function () {
     // Auth routes
     Route::withoutMiddleware([CheckUserIsAgent::class])->group(function () {
@@ -44,7 +48,6 @@ Route::group(['middleware' => ['auth:api', CheckUserIsAgent::class]], function (
 
     // Application routes
     Route::apiResource('applications', ApplicationController::class);
-    Route::get('application-status', [ApplicationController::class, 'getApplicationStatus']);
 
     // BDM Officer routes
     Route::get('bdm-officers', [BdmOfficerController::class, 'index']);
