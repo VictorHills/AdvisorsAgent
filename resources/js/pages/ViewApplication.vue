@@ -315,6 +315,12 @@
                         </div>
                     </div>
 
+                    <!-- Success Message -->
+                    <div v-if="successMessage"
+                         class="p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-green-700 text-sm">
+                        {{ successMessage }}
+                    </div>
+
                     <!-- Error Message -->
                     <div v-if="documentError"
                          class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
@@ -374,6 +380,7 @@ const fileInput = ref(null);
 const uploading = ref(false);
 const deletingDoc = ref(null);
 const documentError = ref(null);
+const successMessage = ref(null);
 
 const getDocumentName = (doc) => doc?.name || 'Document';
 const getDocumentUrl = (doc) => doc?.url || '#';
@@ -434,20 +441,22 @@ const uploadNewDocuments = async () => {
     try {
         uploading.value = true;
         documentError.value = null;
+        successMessage.value = null;
 
         const formData = new FormData();
-        newFiles.value.forEach(file => {
-            formData.append('documents[]', file);
+        formData.append("update_type", "update");
+        newFiles.value.forEach((file, index) => {
+            formData.append(`application_documents[${index}]`, file);
         });
 
-        await applicationsAPI.uploadDocuments(applicationId, formData);
+        await applicationsAPI.updateDocument(applicationId, formData);
         await fetchApplication();
 
+        successMessage.value = 'Document updated successfully!';
         newFiles.value = [];
-        showDocumentModal.value = false;
     } catch (err) {
-        console.error('Error uploading documents:', err);
-        documentError.value = 'Failed to upload documents. Please try again.';
+        console.error("Error uploading documents:", err);
+        documentError.value = "Failed to upload documents. Please try again.";
     } finally {
         uploading.value = false;
     }
@@ -459,9 +468,12 @@ const deleteDocument = async (doc, index) => {
     try {
         deletingDoc.value = index;
         documentError.value = null;
+        successMessage.value = null;
 
         await applicationsAPI.updateDocument(applicationId, {update_type: 'delete', document_name: doc.name});
         await fetchApplication();
+
+        successMessage.value = 'Document deleted successfully!';
     } catch (err) {
         console.error('Error deleting document:', err);
         documentError.value = 'Failed to delete document. Please try again.';

@@ -153,10 +153,30 @@ export const applicationsAPI = {
         })
     },
     delete: (id) => api.delete(`/applications/${id}`),
-    updateDocument: (applicationId, document) => api.patch(`/update-application-document/${applicationId}`, document),
+    updateDocument(applicationId, payload) {
+        // If payload is FormData (for file uploads)
+        if (payload instanceof FormData) {
+            // Add _method field for Laravel method spoofing
+            payload.append('_method', 'PATCH');
+
+            return api.post(`/update-application-document/${applicationId}`, payload, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+        }
+
+        // Otherwise send JSON (for delete operations)
+        return api.patch(`/update-application-document/${applicationId}`, payload, {
+            headers: { "Content-Type": "application/json" }
+        });
+    },
 
     // Counselor endpoints
-    getCounselorApplications: (page, perPage) => api.get('/admin/applications', {params: {page: page, per_page: perPage}}),
+    getCounselorApplications: (page, perPage) => api.get('/admin/applications', {
+        params: {
+            page: page,
+            per_page: perPage
+        }
+    }),
     getCounselorApplicationById: (id) => api.get(`/admin/applications/${id}`),
     updateCounselorApplicationStatus: (id, data) => api.patch(`/admin/applications/${id}`, data),
 
