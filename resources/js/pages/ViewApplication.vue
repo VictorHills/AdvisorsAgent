@@ -132,6 +132,17 @@
                                   d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                         Application Documents
+
+                        <button
+                            v-if="!isCounselor"
+                            @click="showDocumentModal = true"
+                            class="text-blue-600 hover:underline flex items-center gap-1"
+                            title="Manage Documents">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
                     </h2>
                     <div v-if="application.documents && application.documents.length > 0" class="space-y-3">
                         <div v-for="(doc, idx) in application.documents" :key="idx"
@@ -146,16 +157,31 @@
                                     <p class="text-sm text-muted-foreground">Document {{ idx + 1 }}</p>
                                 </div>
                             </div>
-                            <a :href="getDocumentUrl(doc)"
-                               target="_blank"
-                               download
-                               class="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                </svg>
-                                Download
-                            </a>
+
+                            <div class="flex items-center gap-2">
+                                <a :href="getDocumentUrl(doc)"
+                                   target="_blank"
+                                   class="px-3 py-1.5 text-sm bg-primary/20 text-primary rounded hover:bg-primary/30 transition-colors font-medium flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M12 4.5c-7 0-10 7.5-10 7.5s3 7.5 10 7.5 10-7.5 10-7.5-3-7.5-10-7.5z"/>
+                                        <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2"/>
+                                    </svg>
+                                    View
+                                </a>
+
+                                <a :href="getDocumentUrl(doc)"
+                                   target="_blank"
+                                   download
+                                   class="px-3 py-1.5 text-sm bg-primary/20 text-primary rounded hover:bg-primary/30 transition-colors font-medium flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    Download
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div v-else class="text-muted-foreground p-4 bg-secondary/30 rounded-lg">
@@ -174,6 +200,157 @@
                 </div>
             </div>
         </main>
+
+        <!-- Document Management Modal -->
+        <div v-if="showDocumentModal"
+             class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div
+                class="bg-card rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-border shadow-2xl">
+                <!-- Modal Header -->
+                <div
+                    class="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border p-6 flex items-center justify-between backdrop-blur-2xl">
+                    <div>
+                        <h2 class="text-xl font-bold">Manage Documents</h2>
+                        <p class="text-sm text-muted-foreground mt-1">Add, view, or remove application documents</p>
+                    </div>
+                    <button type="button" @click="closeModal"
+                            class="text-muted-foreground hover:text-foreground transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 space-y-6">
+                    <!-- Upload Section -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Add New Documents</h3>
+                        <div
+                            class="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors bg-muted/30">
+                            <input
+                                type="file"
+                                ref="fileInput"
+                                @change="handleFileSelect"
+                                multiple
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                class="hidden"
+                            />
+                            <button
+                                type="button"
+                                @click="$refs.fileInput.click()"
+                                class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+                                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Choose Files
+                            </button>
+                            <p class="text-sm text-muted-foreground mt-2">PDF, DOC, DOCX, JPG, PNG (Max 10MB each)</p>
+                        </div>
+
+                        <!-- New Files Preview -->
+                        <div v-if="newFiles.length > 0" class="space-y-2">
+                            <p class="text-xs text-muted-foreground font-medium mb-2">New files to upload:</p>
+                            <div v-for="(file, idx) in newFiles" :key="idx"
+                                 class="p-3 bg-muted/30 rounded-lg border border-border/50 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-medium text-sm">{{ file.name }}</p>
+                                        <p class="text-xs text-muted-foreground">{{ formatFileSize(file.size) }}</p>
+                                    </div>
+                                </div>
+                                <button type="button" @click="removeNewFile(idx)"
+                                        class="text-red-500 hover:text-red-700 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Existing Documents -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Existing Documents</h3>
+                        <div v-if="application.documents && application.documents.length > 0" class="space-y-2">
+                            <div v-for="(doc, idx) in application.documents" :key="idx"
+                                 class="p-3 bg-muted/30 rounded-lg border border-border/50 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-medium text-sm">{{ getDocumentName(doc) }}</p>
+                                        <p class="text-xs text-muted-foreground">Document {{ idx + 1 }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <a :href="getDocumentUrl(doc)"
+                                       target="_blank"
+                                       class="px-3 py-1.5 text-sm bg-primary/20 text-primary rounded hover:bg-primary/30 transition-colors font-medium">
+                                        View
+                                    </a>
+                                    <button
+                                        type="button"
+                                        @click="deleteDocument(doc, idx)"
+                                        :disabled="deletingDoc === idx"
+                                        class="px-3 py-1.5 text-sm bg-red-500/20 text-red-500 rounded hover:bg-red-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium">
+                                        {{ deletingDoc === idx ? 'Deleting...' : 'Delete' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="p-4 bg-muted/30 rounded-lg border border-border/50 text-center">
+                            <p class="text-sm text-muted-foreground">No existing documents</p>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div v-if="documentError"
+                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+                        {{ documentError }}
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="flex items-center justify-end gap-3 p-6 border-t border-border">
+                    <button
+                        type="button"
+                        @click="closeModal"
+                        class="px-6 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-all duration-200">
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        @click="uploadNewDocuments"
+                        :disabled="newFiles.length === 0 || uploading"
+                        class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <svg v-if="uploading" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>
+                            {{
+                                uploading ? 'Uploading...' : `Upload ${newFiles.length} Document${newFiles.length !== 1 ? 's' : ''}`
+                            }}
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -189,6 +366,15 @@ const loading = ref(true);
 const error = ref(null);
 const application = ref({});
 const {isCounselor} = useAuth();
+
+// Document modal states
+const showDocumentModal = ref(false);
+const newFiles = ref([]);
+const fileInput = ref(null);
+const uploading = ref(false);
+const deletingDoc = ref(null);
+const documentError = ref(null);
+
 const getDocumentName = (doc) => doc?.name || 'Document';
 const getDocumentUrl = (doc) => doc?.url || '#';
 
@@ -212,6 +398,82 @@ const statusColorMap = {
 const getStatusClass = (statusCode) => {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-medium';
     return `${baseClass} ${statusColorMap[statusCode] || 'bg-gray-500/20 text-gray-700'}`;
+};
+
+const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+};
+
+const handleFileSelect = (event) => {
+    const files = Array.from(event.target.files);
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    const validFiles = files.filter(file => {
+        if (file.size > maxSize) {
+            documentError.value = `File ${file.name} is too large. Max size is 10MB.`;
+            return false;
+        }
+        return true;
+    });
+
+    newFiles.value.push(...validFiles);
+    event.target.value = '';
+};
+
+const removeNewFile = (index) => {
+    newFiles.value.splice(index, 1);
+};
+
+const uploadNewDocuments = async () => {
+    if (newFiles.value.length === 0) return;
+
+    try {
+        uploading.value = true;
+        documentError.value = null;
+
+        const formData = new FormData();
+        newFiles.value.forEach(file => {
+            formData.append('documents[]', file);
+        });
+
+        await applicationsAPI.uploadDocuments(applicationId, formData);
+        await fetchApplication();
+
+        newFiles.value = [];
+        showDocumentModal.value = false;
+    } catch (err) {
+        console.error('Error uploading documents:', err);
+        documentError.value = 'Failed to upload documents. Please try again.';
+    } finally {
+        uploading.value = false;
+    }
+};
+
+const deleteDocument = async (doc, index) => {
+    if (!confirm('Are you sure you want to delete this document?')) return;
+
+    try {
+        deletingDoc.value = index;
+        documentError.value = null;
+
+        await applicationsAPI.deleteDocument(applicationId, doc.name);
+        await fetchApplication();
+    } catch (err) {
+        console.error('Error deleting document:', err);
+        documentError.value = 'Failed to delete document. Please try again.';
+    } finally {
+        deletingDoc.value = null;
+    }
+};
+
+const closeModal = () => {
+    showDocumentModal.value = false;
+    newFiles.value = [];
+    documentError.value = null;
 };
 
 const fetchApplication = async () => {
