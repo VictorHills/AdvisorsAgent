@@ -460,7 +460,7 @@ const deleteDocument = async (doc, index) => {
         deletingDoc.value = index;
         documentError.value = null;
 
-        await applicationsAPI.deleteDocument(applicationId, doc.name);
+        await applicationsAPI.updateDocument(applicationId, {update_type: 'delete', document_name: doc.name});
         await fetchApplication();
     } catch (err) {
         console.error('Error deleting document:', err);

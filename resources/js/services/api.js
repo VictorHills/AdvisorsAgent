@@ -153,6 +153,7 @@ export const applicationsAPI = {
         })
     },
     delete: (id) => api.delete(`/applications/${id}`),
+    updateDocument: (applicationId, document) => api.patch(`/update-application-document/${applicationId}`, document),
 
     // Counselor endpoints
     getCounselorApplications: (page, perPage) => api.get('/admin/applications', {params: {page: page, per_page: perPage}}),
