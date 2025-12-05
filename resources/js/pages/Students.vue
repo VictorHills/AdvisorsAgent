@@ -1222,14 +1222,26 @@ export default {
             }
         };
 
+        const statusColorMap = {
+            document_submission: 'bg-blue-500/20 text-blue-700',
+            document_in_check: 'bg-yellow-500/20 text-yellow-700',
+            document_check_complete: 'bg-green-500/20 text-green-700',
+            application_in_process: 'bg-blue-500/20 text-blue-700',
+            application_done_successfully: 'bg-green-500/20 text-green-700',
+            conditional_offers_received: 'bg-purple-500/20 text-purple-700',
+            conditional_offers_accepted: 'bg-purple-700/20 text-purple-900',
+            unconditional_offers_received: 'bg-indigo-500/20 text-indigo-700',
+            unconditional_offers_accepted: 'bg-indigo-700/20 text-indigo-900',
+            school_fees_payment_stage: 'bg-orange-500/20 text-orange-700',
+            cas_ceo_loa_i20_stage: 'bg-teal-500/20 text-teal-700',
+            visa_application: 'bg-blue-500/20 text-blue-700',
+            visa_application_granted: 'bg-green-500/20 text-green-700',
+            application_rejected: 'bg-red-500/20 text-red-700',
+        };
+
         const getStatusClass = (status) => {
-            const statusMap = {
-                'Approved': 'bg-emerald-500/20 text-emerald-500',
-                'Pending': 'bg-blue-500/20 text-blue-500',
-                'In Review': 'bg-amber-500/20 text-amber-500',
-                'Rejected': 'bg-red-500/20 text-red-500'
-            };
-            return statusMap[status] || 'bg-gray-500/20 text-gray-500';
+            const baseClass = 'px-3 py-1 rounded-full text-xs font-medium';
+            return `${baseClass} ${statusColorMap[status] || 'bg-gray-500/20 text-gray-700'}`;
         };
 
         const viewApplications = async (studentId) => {
@@ -1327,13 +1339,13 @@ export default {
                 await applicationsAPI.patch(selectedStudent.value.id, dataToSend);
 
                 console.log("[v0] Update successful");
-                editSuccess.value = true; // Show success loader
+                editSuccess.value = true;
                 setTimeout(() => {
                     showEditModal.value = false;
                     editSuccess.value = false;
                     fetchStudents();
                     fetchStats();
-                }, 2000); // Adjust timing for overlay visibility
+                }, 2000);
 
             } catch (err) {
                 console.error('[v0] Error updating student:', err);
