@@ -33,7 +33,7 @@
                          style="animation-delay: 0.3s;">
                         <h3 class="font-bold mb-6">Monthly Applications Overview</h3>
                         <div class="h-80">
-                            <BarChart v-if="monthlyChartData" :data="monthlyChartData"/>
+                            <BarChart v-if="monthlyChartData" :data="monthlyChartData" label="Applications"/>
                             <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
                                 available
                             </div>
@@ -41,13 +41,13 @@
                     </div>
                 </div>
 
-                <!-- Monthly Applications Bar Chart -->
+                <!-- Monthly Agent SignUp -->
                 <div class="mb-8" v-if="isCounselor">
                     <div class="glass-card rounded-xl p-6 animate-slide-up border-l-4 border-primary"
                          style="animation-delay: 0.3s;">
                         <h3 class="font-bold mb-6">Monthly Agent SignUp</h3>
                         <div class="h-80">
-                            <BarChart v-if="monthlyAgentSignUpData" :data="monthlyAgentSignUpData"/>
+                            <BarChart v-if="monthlyAgentSignUpData" :data="monthlyAgentSignUpData" label="Applications"/>
                             <div v-else class="flex items-center justify-center h-full text-muted-foreground">No data
                                 available
                             </div>
