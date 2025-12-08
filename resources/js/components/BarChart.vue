@@ -1,10 +1,10 @@
 <template>
-    <Bar v-if="formattedData" :data="formattedData" :options="chartOptions" />
+    <Bar v-if="formattedData" :data="formattedData" :options="chartOptions"/>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { Bar } from 'vue-chartjs'
+import {computed} from 'vue'
+import {Bar} from 'vue-chartjs'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -18,7 +18,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const props = defineProps({
-    data: { type: Object, required: true }
+    data: {type: Object, required: true}
 })
 
 const formattedData = computed(() => {
@@ -41,7 +41,7 @@ const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-        legend: { display: false },
+        legend: {display: false},
         tooltip: {
             backgroundColor: 'rgba(0,0,0,0.8)',
             padding: 12,
@@ -52,12 +52,12 @@ const chartOptions = {
     scales: {
         y: {
             beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' },
-            ticks: { color: '#6b7280' }
+            grid: {color: 'rgba(0,0,0,0.05)'},
+            ticks: {color: '#6b7280'}
         },
         x: {
-            grid: { display: false },
-            ticks: { color: '#6b7280', maxRotation: 45, minRotation: 45 }
+            grid: {display: false},
+            ticks: {color: '#6b7280', maxRotation: 45, minRotation: 45}
         }
     }
 }
