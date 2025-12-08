@@ -9,7 +9,8 @@
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
                     <div v-for="(stat, index) in stats" :key="index"
-                         class="glass-card p-6 rounded-xl animate-slide-up hover:shadow-lg hover:border-primary transition-all duration-300 hover:-translate-y-1"
+                         class="glass-card p-6 rounded-xl animate-slide-up hover:shadow-lg hover:border-primary transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                         @click="filterStudentsByStatus(stat)"
                          :style="{ animationDelay: `${index * 0.1}s` }">
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-lg flex items-center justify-center" :class="stat.bgColor">
@@ -72,8 +73,8 @@
                         <div class="h-80 overflow-y-auto">
                             <div :style="{ height: statusChartHeight }">
                                 <HorizontalBarChart v-if="statusChartData" :data="statusChartData"/>
-                                <div v-else class="flex items-center justify-center h-full text-muted-foreground">No
-                                    data available
+                                <div v-else class="flex items-center justify-center h-full text-muted-foreground">
+                                    No data available
                                 </div>
                             </div>
                         </div>
@@ -92,12 +93,14 @@
                                     </th>
                                     <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
                                     <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Phone</th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Gender
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Gender
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Country
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Country
                                     </th>
-                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Enrolled
-                                        Date
+                                    <th class="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                                        Enrolled Date
                                     </th>
                                 </tr>
                                 </thead>
@@ -135,7 +138,7 @@
                              style="animation-delay: 0.2s;">
                             <h3 class="font-bold mb-4">Quick Actions</h3>
                             <div class="space-y-3">
-                                <router-link to="/var/www/html/AdvisorsAgent/resources/js/pages/Applications.vue/create"
+                                <router-link to="/applications/create"
                                              class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
                                     <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
                                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
@@ -149,7 +152,7 @@
                                         <div class="text-xs text-muted-foreground">Submit student application</div>
                                     </div>
                                 </router-link>
-                                <router-link to="/create-student"
+                                <router-link to="/students/create"
                                              class="flex items-center space-x-3 p-3 hover:bg-muted rounded-lg border border-transparent hover:border-primary transition-all duration-200 hover:scale-105">
                                     <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
                                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
@@ -197,6 +200,7 @@
 import {computed, onMounted, ref} from 'vue'
 import {dashboardAPI, studentsAPI} from '../services/api'
 import {useAuth} from '../composables/useAuth'
+import {useRouter} from 'vue-router'
 import LineChart from '../components/LineChart.vue'
 import DoughnutChart from '../components/DoughnutChart.vue'
 import BarChart from '../components/BarChart.vue'
@@ -207,6 +211,7 @@ export default {
     components: {LineChart, DoughnutChart, BarChart, HorizontalBarChart},
     setup() {
         const {userRole, isCounselor, isAgent} = useAuth()
+        const router = useRouter()
 
         const loading = ref(true)
         const loadingActivity = ref(true)
@@ -258,7 +263,7 @@ export default {
                         changeColor: 'text-primary',
                         bgColor: 'bg-primary/20',
                         iconColor: 'text-primary',
-                        icon: 'M17 20a4 4 0 10-8 0m8 0H9m8 0h5v-2a4 4 0 00-4-4h-1m-6 6H4v-2a4 4 0 014-4h1m4-10a4 4 0 11-8 0 4 4 0 018 0zm6 4a3 3 0 11-6 0 3 3 0 016 0z'
+                        icon: 'M17 20a4 4 0 10-8 0m8 0H9m8 0h5v-2a4 4 0 00-3-3.87M5 17h14m-9-4h4m-4 0V5a2 2 0 114 0v8m-4 0h4'
                     });
                 }
 
@@ -303,7 +308,7 @@ export default {
                         changeColor: 'text-warning',
                         bgColor: 'bg-warning/20',
                         iconColor: 'text-warning',
-                        icon: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                        icon: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0zm6 4a3 3 0 11-6 0 3 3 0 016 0z'
                     },
                     {
                         value: statsData.application_rejected || 0,
@@ -392,6 +397,14 @@ export default {
             return `${height}px`
         })
 
+        const filterStudentsByStatus = (stat) => {
+            // Navigate to applications page with status filter
+            router.push({
+                name: 'StudentApplication',
+                query: {status: stat.label.toLowerCase().replace(/[^a-z]/g, '_')}
+            });
+        };
+
         onMounted(() => {
             fetchDashboardData()
             fetchRecentActivity()
@@ -412,7 +425,8 @@ export default {
             recentActivity,
             isCounselor,
             isAgent,
-            monthlyAgentSignUpData
+            monthlyAgentSignUpData,
+            filterStudentsByStatus
         }
     }
 }
