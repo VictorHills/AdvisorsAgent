@@ -76,11 +76,6 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function bdmOfficer(): BelongsTo
-    {
-        return $this->belongsTo(BusinessDevelopmentOfficers::class, 'bdm_officer_id');
-    }
-
     public function applications(): User|HasMany
     {
         return $this->hasMany(StudentApplications::class, 'agent_id');

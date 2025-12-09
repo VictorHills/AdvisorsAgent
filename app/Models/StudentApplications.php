@@ -58,11 +58,6 @@ class StudentApplications extends Model
         return $this->belongsTo(User::class, 'agent_id');
     }
 
-    public function bdmOfficer(): BelongsTo
-    {
-        return $this->belongsTo(BusinessDevelopmentOfficers::class, 'bdm_officer_id');
-    }
-
     public function course(): BelongsTo
     {
         return $this->belongsTo(Courses::class, 'course_id');
