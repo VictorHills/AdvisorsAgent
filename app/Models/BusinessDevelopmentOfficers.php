@@ -33,11 +33,6 @@ class BusinessDevelopmentOfficers extends Model
         'deleted_at'
     ];
 
-    public function applications(): BusinessDevelopmentOfficers|HasMany
-    {
-        return $this->hasMany(StudentApplications::class, 'bdm_officer_id');
-    }
-
     public function agents(): BusinessDevelopmentOfficers|HasMany
     {
         return $this->hasMany(User::class, 'bdm_officer_id');
