@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Mail\AdminEmail;
 use App\Mail\OtpMail;
@@ -18,26 +19,9 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class AuthController extends Controller
 {
     // Register new user
-    public function register(Request $request)
+    public function register(RegisterRequest $registerRequest)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users,email',
-            'phone' => 'required|integer|unique:users,phone',
-            'password' => 'required|string|min:6|confirmed',
-            'agency_name' => 'required|string|max:255',
-            'business_registration_number' => 'required|string|max:255',
-            'role_name' => 'required|string|max:255',
-            'is_terms_and_condition_accepted' => 'required|boolean',
-            'bdm_officer_id' => 'nullable|exists:users,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
-
-        $user = User::create($request->all());
+        $user = User::create($registerRequest->validated());
 
         //send email to user and admin
         $user_full_name = $user->first_name . ' ' . $user->last_name;
