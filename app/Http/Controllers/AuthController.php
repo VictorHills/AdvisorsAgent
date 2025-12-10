@@ -24,30 +24,20 @@ class AuthController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
+            'phone' => 'required|integer|unique:users,phone',
             'password' => 'required|string|min:6|confirmed',
             'agency_name' => 'required|string|max:255',
             'business_registration_number' => 'required|string|max:255',
             'role_name' => 'required|string|max:255',
             'is_terms_and_condition_accepted' => 'required|boolean',
-            'bdm_officer_id' => 'nullable|exists:business_development_officers,id',
+            'bdm_officer_id' => 'nullable|exists:users,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
         }
 
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'agency_name' => $request->agency_name,
-            'business_registration_number' => $request->business_registration_number,
-            'role_name' => $request->role_name,
-            'is_terms_and_condition_accepted' => $request->is_terms_and_condition_accepted,
-            'bdm_officer_id' => $request->bdm_officer_id,
-            'is_active' => true,
-        ]);
+        $user = User::create($request->all());
 
         //send email to user and admin
         $user_full_name = $user->first_name . ' ' . $user->last_name;
@@ -76,7 +66,7 @@ class AuthController extends Controller
 
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Invalid credentials'], 401);
+                return $this->respondUnauthorized(message: 'Invalid Credentials');
             }
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
