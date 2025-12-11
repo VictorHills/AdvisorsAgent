@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen flex animate-fade-in">
-        <div class="hidden lg:block lg:w-1/2 relative bg-gradient-to-br from-primary/20 to-primary/5">
+        <div class="hidden lg:block lg:w-1/2 relative bg-linear-to-br from-primary/20 to-primary/5">
             <div class="absolute inset-0 flex items-center justify-center p-12">
                 <div class="max-w-lg space-y-6 animate-slide-up">
                     <div class="glass-card p-8 rounded-2xl space-y-4 hover:shadow-xl transition-all duration-300">
@@ -21,7 +21,7 @@
                              class="flex items-center space-x-3 text-sm animate-slide-up"
                              :style="{ animationDelay: `${index * 0.1}s` }">
                             <div
-                                class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                           d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -132,6 +132,21 @@
                                 :disabled="loading"
                                 class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 placeholder="agent@example.com"
+                            />
+                        </div>
+
+                        <div class="space-y-2 group">
+                            <label for="phone"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Phone
+                                Number</label>
+                            <input
+                                id="phone"
+                                v-model="form.phone"
+                                type="number"
+                                required
+                                :disabled="loading"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                placeholder="09033226655"
                             />
                         </div>
 
@@ -263,6 +278,14 @@
     </div>
 </template>
 
+<style scoped>
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+</style>
+
 <script>
 import {ref} from 'vue';
 import {useAuth} from '../composables/useAuth';
@@ -280,6 +303,7 @@ export default {
             agency_name: '',
             business_registration_number: '',
             email: '',
+            phone: '',
             password: '',
             password_confirmation: '',
             role_name: 'agent',
