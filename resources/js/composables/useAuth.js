@@ -1,5 +1,3 @@
-"use client"
-
 import {computed, ref} from "vue"
 import {useRouter} from "vue-router"
 import {authAPI} from "../services/api"
@@ -103,12 +101,9 @@ export function useAuth() {
 
             return {success: true, message}
         } catch (err) {
-            const errorMessage =
-                err.response?.data?.error || err.response?.data?.message || err.message || "Registration failed"
+            const errorMessage = err.response?.message || err.response?.data?.message || err.message || "Registration failed"
 
             error.value = errorMessage
-
-            // Clean up
             user.value = null
             localStorage.removeItem("user")
 
