@@ -174,15 +174,8 @@ export default {
         const showPassword = ref(false);
 
         const handleLogin = async () => {
-            loading.value = true;
-
-            try {
-                //await new Promise(resolve => setTimeout(resolve, 10000));
-                await login(form.value);
-            } finally {
-                loading.value = false;
-            }
-        };
+            await login(form.value)
+        }
 
         return {
             form,
