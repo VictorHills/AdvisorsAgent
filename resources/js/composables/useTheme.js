@@ -1,5 +1,3 @@
-"use client"
-
 import {ref, onMounted} from "vue"
 
 export function useTheme() {
