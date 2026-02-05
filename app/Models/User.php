@@ -6,7 +6,6 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -38,6 +37,9 @@ class User extends Authenticatable implements JWTSubject
         'is_terms_and_condition_accepted',
         'is_active',
         'remember_token',
+        'is_contract_signed',
+        'is_contract_sent',
+        'contract_signed_at'
     ];
 
     /**
@@ -63,6 +65,9 @@ class User extends Authenticatable implements JWTSubject
             'password' => 'hashed',
             'is_terms_and_condition_accepted' => 'boolean',
             'is_active' => 'boolean',
+            'is_contract_signed' => 'boolean',
+            'is_contract_sent' => 'boolean',
+            'contract_signed_at' => 'datetime'
         ];
     }
 
