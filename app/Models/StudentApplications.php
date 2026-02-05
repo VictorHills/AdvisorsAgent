@@ -36,6 +36,7 @@ class StudentApplications extends Model
         'country_of_preference',
         'application_documents',
         'status',
+        'course_name'
     ];
 
     protected $casts = [
