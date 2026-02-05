@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('agent_id');
             $table->unsignedBigInteger('bdm_officer_id')->nullable();
-            $table->unsignedBigInteger('course_id');
+            $table->unsignedBigInteger('course_id')->nullable();
             $table->unsignedBigInteger('student_id');
             $table->string('class_of_degree');
             $table->text('additional_notes')->nullable();
