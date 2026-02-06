@@ -92,7 +92,7 @@ class ApplicationController extends Controller
                 Mail::to($student->email)->bcc([config('app.admin_email'), config('app.counselor_email'), auth()->user()->email])
                     ->send(new CreateApplicationEmail($application));
             } catch (Exception $exception) {
-                Log::debug('Email could not be sent: ' . $exception->getMessage());
+                Log::error('Email could not be sent: ' . $exception->getMessage());
             }
 
             return $this->respondSuccessWithData(message: 'Application created successfully', data: new ApplicationResource($application));
