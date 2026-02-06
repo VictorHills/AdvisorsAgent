@@ -24,7 +24,8 @@ class CreateStudentApplicationRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'course_id' => 'required|exists:advisor_db.courses,id',
+            'course_id' => 'nullable|exists:advisor_db.courses,id',
+            'course_name' => 'nullable|string',
             'class_of_degree' => 'required|string|max:255',
             'schools_of_choice' => 'required|array',
             'country_of_preference' => 'required|array',
@@ -40,7 +41,6 @@ class CreateStudentApplicationRequest extends FormRequest
         return [
             'email.required' => 'Email is required',
             'email.email' => 'Email must be a valid email address',
-            'course_id.required' => 'Please select a valid course',
             'course_id.exists' => 'Please select a valid course',
             'class_of_degree.required' => 'Class of degree is required',
             'class_of_degree.string' => 'Class of degree must be a string',
