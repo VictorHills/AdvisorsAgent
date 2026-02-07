@@ -506,7 +506,7 @@ const fetchApplication = async () => {
 
         application.value = {
             id: app.id,
-            courseName: app.course?.name || 'N/A',
+            courseName: app.course_name || 'N/A',
             studentName: `${app.student?.first_name || ''} ${app.student?.middle_name || ''} ${app.student?.last_name || ''}`.trim(),
             studentEmail: app.student?.email || 'N/A',
             studentPhone: app.student?.phone_number || 'N/A',

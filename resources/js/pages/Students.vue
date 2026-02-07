@@ -262,7 +262,7 @@
                                 </div>
                                 <div class="p-3 md:p-4 bg-muted/30 rounded-lg border border-border/50">
                                     <p class="text-xs text-muted-foreground font-medium mb-1">Course</p>
-                                    <p class="font-medium text-sm">{{ selectedStudent.course?.name || 'N/A' }}</p>
+                                    <p class="font-medium text-sm">{{ selectedStudent.course_name || 'N/A' }}</p>
                                 </div>
                             </div>
 
@@ -952,7 +952,7 @@
                                             <div>
                                                 <p class="text-xs text-muted-foreground font-medium mb-1">Course</p>
                                                 <p class="font-medium text-sm">
-                                                    {{ application.course?.name || 'N/A' }}
+                                                    {{ application.course_name || 'N/A' }}
                                                 </p>
                                             </div>
                                             <div>
@@ -1151,7 +1151,7 @@ export default {
                     name: `${student.first_name} ${student.middle_name} ${student.last_name}`,
                     email: student.email,
                     initials: `${student.first_name ? student.first_name[0] : ''}${student.last_name ? student.last_name[0] : ''}`,
-                    course: student.course?.name || 'N/A',
+                    course: student.course_name || 'N/A',
                     degree: student.class_of_degree || 'N/A',
                     country: student.country,
                     phone: student.phone_number,
@@ -1291,7 +1291,7 @@ export default {
                 };
 
                 editErrors.value = {};
-                courseSearch.value = student.fullData.course?.name || '';
+                courseSearch.value = student.fullData.course_name || '';
                 schoolSearch.value = '';
                 countrySearch.value = '';
 
