@@ -93,9 +93,12 @@
                         </thead>
 
                         <tbody>
-                        <tr v-for="application in filteredApplications" :key="application.id" class="border-b border-border hover:bg-muted/95 transition-all duration-200">
+                        <tr v-for="application in filteredApplications" :key="application.id"
+                            class="border-b border-border hover:bg-muted/95 transition-all duration-200">
                             <td class="py-4 px-4 text-sm">{{ application.studentName }}</td>
-                            <td class="py-4 px-4 text-sm">{{ application.courseName }}</td>
+                            <td class="py-4 px-4 text-sm">
+                                {{ application.courseName ? application.courseName : application.courseNameAlt }}
+                            </td>
                             <td class="py-4 px-4 text-sm">
                                 <span :class="getStatusClass(application.status)">
                                     {{ application.status }}
@@ -336,7 +339,7 @@ const fetchApplications = async () => {
 
         applications.value = applicationsData.map(application => ({
             id: application.id,
-            courseName: application.course.name.trim(),
+            courseName: application.course_name.trim(),
             studentName: `${application.student.first_name} ${application.student.middle_name} ${application.student.last_name}`,
             status: application.status,
             submittedAt: application.created_at ? new Date(application.created_at).toLocaleDateString() : 'N/A',
