@@ -190,7 +190,7 @@
                     <span class="feature-icon">🎓</span>
                     <span class="feature-text">
                         <strong>Course Applied:</strong>
-                        {{ $application->course->name }}
+                        {{ $application->course_name }}
                     </span>
                 </div>
 
