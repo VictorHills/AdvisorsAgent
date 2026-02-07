@@ -93,6 +93,8 @@ Route::group(['middleware' => ['auth:api', CheckUserIsCounselor::class], 'prefix
 
     Route::prefix('agents')->group(function () {
         Route::get('/', [AdminAgentController::class, 'index']);
+        Route::post('/send_contract', [AdminAgentController::class, 'sendContract']);
+        Route::post('/confirm_contract_sent', [AdminAgentController::class, 'confirmContractSent']);
     });
 
     Route::apiResource('applications', AdminApplicationController::class)->names([
