@@ -306,38 +306,54 @@
                     <h2 class="text-lg font-bold mb-6">Academic Preferences</h2>
                     <div class="space-y-6 relative">
                         <!-- Desired Course -->
+                        <!--                        <div class="space-y-2 group">
+                                                    <label for="course_search"
+                                                           class="text-sm font-medium transition-colors group-focus-within:text-primary">Desired
+                                                        Course *</label>
+                                                    <div class="relative">
+                                                        <input
+                                                            id="course_search"
+                                                            v-model="courseSearch"
+                                                            type="text"
+                                                            placeholder="Search and select a course..."
+                                                            class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                                            @focus="handleCourseFocus"
+                                                            @blur="handleCourseBlur"
+                                                        />
+                                                        <div v-if="showCourseDropdown"
+                                                             class="z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                                                            <div v-if="filteredCourses.length === 0" class="p-3 text-sm text-muted-foreground">
+                                                                No courses found
+                                                            </div>
+                                                            <div
+                                                                v-for="course in filteredCourses"
+                                                                :key="course.id"
+                                                                @mousedown.prevent="selectCourse(course)"
+                                                                class="px-4 py-2 cursor-pointer hover:bg-muted transition-colors"
+                                                            >
+                                                                {{ course.name }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="form.course_id" class="mt-2 text-sm text-muted-foreground">
+                                                        Selected: {{ getCourseName(form.course_id) }}
+                                                    </div>
+                                                </div>-->
                         <div class="space-y-2 group">
-                            <label for="course_search"
-                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">Desired
-                                Course *</label>
-                            <div class="relative">
-                                <input
-                                    id="course_search"
-                                    v-model="courseSearch"
-                                    type="text"
-                                    placeholder="Search and select a course..."
-                                    class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                                    @focus="handleCourseFocus"
-                                    @blur="handleCourseBlur"
-                                />
-                                <div v-if="showCourseDropdown"
-                                     class="z-50 w-full mt-1 bg-input border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
-                                    <div v-if="filteredCourses.length === 0" class="p-3 text-sm text-muted-foreground">
-                                        No courses found
-                                    </div>
-                                    <div
-                                        v-for="course in filteredCourses"
-                                        :key="course.id"
-                                        @mousedown.prevent="selectCourse(course)"
-                                        class="px-4 py-2 cursor-pointer hover:bg-muted transition-colors"
-                                    >
-                                        {{ course.name }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-if="form.course_id" class="mt-2 text-sm text-muted-foreground">
-                                Selected: {{ getCourseName(form.course_id) }}
-                            </div>
+                            <label for="first_name"
+                                   class="text-sm font-medium transition-colors group-focus-within:text-primary">
+                                Desired Course *
+                            </label>
+                            <input
+                                id="course_name"
+                                v-model="form.course_name"
+                                type="text"
+                                required
+                                :class="[
+                                    'w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200',
+                                ]"
+                                placeholder="Enter Course Name"
+                            />
                         </div>
 
                         <!-- Schools of Choice -->
@@ -524,7 +540,7 @@
                 </div>
             </form>
 
-            <!-- Review Modal (keeping your existing modal structure) -->
+            <!-- Review Modal -->
             <div v-if="showReviewModal"
                  class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto">
                 <div
@@ -589,7 +605,7 @@
                             <div class="space-y-3">
                                 <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
                                     <p class="text-xs text-muted-foreground font-medium mb-1">Desired Course</p>
-                                    <p class="font-medium">{{ getCourseName(form.course_id) }}</p>
+                                    <p class="font-medium">{{ form.course_name }}</p>
                                 </div>
                                 <div class="p-3 bg-muted/30 rounded-lg border border-border/50">
                                     <p class="text-xs text-muted-foreground font-medium mb-1">Schools of Choice</p>
@@ -748,7 +764,8 @@ export default {
             phone_number: '',
             country: '',
             class_of_degree: '',
-            course_id: '',
+            //course_id: '',
+            course_name: '',
             schools_of_choice: [],
             country_of_preference: [],
             additional_notes: '',
