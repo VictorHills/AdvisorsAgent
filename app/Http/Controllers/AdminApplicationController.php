@@ -20,7 +20,21 @@ class AdminApplicationController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 10);
-        $applications = StudentApplications::latest()->paginate($perPage);
+        $query = StudentApplications::query();
+
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('course_name', 'like', "%{$search}%")
+                  ->orWhereHas('student', function ($q) use ($search) {
+                      $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('middle_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $applications = $query->latest()->paginate($perPage);
 
         return ApplicationResource::collection($applications);
     }
