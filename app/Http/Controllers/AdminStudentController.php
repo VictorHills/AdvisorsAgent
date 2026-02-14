@@ -10,8 +10,23 @@ class AdminStudentController extends Controller
 {
     public function index(Request $request)
     {
+        $search = $request->get('search', '');
         $perPage = $request->get('per_page', 10);
-        $students = Students::latest()->paginate($perPage);
+
+        $query = Students::query();
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('phone_number', 'LIKE', "%{$search}%")
+                    ->orWhere('country', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $students = $query->latest()->paginate($perPage);
 
         return StudentsResource::collection($students);
     }
