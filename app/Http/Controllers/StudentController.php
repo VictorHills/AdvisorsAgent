@@ -19,6 +19,18 @@ class StudentController extends Controller
         $agentId = auth()->id();
         $query = Students::where('agent_id', $agentId);
 
+        $search = $request->get('search', '');
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('phone_number', 'LIKE', "%{$search}%")
+                    ->orWhere('country', 'LIKE', "%{$search}%");
+            });
+        }
+
         $perPage = $request->get('per_page', 10);
         $students = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
