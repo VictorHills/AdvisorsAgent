@@ -66,7 +66,7 @@ export const dashboardAPI = {
 }
 
 export const applicationsAPI = {
-    getAll: (page, perPage) => api.get('/applications', {params: {page: page, per_page: perPage}}),
+    getAll: (page, perPage, search = '') => api.get('/applications', {params: {page, per_page: perPage, ...(search && {search})}}),
     getOne: (id) => api.get(`/applications/${id}`),
     getStatus: () => api.get(`/application-status`),
     create: (data) => {
@@ -172,10 +172,11 @@ export const applicationsAPI = {
     },
 
     // Counselor endpoints
-    getCounselorApplications: (page, perPage) => api.get('/admin/applications', {
+    getCounselorApplications: (page, perPage, search = '') => api.get('/admin/applications', {
         params: {
-            page: page,
-            per_page: perPage
+            page,
+            per_page: perPage,
+            ...(search && {search})
         }
     }),
     getCounselorApplicationById: (id) => api.get(`/admin/applications/${id}`),
@@ -185,7 +186,7 @@ export const applicationsAPI = {
 
 export const studentsAPI = {
     // Agent endpoints (regular)
-    getAll: (page, perPage) => api.get('/students', {params: {page, per_page: perPage}}),
+    getAll: (page, perPage, search = '') => api.get('/students', {params: {page, per_page: perPage, ...(search && {search})}}),
     getById: (id) => api.get(`/students/${id}`),
     create: (studentData) => api.post('/students', studentData),
     update: (id, studentData) => api.put(`/students/${id}`, studentData),
@@ -194,7 +195,7 @@ export const studentsAPI = {
     validateStudent: (email) => api.post("/students/validate", {email}),
 
     // Counselor endpoints (assigned students only)
-    getCounselorStudents: (page, perPage) => api.get('/admin/students', {params: {page, per_page: perPage}}),
+    getCounselorStudents: (page, perPage, search = '') => api.get('/admin/students', {params: {page, per_page: perPage, ...(search && {search})}}),
     getCounselorStudentById: (id) => api.get(`/admin/students/${id}`),
     updateCounselorStudent: (id, studentData) => api.put(`/admin/students/${id}`, studentData),
     searchCounselorStudents: (query) => api.get(`/admin/students/search?q=${query}`),
