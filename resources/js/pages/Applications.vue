@@ -285,14 +285,10 @@ const uniqueCountries = computed(() => {
 
 const filteredApplications = computed(() => {
     return applications.value.filter(app => {
-        const matchesSearch = searchQuery.value === '' ||
-            app.studentName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-            app.courseName.toLowerCase().includes(searchQuery.value.toLowerCase());
-
         const matchesCountry = selectedCountry.value === '' ||
             app.countries.includes(selectedCountry.value);
 
-        return matchesSearch && matchesCountry;
+        return matchesCountry;
     });
 });
 
@@ -327,8 +323,8 @@ const fetchApplications = async () => {
         error.value = null;
 
         const applicationPromise = isCounselor.value
-            ? applicationsAPI.getCounselorApplications(currentPage.value, itemsPerPage.value)
-            : applicationsAPI.getAll(currentPage.value, itemsPerPage.value);
+            ? applicationsAPI.getCounselorApplications(currentPage.value, itemsPerPage.value, searchQuery.value)
+            : applicationsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value);
 
         const [applicationRes] = await Promise.all([
             applicationPromise.catch(() => ({data: []})),
@@ -350,12 +346,12 @@ const fetchApplications = async () => {
 
         if (paginationData.meta) {
             pagination.value = {
-                total: paginationData.meta.total,
-                from: paginationData.meta.from,
-                to: paginationData.meta.to,
                 currentPage: paginationData.meta.current_page,
+                from: paginationData.meta.from,
+                lastPage: paginationData.meta.last_page,
                 perPage: paginationData.meta.per_page,
-                lastPage: paginationData.meta.last_page
+                to: paginationData.meta.to,
+                total: paginationData.meta.total
             };
         }
     } catch (err) {
@@ -389,6 +385,15 @@ const updatePage = async (newPage) => {
         await fetchApplications();
     }
 };
+
+let searchTimeout = null;
+watch(searchQuery, () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        currentPage.value = 1;
+        fetchApplications();
+    }, 300);
+});
 
 watch(itemsPerPage, async () => {
     currentPage.value = 1;
