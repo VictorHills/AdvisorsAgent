@@ -1,6 +1,7 @@
 <template>
     <!-- add overflow-hidden when modals are open to prevent background scrolling -->
-    <div class="min-h-screen bg-background animate-fade-in" :class="{ 'overflow-hidden': showDetailsModal || showEditModal || showApplicationsModal }">
+    <div class="min-h-screen bg-background animate-fade-in"
+         :class="{ 'overflow-hidden': showDetailsModal || showEditModal || showApplicationsModal }">
         <main class="container mx-auto px-6 py-8">
             <div class="mb-8 animate-slide-up">
                 <h1 class="text-3xl font-bold mb-2">Student List & Applications</h1>
@@ -1139,8 +1140,8 @@ export default {
                 error.value = null;
 
                 const studentsPromise = isCounselor.value
-                    ? studentsAPI.getCounselorStudents(currentPage.value, itemsPerPage.value)
-                    : studentsAPI.getAll(currentPage.value, itemsPerPage.value)
+                    ? studentsAPI.getCounselorStudents(currentPage.value, itemsPerPage.value, searchQuery.value)
+                    : studentsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value)
 
                 const response = await studentsPromise;
                 const paginationData = response.data;
@@ -1634,9 +1635,13 @@ export default {
             await fetchStudents();
         });
 
-        watch([searchQuery, statusFilter, countryFilter], async () => {
-            currentPage.value = 1;
-            await fetchStudents();
+        let searchTimeout = null;
+        watch([searchQuery, statusFilter, countryFilter], () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage.value = 1;
+                fetchStudents();
+            }, 300);
         });
 
         onMounted(() => {
