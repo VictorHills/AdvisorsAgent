@@ -215,7 +215,7 @@ const fetchAgents = async () => {
         loading.value = true;
         error.value = null;
 
-        const agentsRes = await agentsAPI.getAll(currentPage.value, itemsPerPage.value);
+        const agentsRes = await agentsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value);
         const paginationData = agentsRes?.data || {data: [], meta: {}};
         const agentsData = paginationData.data || [];
 
@@ -258,16 +258,7 @@ const fetchAgents = async () => {
 };
 
 const filteredAgents = computed(() => {
-    const query = searchQuery.value.toLowerCase().trim();
-
-    if (!query) return agents.value;
-
-    return agents.value.filter(agent =>
-        `${agent.firstName} ${agent.lastName}`.toLowerCase().includes(query) ||
-        agent.email?.toLowerCase().includes(query) ||
-        agent.phone?.toLowerCase().includes(query) ||
-        agent.agencyName?.toLowerCase().includes(query)
-    );
+    return agents.value;
 });
 
 const paginationButtons = computed(() => {
@@ -293,6 +284,15 @@ const updatePage = async (newPage) => {
         await fetchAgents();
     }
 };
+
+let searchTimeout = null;
+watch(searchQuery, () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        currentPage.value = 1;
+        fetchAgents();
+    }, 300);
+});
 
 watch(itemsPerPage, async () => {
     currentPage.value = 1;
