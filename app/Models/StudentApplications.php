@@ -68,4 +68,14 @@ class StudentApplications extends Model
     {
         return $this->belongsTo(Students::class, 'student_id');
     }
+
+    /**
+     * Return the instance of the model's corresponding factory
+     *
+     * @return StudentApplicationsFactory
+     */
+    protected static function newFactory(): StudentApplicationsFactory
+    {
+        return StudentApplicationsFactory::new();
+    }
 }

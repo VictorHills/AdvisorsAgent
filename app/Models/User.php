@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -96,5 +97,15 @@ class User extends Authenticatable implements JWTSubject
     public function bdm_officer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'bdm_officer_id', 'id');
+    }
+
+    /**
+     * Return the instance of the model's corresponding factory
+     *
+     * @return Factory|UserFactory
+     */
+    protected static function newFactory(): UserFactory|Factory
+    {
+        return UserFactory::new();
     }
 }

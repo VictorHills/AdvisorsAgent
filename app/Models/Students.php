@@ -56,4 +56,14 @@ class Students extends Model
     {
         return $this->hasMany(StudentApplications::class, 'student_id');
     }
+
+    /**
+     * Return the instance of the model's corresponding factory
+     *
+     * @return StudentsFactory
+     */
+    protected static function newFactory(): StudentsFactory
+    {
+        return StudentsFactory::new();
+    }
 }

@@ -27,4 +27,14 @@ class ApplicationStatus extends Model
     protected array $dates = [
         'deleted_at'
     ];
+
+    /**
+     * Return the instance of the model's corresponding factory
+     *
+     * @return ApplicationStatusFactory
+     */
+    protected static function newFactory(): ApplicationStatusFactory
+    {
+        return ApplicationStatusFactory::new();
+    }
 }
