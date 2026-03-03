@@ -125,4 +125,5 @@ return [
 
     'admin_email' => env('ADMIN_EMAIL', 'tgmdigitalbusiness@gmail.com'),
     'counselor_email' => env('COUNSELOR_EMAIL', 'agents@advisors.academy'),
+    'agreement_signing_url' => env('AGREEMENT_SIGNING_URL', 'https://www.jotform.com/sign/260085014414042/invite/01kepd3b3p5a9e7f8e954039bf'),
 ];
