@@ -47,6 +47,32 @@
                             <option value="Australia">Australia</option>
                             <option value="United States">United States</option>
                         </select>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm text-muted-foreground whitespace-nowrap">From:</label>
+                            <input
+                                v-model="startDate"
+                                type="date"
+                                class="px-3 py-2.5 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm"
+                            />
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm text-muted-foreground whitespace-nowrap">To:</label>
+                            <input
+                                v-model="endDate"
+                                type="date"
+                                class="px-3 py-2.5 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm"
+                            />
+                        </div>
+                        <button
+                            @click="applyFilter"
+                            class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                            </svg>
+                            <span>Filter</span>
+                        </button>
                     </div>
 
                     <router-link
@@ -1035,6 +1061,8 @@ export default {
         const searchQuery = ref('');
         const statusFilter = ref('');
         const countryFilter = ref('');
+        const startDate = ref('');
+        const endDate = ref('');
         const currentPage = ref(1);
         const itemsPerPage = ref(10);
         const loading = ref(true);
@@ -1140,8 +1168,8 @@ export default {
                 error.value = null;
 
                 const studentsPromise = isCounselor.value
-                    ? studentsAPI.getCounselorStudents(currentPage.value, itemsPerPage.value, searchQuery.value)
-                    : studentsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value)
+                    ? studentsAPI.getCounselorStudents(currentPage.value, itemsPerPage.value, searchQuery.value, startDate.value, endDate.value)
+                    : studentsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value, startDate.value, endDate.value)
 
                 const response = await studentsPromise;
                 const paginationData = response.data;
@@ -1635,14 +1663,10 @@ export default {
             await fetchStudents();
         });
 
-        let searchTimeout = null;
-        watch([searchQuery, statusFilter, countryFilter], () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                currentPage.value = 1;
-                fetchStudents();
-            }, 300);
-        });
+        const applyFilter = () => {
+            currentPage.value = 1;
+            fetchStudents();
+        };
 
         onMounted(() => {
             fetchStudents();
@@ -1672,13 +1696,15 @@ export default {
             }
         };
 
-
         return {
             loading,
             error,
             searchQuery,
             statusFilter,
             countryFilter,
+            startDate,
+            endDate,
+            applyFilter,
             stats,
             students,
             currentPage,
