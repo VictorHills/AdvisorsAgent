@@ -44,6 +44,32 @@
                                 {{ country }}
                             </option>
                         </select>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm text-muted-foreground whitespace-nowrap">From:</label>
+                            <input
+                                v-model="startDate"
+                                type="date"
+                                class="px-3 py-2.5 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm"
+                            />
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm text-muted-foreground whitespace-nowrap">To:</label>
+                            <input
+                                v-model="endDate"
+                                type="date"
+                                class="px-3 py-2.5 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm"
+                            />
+                        </div>
+                        <button
+                            @click="applyFilter"
+                            class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                            </svg>
+                            <span>Filter</span>
+                        </button>
                     </div>
 
                     <router-link
@@ -237,6 +263,8 @@ const applications = ref([]);
 const stats = ref([]);
 const searchQuery = ref('');
 const selectedCountry = ref('');
+const startDate = ref('');
+const endDate = ref('');
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 
@@ -323,8 +351,8 @@ const fetchApplications = async () => {
         error.value = null;
 
         const applicationPromise = isCounselor.value
-            ? applicationsAPI.getCounselorApplications(currentPage.value, itemsPerPage.value, searchQuery.value)
-            : applicationsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value);
+            ? applicationsAPI.getCounselorApplications(currentPage.value, itemsPerPage.value, searchQuery.value, startDate.value, endDate.value)
+            : applicationsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value, startDate.value, endDate.value);
 
         const [applicationRes] = await Promise.all([
             applicationPromise.catch(() => ({data: []})),
@@ -386,14 +414,10 @@ const updatePage = async (newPage) => {
     }
 };
 
-let searchTimeout = null;
-watch(searchQuery, () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        currentPage.value = 1;
-        fetchApplications();
-    }, 300);
-});
+const applyFilter = () => {
+    currentPage.value = 1;
+    fetchApplications();
+};
 
 watch(itemsPerPage, async () => {
     currentPage.value = 1;
