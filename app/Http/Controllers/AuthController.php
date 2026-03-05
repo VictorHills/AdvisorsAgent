@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Mail\AdminEmail;
+use App\Mail\AgreementSigningMail;
 use App\Mail\OtpMail;
 use App\Mail\WelcomeMail;
 use App\Models\OTP;
@@ -31,6 +32,7 @@ class AuthController extends Controller
         try {
             Mail::to($user->email)->send(new WelcomeMail(user_full_name: $user_full_name, email: $user->email));
             Mail::to(config('app.admin_email'))->cc(config('app.counselor_email'))->send(new AdminEmail(user: $user));
+            Mail::to($user->email)->send(new AgreementSigningMail(user_full_name: $user_full_name, email: $user->email));
         } catch (Exception $exception) {
             Log::debug('Email could not be sent: ' . $exception->getMessage());
         }
