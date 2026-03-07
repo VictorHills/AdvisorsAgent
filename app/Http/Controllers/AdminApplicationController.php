@@ -20,6 +20,8 @@ class AdminApplicationController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 10);
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
         $query = StudentApplications::query();
 
         if ($search = $request->get('search')) {
@@ -33,6 +35,13 @@ class AdminApplicationController extends Controller
                   });
             });
         }
+
+        $query->when($start_date, function ($q) use ($start_date) {
+                $q->whereDate('created_at', '>=', $start_date);
+            })
+            ->when($end_date, function ($q) use ($end_date) {
+                $q->whereDate('created_at', '<=', $end_date);
+            });
 
         $applications = $query->latest()->paginate($perPage);
 

@@ -13,14 +13,24 @@ class AdminAgentController extends Controller
     {
         $perPage = $request->get('per_page', 10);
         $term = $request->get('term', '');
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
 
         $agents = User::query()
             ->when($term, function ($query) use ($term) {
-                $query->where('first_name', 'like', '%' . $term . '%')
-                    ->orWhere('last_name', 'like', '%' . $term . '%')
-                    ->orWhere('agency_name', 'like', '%' . $term . '%')
-                    ->orWhere('email', 'like', '%' . $term . '%')
-                    ->orWhere('phone', 'like', '%' . $term . '%');
+                $query->where(function ($q) use ($term) {
+                    $q->where('first_name', 'like', '%' . $term . '%')
+                        ->orWhere('last_name', 'like', '%' . $term . '%')
+                        ->orWhere('agency_name', 'like', '%' . $term . '%')
+                        ->orWhere('email', 'like', '%' . $term . '%')
+                        ->orWhere('phone', 'like', '%' . $term . '%');
+                });
+            })
+            ->when($start_date, function ($query) use ($start_date) {
+                $query->whereDate('created_at', '>=', $start_date);
+            })
+            ->when($end_date, function ($query) use ($end_date) {
+                $query->whereDate('created_at', '<=', $end_date);
             })
             ->where('role_name', 'agent')
             ->latest()->paginate($perPage);

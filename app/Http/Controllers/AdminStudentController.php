@@ -12,21 +12,27 @@ class AdminStudentController extends Controller
     {
         $search = $request->get('search', '');
         $perPage = $request->get('per_page', 10);
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
 
-        $query = Students::query();
-
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'LIKE', "%{$search}%")
-                    ->orWhere('last_name', 'LIKE', "%{$search}%")
-                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
-                    ->orWhere('email', 'LIKE', "%{$search}%")
-                    ->orWhere('phone_number', 'LIKE', "%{$search}%")
-                    ->orWhere('country', 'LIKE', "%{$search}%");
-            });
-        }
-
-        $students = $query->latest()->paginate($perPage);
+        $students = Students::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('first_name', 'LIKE', "%$search%")
+                        ->orWhere('last_name', 'LIKE', "%$search%")
+                        ->orWhere('middle_name', 'LIKE', "%$search%")
+                        ->orWhere('email', 'LIKE', "%$search%")
+                        ->orWhere('phone_number', 'LIKE', "%$search%")
+                        ->orWhere('country', 'LIKE', "%$search%");
+                });
+            })
+            ->when($start_date, function ($query) use ($start_date) {
+                $query->whereDate('created_at', '>=', $start_date);
+            })
+            ->when($end_date, function ($query) use ($end_date) {
+                $query->whereDate('created_at', '<=', $end_date);
+            })
+            ->latest()->paginate($perPage);
 
         return StudentsResource::collection($students);
     }
