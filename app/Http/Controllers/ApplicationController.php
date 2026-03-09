@@ -22,22 +22,30 @@ class ApplicationController extends Controller
     public function index(Request $request)
     {
         $agentId = auth()->id();
-        $query = StudentApplications::where('agent_id', $agentId);
-
-        if ($search = $request->get('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('course_name', 'like', "%{$search}%")
-                  ->orWhereHas('student', function ($q) use ($search) {
-                      $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('middle_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                  });
-            });
-        }
-
+        $search = $request->get('search', '');
         $perPage = $request->get('per_page', 10);
-        $applications = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+
+        $applications = StudentApplications::where('agent_id', $agentId)
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('course_name', 'like', "%$search%")
+                        ->orWhereHas('student', function ($q) use ($search) {
+                            $q->where('first_name', 'like', "%$search%")
+                                ->orWhere('middle_name', 'like', "%$search%")
+                                ->orWhere('last_name', 'like', "%$search%")
+                                ->orWhere('email', 'like', "%$search%");
+                        });
+                });
+            })
+            ->when($start_date, function ($query) use ($start_date) {
+                $query->whereDate('created_at', '>=', $start_date);
+            })
+            ->when($end_date, function ($query) use ($end_date) {
+                $query->whereDate('created_at', '<=', $end_date);
+            })
+            ->orderBy('created_at', 'desc')->paginate($perPage);
 
         return ApplicationResource::collection($applications);
     }

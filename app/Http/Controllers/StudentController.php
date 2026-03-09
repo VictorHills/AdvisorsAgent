@@ -7,7 +7,6 @@ use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Http\Requests\ValidateStudentRequest;
 use App\Http\Resources\StudentsResource;
-use App\Models\StudentApplications;
 use App\Models\Students;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,22 +16,29 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $agentId = auth()->id();
-        $query = Students::where('agent_id', $agentId);
-
         $search = $request->get('search', '');
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'LIKE', "%{$search}%")
-                    ->orWhere('last_name', 'LIKE', "%{$search}%")
-                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
-                    ->orWhere('email', 'LIKE', "%{$search}%")
-                    ->orWhere('phone_number', 'LIKE', "%{$search}%")
-                    ->orWhere('country', 'LIKE', "%{$search}%");
-            });
-        }
-
         $perPage = $request->get('per_page', 10);
-        $students = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+
+        $students = Students::where('agent_id', $agentId)
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('first_name', 'LIKE', "%$search%")
+                        ->orWhere('last_name', 'LIKE', "%$search%")
+                        ->orWhere('middle_name', 'LIKE', "%$search%")
+                        ->orWhere('email', 'LIKE', "%$search%")
+                        ->orWhere('phone_number', 'LIKE', "%$search%")
+                        ->orWhere('country', 'LIKE', "%$search%");
+                });
+            })
+            ->when($start_date, function ($query) use ($start_date) {
+                $query->whereDate('created_at', '>=', $start_date);
+            })
+            ->when($end_date, function ($query) use ($end_date) {
+                $query->whereDate('created_at', '<=', $end_date);
+            })
+            ->orderBy('created_at', 'desc')->paginate($perPage);
 
         return StudentsResource::collection($students);
     }
