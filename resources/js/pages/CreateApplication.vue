@@ -2,126 +2,7 @@
     <div class="min-h-screen bg-background animate-fade-in">
         <main class="container mx-auto px-6 py-8 max-w-4xl">
 
-            <!-- Step 1: Email Verification -->
-            <div v-if="!isVerified" class="glass-card rounded-xl p-8 animate-slide-up">
-                <div class="mb-8">
-                    <h1 class="text-2xl font-bold mb-2">Verify Your Email</h1>
-                    <p class="text-muted-foreground">Enter your email to get started with your application</p>
-                </div>
-
-                <!-- Email Input -->
-                <div v-if="!otpSent" class="space-y-6">
-                    <div v-if="error"
-                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
-                        {{ error }}
-                    </div>
-
-                    <div class="space-y-2 group">
-                        <label for="email" class="text-sm font-medium">Email Address *</label>
-                        <input
-                            id="email"
-                            v-model="verificationEmail"
-                            type="email"
-                            required
-                            :disabled="verifyLoading"
-                            class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            placeholder="student@email.com"
-                            @keyup.enter="handleEmailSubmit"
-                        />
-                    </div>
-
-                    <button
-                        @click="handleEmailSubmit"
-                        :disabled="verifyLoading || !verificationEmail"
-                        class="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                        <span v-if="verifyLoading" class="flex items-center gap-2">
-                            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                 viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Verifying...
-                        </span>
-                        <span v-else>Search & Verify</span>
-                    </button>
-                </div>
-
-                <!-- OTP Verification (for new students) -->
-                <div v-else class="space-y-6">
-                    <div class="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                        <p class="text-sm text-green-600">OTP sent to {{ verificationEmail }}. Check your email for the
-                            verification code.</p>
-                    </div>
-
-                    <div v-if="error"
-                         class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
-                        {{ error }}
-                    </div>
-
-                    <div class="space-y-2 group">
-                        <label for="otp" class="text-sm font-medium">Verification Code *</label>
-                        <input
-                            id="otp"
-                            v-model="otp"
-                            type="text"
-                            required
-                            :disabled="verifyLoading"
-                            maxlength="6"
-                            class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-center text-lg tracking-widest"
-                            placeholder="000000"
-                            @keyup.enter="handleOtpSubmit"
-                        />
-                    </div>
-
-                    <button
-                        @click="handleOtpSubmit"
-                        :disabled="verifyLoading || !otp"
-                        class="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                        <span v-if="verifyLoading" class="flex items-center gap-2">
-                            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                 viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Verifying...
-                        </span>
-                        <span v-else>Verify Code</span>
-                    </button>
-
-                    <button
-                        @click="resetVerification"
-                        :disabled="verifyLoading"
-                        class="w-full px-6 py-3 bg-transparent border border-border text-foreground rounded-lg font-medium hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Back to Email
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 2: Application Form (after verification) -->
-            <form v-else @submit.prevent="handleSubmit" class="space-y-8">
-                <!-- Existing Student Banner -->
-                <div v-if="isExistingStudent" class="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <div>
-                            <p class="text-sm font-medium text-blue-600">Existing Student Found</p>
-                            <p class="text-xs text-blue-500/80">Your personal information has been prefilled and cannot
-                                be edited.</p>
-                        </div>
-                    </div>
-                </div>
-
+            <form @submit.prevent="handleSubmit" class="space-y-8">
                 <!-- Error/Success Messages -->
                 <div v-if="error" class="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
                     {{ error }}
@@ -154,11 +35,7 @@
                                 v-model="form.first_name"
                                 type="text"
                                 required
-                                :disabled="isExistingStudent"
-                                :class="[
-                                    'w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200',
-                                    isExistingStudent ? 'bg-muted/50 cursor-not-allowed opacity-75' : ''
-                                ]"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                 placeholder="John"
                             />
                         </div>
@@ -171,11 +48,7 @@
                                 id="middle_name"
                                 v-model="form.middle_name"
                                 type="text"
-                                :disabled="isExistingStudent"
-                                :class="[
-                                    'w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200',
-                                    isExistingStudent ? 'bg-muted/50 cursor-not-allowed opacity-75' : ''
-                                ]"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                 placeholder="Optional"
                             />
                         </div>
@@ -189,11 +62,7 @@
                                 v-model="form.last_name"
                                 type="text"
                                 required
-                                :disabled="isExistingStudent"
-                                :class="[
-                                    'w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200',
-                                    isExistingStudent ? 'bg-muted/50 cursor-not-allowed opacity-75' : ''
-                                ]"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                 placeholder="Doe"
                             />
                         </div>
@@ -206,11 +75,7 @@
                                 id="gender"
                                 v-model="form.gender"
                                 required
-                                :disabled="isExistingStudent"
-                                :class="[
-                                    'w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200',
-                                    isExistingStudent ? 'bg-muted/50 cursor-not-allowed opacity-75' : ''
-                                ]"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                             >
                                 <option value="">Select gender</option>
                                 <option value="Male">Male</option>
@@ -224,9 +89,7 @@
                             v-model="form.birth_date"
                             label="Date of Birth"
                             :required="true"
-                            :disabled="isExistingStudent"
                             :max-date="maxBirthDate"
-                            :class="isExistingStudent ? 'opacity-75' : ''"
                         />
 
                         <div class="space-y-2 group">
@@ -238,8 +101,7 @@
                                 v-model="form.email"
                                 type="email"
                                 required
-                                disabled
-                                class="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg cursor-not-allowed opacity-75"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                 placeholder="student@email.com"
                             />
                         </div>
@@ -253,11 +115,7 @@
                                 v-model="form.phone_number"
                                 type="tel"
                                 required
-                                :disabled="isExistingStudent"
-                                :class="[
-                                    'w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200',
-                                    isExistingStudent ? 'bg-muted/50 cursor-not-allowed opacity-75' : ''
-                                ]"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                 placeholder="+1234567890"
                             />
                         </div>
@@ -271,11 +129,7 @@
                                 v-model="form.country"
                                 type="text"
                                 required
-                                :disabled="isExistingStudent"
-                                :class="[
-                                    'w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200',
-                                    isExistingStudent ? 'bg-muted/50 cursor-not-allowed opacity-75' : ''
-                                ]"
+                                class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                 placeholder="Nigeria"
                             />
                         </div>
@@ -712,9 +566,9 @@
 </template>
 
 <script>
-import {ref, onMounted, computed} from 'vue'
+import {ref, onMounted, computed, watch} from 'vue'
 import {useRouter} from 'vue-router'
-import {applicationsAPI, coursesAPI, countriesAPI, schoolsAPI, studentsAPI, authAPI} from '../services/api'
+import {applicationsAPI, coursesAPI, countriesAPI, schoolsAPI} from '../services/api'
 import DatePickerField from '../components/DatePickerField.vue'
 
 export default {
@@ -722,15 +576,6 @@ export default {
     components: {DatePickerField},
     setup() {
         const router = useRouter()
-
-        // Verification state
-        const verificationEmail = ref('')
-        const otp = ref('')
-        const otpSent = ref(false)
-        const isVerified = ref(false)
-        const isExistingStudent = ref(false)
-        const verifyLoading = ref(false)
-        const existingStudentData = ref(null)
 
         // Form state
         const loading = ref(false)
@@ -772,80 +617,12 @@ export default {
             application_documents: []
         })
 
-        // Email verification
-        const handleEmailSubmit = async () => {
-            try {
-                verifyLoading.value = true
-                error.value = ''
+        // Debounce helper
+        let schoolDebounceTimer = null
+        let courseDebounceTimer = null
 
-                const response = await studentsAPI.validateStudent(verificationEmail.value)
-
-                if (response.data?.status) {
-                    // Existing student found - prefill all data
-                    isExistingStudent.value = true
-                    existingStudentData.value = response.data.data
-                    isVerified.value = true
-                    prefillExistingStudent(response.data.data)
-                }
-            } catch (err) {
-                if (err.response?.data?.error?.status_code === 400) {
-                    // New student - OTP sent
-                    otpSent.value = true
-                    error.value = ''
-                } else {
-                    error.value = err.response?.data?.error?.message || 'Failed to verify email'
-                }
-            } finally {
-                verifyLoading.value = false
-            }
-        }
-
-        const handleOtpSubmit = async () => {
-            try {
-                verifyLoading.value = true
-                error.value = ''
-
-                const response = await authAPI.verifyOtp(verificationEmail.value, otp.value, 'email')
-
-                if (response.data?.status) {
-                    // OTP verified - new student, only prefill email
-                    isVerified.value = true
-                    isExistingStudent.value = false
-                    form.value.email = verificationEmail.value
-                } else {
-                    error.value = response.data?.message || 'OTP verification failed'
-                }
-            } catch (err) {
-                error.value = err.response?.data?.message || err.response?.data?.error?.message || 'Invalid verification code'
-            } finally {
-                verifyLoading.value = false
-            }
-        }
-
-        const prefillExistingStudent = (studentData) => {
-            form.value.first_name = studentData.first_name || ''
-            form.value.middle_name = studentData.middle_name || ''
-            form.value.last_name = studentData.last_name || ''
-            form.value.gender = studentData.gender || ''
-            form.value.birth_date = studentData.birth_date || ''
-            form.value.email = studentData.email || ''
-            form.value.phone_number = studentData.phone_number || ''
-            form.value.country = studentData.country || ''
-        }
-
-        const resetVerification = () => {
-            verificationEmail.value = ''
-            otp.value = ''
-            otpSent.value = false
-            error.value = ''
-        }
-
-        // Filtered lists
-        const filteredCourses = computed(() => {
-            const list = Array.isArray(courses.value) ? courses.value : []
-            if (!courseSearch.value) return list
-            return list.filter(c => c.name.toLowerCase().includes(courseSearch.value.toLowerCase()))
-        })
+        // Filtered lists (courses and schools use server-side search)
+        const filteredCourses = computed(() => Array.isArray(courses.value) ? courses.value : [])
 
         // Max birthdate (must be at least 16 years old)
         const maxBirthDate = computed(() => {
@@ -854,11 +631,7 @@ export default {
             return date.toISOString().split('T')[0]
         })
 
-        const filteredSchools = computed(() => {
-            const list = Array.isArray(schools.value) ? schools.value : []
-            if (!schoolSearch.value) return list
-            return list.filter(s => s.name.toLowerCase().includes(schoolSearch.value.toLowerCase()))
-        })
+        const filteredSchools = computed(() => Array.isArray(schools.value) ? schools.value : [])
 
         const filteredCountries = computed(() => {
             const list = Array.isArray(countries.value) ? countries.value : []
@@ -866,19 +639,30 @@ export default {
             return list.filter(c => c.name.toLowerCase().includes(countrySearch.value.toLowerCase()))
         })
 
-        // Fetch functions
-        const fetchCourses = async () => {
+        // Server-side search watchers with debounce
+        watch(schoolSearch, (val) => {
+            clearTimeout(schoolDebounceTimer)
+            schoolDebounceTimer = setTimeout(() => fetchSchools(val), 300)
+        })
+
+        watch(courseSearch, (val) => {
+            clearTimeout(courseDebounceTimer)
+            courseDebounceTimer = setTimeout(() => fetchCourses(val), 300)
+        })
+
+        // Fetch functions (server-side search)
+        const fetchCourses = async (search = '') => {
             try {
-                const response = await coursesAPI.getAll()
+                const response = await coursesAPI.search(search, 100)
                 courses.value = response.data?.data?.data || []
             } catch (err) {
                 console.error('Error fetching courses:', err)
             }
         }
 
-        const fetchSchools = async () => {
+        const fetchSchools = async (search = '') => {
             try {
-                const response = await schoolsAPI.getAll()
+                const response = await schoolsAPI.search(search, 100)
                 schools.value = response.data?.data?.data || []
             } catch (err) {
                 console.error('Error fetching schools:', err)
@@ -995,9 +779,6 @@ export default {
         })
 
         return {
-            // Verification
-            verificationEmail, otp, otpSent, isVerified, isExistingStudent, verifyLoading,
-            handleEmailSubmit, handleOtpSubmit, resetVerification,
             // Form
             form, loading, error, success, successMessage, isDragOver, showReviewModal, maxBirthDate,
             // Dropdowns
