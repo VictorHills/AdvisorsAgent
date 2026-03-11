@@ -66,7 +66,7 @@ export const dashboardAPI = {
 }
 
 export const applicationsAPI = {
-    getAll: (page, perPage, search = '') => api.get('/applications', {params: {page, per_page: perPage, ...(search && {search})}}),
+    getAll: (page, perPage, search = '', start_date = '', end_date = '') => api.get('/applications', {params: {page, per_page: perPage, ...(search && {search}), ...(start_date && {start_date}), ...(end_date && {end_date})}}),
     getOne: (id) => api.get(`/applications/${id}`),
     getStatus: () => api.get(`/application-status`),
     create: (data) => {
@@ -172,11 +172,13 @@ export const applicationsAPI = {
     },
 
     // Counselor endpoints
-    getCounselorApplications: (page, perPage, search = '') => api.get('/admin/applications', {
+    getCounselorApplications: (page, perPage, search = '', start_date = '', end_date = '') => api.get('/admin/applications', {
         params: {
             page,
             per_page: perPage,
-            ...(search && {search})
+            ...(search && {search}),
+            ...(start_date && {start_date}),
+            ...(end_date && {end_date})
         }
     }),
     getCounselorApplicationById: (id) => api.get(`/admin/applications/${id}`),
@@ -186,7 +188,7 @@ export const applicationsAPI = {
 
 export const studentsAPI = {
     // Agent endpoints (regular)
-    getAll: (page, perPage, search = '') => api.get('/students', {params: {page, per_page: perPage, ...(search && {search})}}),
+    getAll: (page, perPage, search = '', start_date = '', end_date = '') => api.get('/students', {params: {page, per_page: perPage, ...(search && {search}), ...(start_date && {start_date}), ...(end_date && {end_date})}}),
     getById: (id) => api.get(`/students/${id}`),
     create: (studentData) => api.post('/students', studentData),
     update: (id, studentData) => api.put(`/students/${id}`, studentData),
@@ -195,7 +197,7 @@ export const studentsAPI = {
     validateStudent: (email) => api.post("/students/validate", {email}),
 
     // Counselor endpoints (assigned students only)
-    getCounselorStudents: (page, perPage, search = '') => api.get('/admin/students', {params: {page, per_page: perPage, ...(search && {search})}}),
+    getCounselorStudents: (page, perPage, search = '', start_date = '', end_date = '') => api.get('/admin/students', {params: {page, per_page: perPage, ...(search && {search}), ...(start_date && {start_date}), ...(end_date && {end_date})}}),
     getCounselorStudentById: (id) => api.get(`/admin/students/${id}`),
     updateCounselorStudent: (id, studentData) => api.put(`/admin/students/${id}`, studentData),
     searchCounselorStudents: (query) => api.get(`/admin/students/search?q=${query}`),
@@ -224,7 +226,15 @@ export const countriesAPI = {
 }
 
 export const agentsAPI = {
-    getAll: (page, per_page, term,) => api.get('/admin/agents', {params: {term: term, per_page: per_page, page: page}})
+    getAll: (page, per_page, term, start_date = '', end_date = '') => api.get('/admin/agents', {
+        params: {
+            page,
+            per_page,
+            ...(term && {term}),
+            ...(start_date && {start_date}),
+            ...(end_date && {end_date})
+        }
+    })
 }
 
 export default api
