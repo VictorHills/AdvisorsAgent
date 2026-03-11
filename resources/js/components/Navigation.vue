@@ -54,18 +54,6 @@
                         <span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
                     </button>
 
-                    <!-- Add prominent logout button for desktop -->
-                    <button
-                        @click="handleLogout"
-                        class="hidden md:flex items-center space-x-2 px-4 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-all duration-200 hover:scale-105 font-medium text-sm"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                        </svg>
-                        <span>Logout</span>
-                    </button>
-
                     <div class="flex items-center space-x-3 pl-4 border-l border-border">
                         <!-- Display user info with role -->
                         <div class="hidden lg:block text-right max-w-[150px]">
