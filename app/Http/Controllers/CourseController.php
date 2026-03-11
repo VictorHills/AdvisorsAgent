@@ -9,6 +9,7 @@ class CourseController extends Controller
 {
     public function index(Request $request)
     {
+        $per_page = $request->input('per_page', 100);
         $search = $request->input('search', $request->input('term', ''));
         $query = Courses::query();
 
@@ -18,7 +19,7 @@ class CourseController extends Controller
 
         $courses = $query->orderBy('name')
             ->select(['id', 'name', 'university_id', 'description'])
-            ->get();
+            ->paginate($per_page);
 
         return $this->respondSuccessWithData(message: 'Courses fetched successfully', data: $courses);
     }
