@@ -20,21 +20,61 @@
             </div>
 
             <div v-else class="glass-card rounded-xl p-6 animate-slide-up" style="animation-delay: 0.1s;">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div
-                        class="flex-1 flex flex-col md:flex-row items-stretch md:items-center space-y-4 md:space-y-0 md:space-x-4">
-                        <div class="flex-1 relative">
-                            <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                            <input
-                                v-model="searchQuery"
-                                type="text"
-                                placeholder="Search by name, email, phone or agency name..."
-                                class="w-full pl-10 pr-4 py-2.5 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                            />
+                <div class="flex flex-col gap-4 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div
+                            class="flex-1 flex flex-col md:flex-row items-stretch md:items-center space-y-4 md:space-y-0 md:space-x-4">
+                            <div class="flex-1 relative">
+                                <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                                <input
+                                    v-model="searchQuery"
+                                    type="text"
+                                    placeholder="Search by name, email, phone or agency name..."
+                                    class="w-full pl-10 pr-4 py-2.5 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                />
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm text-muted-foreground whitespace-nowrap">From:</label>
+                                <input
+                                    v-model="startDate"
+                                    type="date"
+                                    class="px-3 py-2.5 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm"
+                                />
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm text-muted-foreground whitespace-nowrap">To:</label>
+                                <input
+                                    v-model="endDate"
+                                    type="date"
+                                    class="px-3 py-2.5 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button
+                                @click="applyDateFilter"
+                                class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                                </svg>
+                                <span>Filter</span>
+                            </button>
+                            <button
+                                @click="downloadCSV"
+                                class="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 justify-center"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                <span>Download CSV</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -197,6 +237,8 @@ import {agentsAPI} from "../services/api.js";
 const loading = ref(true);
 const error = ref(null);
 const searchQuery = ref('');
+const startDate = ref('');
+const endDate = ref('');
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const agents = ref([]);
@@ -215,7 +257,7 @@ const fetchAgents = async () => {
         loading.value = true;
         error.value = null;
 
-        const agentsRes = await agentsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value);
+        const agentsRes = await agentsAPI.getAll(currentPage.value, itemsPerPage.value, searchQuery.value, startDate.value, endDate.value);
         const paginationData = agentsRes?.data || {data: [], meta: {}};
         const agentsData = paginationData.data || [];
 
@@ -285,19 +327,50 @@ const updatePage = async (newPage) => {
     }
 };
 
-let searchTimeout = null;
-watch(searchQuery, () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        currentPage.value = 1;
-        fetchAgents();
-    }, 300);
-});
+const applyDateFilter = () => {
+    currentPage.value = 1;
+    fetchAgents();
+};
+
 
 watch(itemsPerPage, async () => {
     currentPage.value = 1;
     await fetchAgents();
 });
+
+const downloadCSV = () => {
+    const headers = [
+        'Full Name', 'Agency Name', 'Email', 'Phone Number', 'BRN',
+        'Active Status', 'Joined Date', 'BDM Officer', 'Total Students', 'Total Applications'
+    ];
+
+    const rows = filteredAgents.value.map(agent => [
+        `${agent.firstName} ${agent.lastName}`,
+        agent.agencyName || 'N/A',
+        agent.email,
+        agent.phone || 'N/A',
+        agent.businessRegistrationNumber || 'N/A',
+        agent.isActive ? 'Active' : 'Inactive',
+        agent.createdAt,
+        agent.bdmOfficer?.fullName?.trim() || 'N/A',
+        agent.totalStudents,
+        agent.totalApplications
+    ]);
+
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `agents_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+};
 
 onMounted(() => {
     fetchAgents();
