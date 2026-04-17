@@ -5,14 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Countries;
 use App\Models\StudentApplications;
 use App\Models\Students;
-use App\Traits\ApiResponses;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    use ApiResponses;
-
     public function stats()
     {
         $agentId = auth()->id();
